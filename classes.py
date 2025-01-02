@@ -79,12 +79,12 @@ class SwerveModuleLocation(IntEnum):
 class SwerveModuleConstants:
   drivingMotorControllerType: MotorControllerType
   drivingMotorCurrentLimit: int
-  drivingMotorPID: PID
   drivingEncoderPositionConversionFactor: float
+  drivingMotorPID: PID
   drivingMotorVelocityFeedForward: float
   turningMotorCurrentLimit: int
-  turningMotorPID: PID
   turningEncoderPositionConversionFactor: float
+  turningMotorPID: PID
 
 @dataclass(frozen=True, slots=True)
 class SwerveModuleConfig:
