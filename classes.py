@@ -59,11 +59,6 @@ class ControllerRumblePattern(Enum):
   Short = auto()
   Long = auto()
 
-class LightsMode(Enum):
-  Default = auto()
-  RobotNotReady = auto()
-  VisionNotReady = auto()
-
 class PID(NamedTuple):
   P: float
   I: float
@@ -77,13 +72,16 @@ class SwerveModuleLocation(IntEnum):
 
 @dataclass(frozen=True, slots=True)
 class SwerveModuleConstants:
+  wheelDiameter: units.meters
+  wheelBevelGearTeeth: int
+  wheelSpurGearTeeth: int
+  wheelBevelPinionTeeth: int
+  drivingMotorPinionTeeth: int
+  drivingMotorFreeSpeed: units.revolutions_per_minute
   drivingMotorControllerType: MotorControllerType
   drivingMotorCurrentLimit: int
-  drivingEncoderPositionConversionFactor: float
   drivingMotorPID: PID
-  drivingMotorVelocityFeedForward: float
   turningMotorCurrentLimit: int
-  turningEncoderPositionConversionFactor: float
   turningMotorPID: PID
 
 @dataclass(frozen=True, slots=True)
@@ -105,9 +103,10 @@ class DifferentialModuleLocation(IntEnum):
 
 @dataclass(frozen=True, slots=True)
 class DifferentialModuleConstants:
+  wheelDiameter: units.meters
   drivingMotorControllerType: MotorControllerType
   drivingMotorCurrentLimit: int
-  drivingEncoderPositionConversionFactor: float
+  drivingMotorReduction: float
 
 @dataclass(frozen=True, slots=True)
 class DifferentialModuleConfig:

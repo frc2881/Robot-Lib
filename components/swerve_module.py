@@ -1,9 +1,10 @@
+import math
 from wpimath import units
 from wpimath.geometry import Rotation2d
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpilib import SmartDashboard
 from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, ClosedLoopConfig
-from ..classes import SwerveModuleConfig, MotorIdleMode, MotorControllerType
+from ..classes import PID, SwerveModuleConfig, MotorIdleMode, MotorControllerType
 from .. import logger, utils
 
 class SwerveModule:
@@ -16,6 +17,11 @@ class SwerveModule:
     self._baseKey = f'Robot/Drive/Modules/{self._config.location.name}'
     self._drivingTargetSpeed: units.meters_per_second = 0
 
+    _drivingMotorReduction: float = (self._config.constants.wheelBevelGearTeeth * self._config.constants.wheelSpurGearTeeth) / (self._config.constants.drivingMotorPinionTeeth * self._config.constants.wheelBevelPinionTeeth)
+    _driveWheelFreeSpeedRps: float = ((self._config.constants.drivingMotorFreeSpeed / 60) * (self._config.constants.wheelDiameter * math.pi)) / _drivingMotorReduction
+    _drivingEncoderPositionConversionFactor: float = (self._config.constants.wheelDiameter * math.pi) / _drivingMotorReduction
+    _turningEncoderPositionConversionFactor: float = 2 * math.pi
+
     if self._config.constants.drivingMotorControllerType == MotorControllerType.SparkFlex:
       self._drivingMotor = SparkFlex(self._config.drivingMotorCANId, SparkLowLevel.MotorType.kBrushless)
     else: 
@@ -26,12 +32,12 @@ class SwerveModule:
       .smartCurrentLimit(self._config.constants.drivingMotorCurrentLimit)
       .secondaryCurrentLimit(self._config.constants.drivingMotorCurrentLimit))
     (self._drivingMotorConfig.encoder
-      .positionConversionFactor(self._config.constants.drivingEncoderPositionConversionFactor)
-      .velocityConversionFactor(self._config.constants.drivingEncoderPositionConversionFactor / 60.0))
+      .positionConversionFactor(_drivingEncoderPositionConversionFactor)
+      .velocityConversionFactor(_drivingEncoderPositionConversionFactor / 60.0))
     (self._drivingMotorConfig.closedLoop
       .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
       .pid(*self._config.constants.drivingMotorPID)
-      .velocityFF(self._config.constants.drivingMotorVelocityFeedForward)
+      .velocityFF(1 / _driveWheelFreeSpeedRps)
       .outputRange(-1.0, 1.0))
     utils.setSparkConfig(
       self._drivingMotor.configure(
@@ -52,14 +58,14 @@ class SwerveModule:
       .secondaryCurrentLimit(self._config.constants.turningMotorCurrentLimit))
     (self._turningMotorConfig.absoluteEncoder
       .inverted(True)
-      .positionConversionFactor(self._config.constants.turningEncoderPositionConversionFactor)
-      .velocityConversionFactor(self._config.constants.turningEncoderPositionConversionFactor / 60.0))
+      .positionConversionFactor(_turningEncoderPositionConversionFactor)
+      .velocityConversionFactor(_turningEncoderPositionConversionFactor / 60.0))
     (self._turningMotorConfig.closedLoop
       .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kAbsoluteEncoder)
       .pid(*self._config.constants.turningMotorPID)
       .outputRange(-1.0, 1.0)
       .positionWrappingEnabled(True)
-      .positionWrappingInputRange(0, self._config.constants.turningEncoderPositionConversionFactor))
+      .positionWrappingInputRange(0, _turningEncoderPositionConversionFactor))
     utils.setSparkConfig(
       self._turningMotor.configure(
         self._turningMotorConfig,

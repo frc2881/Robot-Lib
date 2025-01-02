@@ -1,3 +1,4 @@
+import math
 from wpimath import units
 from wpilib import SmartDashboard
 from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex
@@ -14,6 +15,9 @@ class DifferentialModule:
     self._baseKey = f'Robot/Drive/Modules/{self._config.location.name}'
     self._drivingTargetSpeed: units.meters_per_second = 0
  
+    _drivingMotorReduction: float = self._config.constants.drivingMotorReduction
+    _drivingEncoderPositionConversionFactor: float = (self._config.constants.wheelDiameter * math.pi) / _drivingMotorReduction
+
     if self._config.constants.drivingMotorControllerType == MotorControllerType.SparkFlex:
       self._drivingMotor = SparkFlex(self._config.drivingMotorCANId, SparkLowLevel.MotorType.kBrushless)
     else: 
@@ -25,8 +29,8 @@ class DifferentialModule:
       .secondaryCurrentLimit(self._config.constants.drivingMotorCurrentLimit)
       .inverted(self._config.isInverted))
     (self._drivingMotorConfig.encoder
-      .positionConversionFactor(self._config.constants.drivingEncoderPositionConversionFactor)
-      .velocityConversionFactor(self._config.constants.drivingEncoderPositionConversionFactor / 60.0))
+      .positionConversionFactor(_drivingEncoderPositionConversionFactor)
+      .velocityConversionFactor(_drivingEncoderPositionConversionFactor / 60.0))
     if self._config.leaderMotorCANId is not None:
       self._drivingMotorConfig.follow(self._config.leaderMotorCANId)
     utils.setSparkConfig(
