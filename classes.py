@@ -134,6 +134,25 @@ class PoseSensorConfig:
   fallbackPoseStrategy: PoseStrategy
   aprilTagFieldLayout: AprilTagFieldLayout
 
+@dataclass(frozen=True, slots=True)
+class LeadscrewModuleConstants:
+  leadscrewTravelDistance: units.inches
+  motorControllerType: MotorControllerType
+  motorCurrentLimit: int
+  motorReduction: float
+  motorPID: PID
+  motorSmartMotionMaxVelocityRate: units.percent
+  motorSmartMotionMaxAccelerationRate: units.percent
+  motorSoftLimitForward: float
+  motorSoftLimitReverse: float
+  motorResetSpeed: units.percent
+
+@dataclass(frozen=True, slots=True)
+class LeadscrewModuleConfig:
+  moduleBaseKey: str
+  motorCANId: int
+  constants: LeadscrewModuleConstants
+
 @dataclass(frozen=False, slots=True)
 class TargetInfo:
   distance: units.meters
