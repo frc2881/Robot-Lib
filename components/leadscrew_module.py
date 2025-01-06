@@ -15,8 +15,8 @@ class LeadscrewModule:
 
     _encoderPositionConversionFactor: float = self._config.constants.leadscrewTravelDistance / self._config.constants.motorReduction
     _encoderVelocityConversionFactor: float = _encoderPositionConversionFactor / 60.0
-    _motorSmartMotionMaxVelocity: float = (self._config.constants.motorSmartMotionMaxVelocityRate / _encoderPositionConversionFactor) * 60
-    _motorSmartMotionMaxAcceleration: float = self._config.constants.motorSmartMotionMaxAccelerationRate / _encoderVelocityConversionFactor 
+    _motorMotionMaxVelocity: float = (self._config.constants.motorMotionMaxVelocityRate / _encoderPositionConversionFactor) * 60
+    _motorMotionMaxAcceleration: float = self._config.constants.motorMotionMaxAccelerationRate / _encoderVelocityConversionFactor 
 
     if self._config.constants.motorControllerType == MotorControllerType.SparkFlex:
       self._motor = SparkFlex(self._config.motorCANId, SparkLowLevel.MotorType.kBrushless)
@@ -34,9 +34,9 @@ class LeadscrewModule:
       .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
       .pid(*self._config.constants.motorPID)
       .outputRange(-1.0, 1.0)
-      .smartMotion
-        .maxVelocity(_motorSmartMotionMaxVelocity)
-        .maxAcceleration(_motorSmartMotionMaxAcceleration))
+      .maxMotion
+        .maxVelocity(_motorMotionMaxVelocity)
+        .maxAcceleration(_motorMotionMaxAcceleration))
     (self._motorConfig.softLimit
       .forwardSoftLimitEnabled(True)
       .forwardSoftLimit(self._config.constants.motorSoftLimitForward)
@@ -59,7 +59,7 @@ class LeadscrewModule:
     self._motor.set(speed)
 
   def setPosition(self, position: float) -> None:
-    self._closedLoopController.setReference(position, SparkBase.ControlType.kSmartMotion)
+    self._closedLoopController.setReference(position, SparkBase.ControlType.kMAXMotionPositionControl)
 
   def getPosition(self) -> float:
     return self._encoder.getPosition()
