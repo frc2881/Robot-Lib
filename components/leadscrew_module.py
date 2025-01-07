@@ -36,7 +36,8 @@ class LeadscrewModule:
       .outputRange(-1.0, 1.0)
       .maxMotion
         .maxVelocity(_motorMotionMaxVelocity)
-        .maxAcceleration(_motorMotionMaxAcceleration))
+        .maxAcceleration(_motorMotionMaxAcceleration)
+        .allowedClosedLoopError(self._config.constants.allowedClosedLoopError))
     (self._motorConfig.softLimit
       .forwardSoftLimitEnabled(True)
       .forwardSoftLimit(self._config.constants.motorSoftLimitForward)

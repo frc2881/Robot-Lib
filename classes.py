@@ -143,6 +143,7 @@ class LeadscrewModuleConstants:
   motorPID: PID
   motorMotionMaxVelocityRate: units.percent
   motorMotionMaxAccelerationRate: units.percent
+  allowedClosedLoopError: float
   motorSoftLimitForward: float
   motorSoftLimitReverse: float
   motorResetSpeed: units.percent
