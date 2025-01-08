@@ -43,6 +43,8 @@ class LeadscrewModule:
       .forwardSoftLimit(self._config.constants.motorSoftLimitForward)
       .reverseSoftLimitEnabled(True)
       .reverseSoftLimit(self._config.constants.motorSoftLimitReverse))
+    if self._config.leaderMotorCANId is not None:
+      self._motorConfig.follow(self._config.leaderMotorCANId)
     utils.setSparkConfig(
       self._motor.configure(
         self._motorConfig,
