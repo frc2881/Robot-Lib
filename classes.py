@@ -152,6 +152,7 @@ class LeadscrewModuleConstants:
 class LeadscrewModuleConfig:
   moduleBaseKey: str
   motorCANId: int
+  leaderMotorCANId: int | None
   constants: LeadscrewModuleConstants
 
 @dataclass(frozen=False, slots=True)
