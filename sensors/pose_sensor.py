@@ -9,6 +9,7 @@ class PoseSensor:
       self, 
       config: PoseSensorConfig
     ) -> None:
+    self._config = config
     self._baseKey = f'Robot/Sensors/Pose/{config.location.name}'
     self._photonCamera = PhotonCamera(config.location.name)
     self._photonCamera.setDriverMode(False)
