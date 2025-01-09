@@ -75,10 +75,12 @@ class SwerveModule:
     )
     self._turningClosedLoopController = self._turningMotor.getClosedLoopController()
     self._turningEncoder = self._turningMotor.getAbsoluteEncoder()
+    self._targetState = SwerveModuleState()
 
     utils.addRobotPeriodic(self._updateTelemetry)
 
   def setTargetState(self, targetState: SwerveModuleState) -> None:
+    self._targetState = SwerveModuleState(targetState.speed, targetState.angle)
     targetState.angle = targetState.angle.__add__(Rotation2d(self._config.turningOffset))
     targetState.optimize(Rotation2d(self._turningEncoder.getPosition()))
     self._drivingClosedLoopController.setReference(targetState.speed, SparkBase.ControlType.kVelocity)
