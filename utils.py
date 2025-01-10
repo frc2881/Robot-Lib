@@ -63,7 +63,7 @@ def isValueInRange(value: float, minValue: float, maxValue: float) -> bool:
   return value >= minValue and value <= maxValue
 
 def clampValue(value: float, minValue: float, maxValue: float) -> float:
-  return max(minValue, min(maxValue, value))
+  return max(min(value, maxValue), minValue)
 
 def squareControllerInput(input: units.percent, deadband: units.percent) -> units.percent:
   deadbandInput: units.percent = wpimath.applyDeadband(input, deadband)
