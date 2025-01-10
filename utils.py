@@ -62,6 +62,9 @@ def getMatchTime() -> units.seconds:
 def isValueInRange(value: float, minValue: float, maxValue: float) -> bool:
   return value >= minValue and value <= maxValue
 
+def clampValue(value: float, minValue: float, maxValue: float) -> float:
+  return max(minValue, min(maxValue, value))
+
 def squareControllerInput(input: units.percent, deadband: units.percent) -> units.percent:
   deadbandInput: units.percent = wpimath.applyDeadband(input, deadband)
   return math.copysign(deadbandInput * deadbandInput, input)
