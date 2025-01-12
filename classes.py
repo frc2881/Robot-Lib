@@ -50,6 +50,10 @@ class LockState(Enum):
   Unlocked = auto()
   Locked = auto()
 
+class TargetAlignmentType(Enum):
+  Heading = auto()
+  Pose = auto()
+
 class ControllerRumbleMode(Enum):
   Both = auto()
   Driver = auto()
