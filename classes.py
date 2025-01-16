@@ -52,7 +52,7 @@ class LockState(Enum):
 
 class TargetAlignmentMode(Enum):
   Heading = auto()
-  Pose = auto()
+  Translation = auto()
 
 class ControllerRumbleMode(Enum):
   Both = auto()
