@@ -50,7 +50,7 @@ class LockState(Enum):
   Unlocked = auto()
   Locked = auto()
 
-class TargetAlignmentType(Enum):
+class TargetAlignmentMode(Enum):
   Heading = auto()
   Pose = auto()
 
@@ -158,9 +158,3 @@ class LeadscrewModuleConfig:
   motorCANId: int
   leaderMotorCANId: int | None
   constants: LeadscrewModuleConstants
-
-@dataclass(frozen=False, slots=True)
-class TargetInfo:
-  distance: units.meters
-  heading: units.degrees
-  pitch: units.degrees

@@ -6,7 +6,7 @@ from commands2 import TimedCommandRobot
 import wpilib
 import wpimath
 from wpimath import units
-from wpimath.geometry import Pose2d, Translation2d
+from wpimath.geometry import Pose2d, Pose3d, Translation2d, Rotation2d
 from wpilib import DriverStation
 from rev import SparkBase, SparkBaseConfig, REVLibError
 from . import logger
@@ -74,6 +74,20 @@ def wrapAngle(angle: units.degrees) -> units.degrees:
 
 def isPoseInBounds(pose: Pose2d, bounds: Tuple[Translation2d, Translation2d]) -> bool:
   return isValueInRange(pose.X(), bounds[0].X(), bounds[1].X()) and isValueInRange(pose.Y(), bounds[0].Y(), bounds[1].Y())
+
+def getTargetHash(pose: Pose2d) -> int:
+  return hash((pose.X(), pose.Y(), pose.rotation().radians()))
+
+def getTargetHeading(robotPose: Pose2d, targetPose: Pose3d) -> units.degrees:
+  translation = targetPose.toPose2d().relativeTo(robotPose).translation()
+  rotation = Rotation2d(translation.X(), translation.Y()).rotateBy(robotPose.rotation())
+  return wrapAngle(rotation.degrees())
+
+def getTargetDistance(robotPose: Pose2d, targetPose: Pose3d) -> units.meters:
+  return robotPose.translation().distance(targetPose.toPose2d().translation())
+
+def getTargetPitch(robotPose: Pose2d, targetPose: Pose3d) -> units.degrees:
+  return math.degrees(math.atan2((targetPose - Pose3d(robotPose)).Z(), getTargetDistance(robotPose, targetPose)))
 
 def getInterpolatedValue(x: float, xs: tuple[float, ...], ys: tuple[float, ...]) -> float:
   try:

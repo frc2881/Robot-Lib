@@ -4,7 +4,7 @@ from wpimath.geometry import Rotation2d
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpilib import SmartDashboard
 from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, ClosedLoopConfig
-from ..classes import PID, SwerveModuleConfig, MotorIdleMode, MotorControllerType
+from ..classes import SwerveModuleConfig, MotorIdleMode, MotorControllerType
 from .. import logger, utils
 
 class SwerveModule:
