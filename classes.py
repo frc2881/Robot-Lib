@@ -68,6 +68,26 @@ class PID(NamedTuple):
   I: float
   D: float
 
+class Tolerance(NamedTuple):
+  error: float
+  errorDerivative: float
+
+@dataclass(frozen=True, slots=True)
+class DriftCorrectionConstants:
+  rotationPID: PID
+  rotationTolerance: Tolerance
+
+@dataclass(frozen=True, slots=True)
+class TargetAlignmentConstants:
+  rotationPID: PID
+  rotationTolerance: Tolerance
+  rotationSpeedMax: units.radians_per_second # type: ignore
+  rotationHeadingModeOffset: units.degrees
+  rotationTranslationModeOffset: units.degrees
+  translationPID: PID
+  translationTolerance: Tolerance
+  translationSpeedMax: units.meters_per_second
+
 class SwerveModuleLocation(IntEnum):
   FrontLeft = 0,
   FrontRight = 1,
