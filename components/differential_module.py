@@ -13,11 +13,9 @@ class DifferentialModule:
     self._config = config
 
     self._baseKey = f'Robot/Drive/Modules/{self._config.location.name}'
-    self._drivingTargetSpeed: units.meters_per_second = 0
- 
-    _drivingMotorReduction: float = self._config.constants.drivingMotorReduction
-    _drivingEncoderPositionConversionFactor: float = (self._config.constants.wheelDiameter * math.pi) / _drivingMotorReduction
 
+    drivingMotorReduction: float = self._config.constants.drivingMotorReduction
+    drivingEncoderPositionConversionFactor: float = (self._config.constants.wheelDiameter * math.pi) / drivingMotorReduction
     if self._config.constants.drivingMotorControllerType == MotorControllerType.SparkFlex:
       self._drivingMotor = SparkFlex(self._config.drivingMotorCANId, SparkLowLevel.MotorType.kBrushless)
     else: 
@@ -29,8 +27,8 @@ class DifferentialModule:
       .secondaryCurrentLimit(self._config.constants.drivingMotorCurrentLimit)
       .inverted(self._config.isInverted))
     (self._drivingMotorConfig.encoder
-      .positionConversionFactor(_drivingEncoderPositionConversionFactor)
-      .velocityConversionFactor(_drivingEncoderPositionConversionFactor / 60.0))
+      .positionConversionFactor(drivingEncoderPositionConversionFactor)
+      .velocityConversionFactor(drivingEncoderPositionConversionFactor / 60.0))
     if self._config.leaderMotorCANId is not None:
       self._drivingMotorConfig.follow(self._config.leaderMotorCANId)
     utils.setSparkConfig(
@@ -40,9 +38,10 @@ class DifferentialModule:
         SparkBase.PersistMode.kPersistParameters
       )
     )
-
     self._drivingEncoder = self._drivingMotor.getEncoder()
     self._drivingEncoder.setPosition(0)
+
+    self._drivingTargetSpeed: units.meters_per_second = 0
 
     utils.addRobotPeriodic(self._updateTelemetry)
 

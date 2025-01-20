@@ -9,20 +9,21 @@ class ObjectSensor:
       cameraName: str
     ) -> None:
     self._cameraName = cameraName
-    
     self._baseKey = f'Robot/Sensors/Object/{self._cameraName}'
+    
     self._photonCamera = PhotonCamera(cameraName)
+
     self._hasTarget = False
 
     utils.addRobotPeriodic(self._updateTelemetry)
 
   def getTargetInfo(self) -> PhotonTrackedTarget:
+    self._hasTarget = False
     if self._photonCamera.isConnected():
       result = self._photonCamera.getLatestResult()
       if result.hasTargets():
         self._hasTarget = True
         return result.getTargets()[0]
-    self._hasTarget = False
     return PhotonTrackedTarget()
 
   def hasTarget(self) -> bool:

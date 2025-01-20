@@ -8,11 +8,12 @@ class BeamBreakSensor:
       channel: int
     ) -> None:
     self._sensorName = sensorName
-    
     self._baseKey = f'Robot/Sensors/BeamBreak/{self._sensorName}'
-    self._digitalInput = DigitalInput(channel)
-    self._isTriggered: bool = False
 
+    self._digitalInput = DigitalInput(channel)
+
+    self._isTriggered: bool = False
+    
     utils.addRobotPeriodic(self._updateTelemetry)
 
   def hasTarget(self) -> bool:
@@ -29,4 +30,4 @@ class BeamBreakSensor:
 
   def _updateTelemetry(self) -> None:
     SmartDashboard.putBoolean(f'{self._baseKey}/HasTarget', self.hasTarget())
-    SmartDashboard.putBoolean(f'{self._baseKey}/IsTriggered', self._isTriggered)
+    SmartDashboard.putBoolean(f'{self._baseKey}/IsTriggered', self.isTriggered())

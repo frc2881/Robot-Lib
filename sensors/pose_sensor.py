@@ -10,6 +10,7 @@ class PoseSensor:
       config: PoseSensorConfig
     ) -> None:
     self._baseKey = f'Robot/Sensors/Pose/{config.location.name}'
+
     self._photonCamera = PhotonCamera(config.location.name)
     self._photonCamera.setDriverMode(False)
     self._photonPoseEstimator = PhotonPoseEstimator(
@@ -19,18 +20,18 @@ class PoseSensor:
       config.cameraTransform
     )
     self._photonPoseEstimator.multiTagFallbackStrategy = config.fallbackPoseStrategy
-    self._hasTarget = False
-    self._targetCount: int = 0
 
+    self._hasTarget = False
+    
     utils.addRobotPeriodic(self._updateTelemetry)
 
   def getEstimatedRobotPose(self) -> EstimatedRobotPose | None:
+    self._hasTarget = False
     if self._photonCamera.isConnected():
       photonPipelineResult = self._photonCamera.getLatestResult()
       self._hasTarget = photonPipelineResult.hasTargets()
-      self._targetCount = len(photonPipelineResult.getTargets()) if self._hasTarget else 0
-      return self._photonPoseEstimator.update(photonPipelineResult)
-    self._hasTarget = False
+      if self._hasTarget:
+        return self._photonPoseEstimator.update(photonPipelineResult)
     return None
   
   def hasTarget(self) -> bool:
@@ -38,5 +39,4 @@ class PoseSensor:
   
   def _updateTelemetry(self) -> None:
     SmartDashboard.putBoolean(f'{self._baseKey}/IsConnected', self._photonCamera.isConnected())
-    SmartDashboard.putBoolean(f'{self._baseKey}/HasTarget', self._hasTarget)
-    SmartDashboard.putNumber(f'{self._baseKey}/TargetCount', self._targetCount)
+    SmartDashboard.putBoolean(f'{self._baseKey}/HasTarget', self.hasTarget())

@@ -13,10 +13,10 @@ class LeadscrewModule:
 
     self._baseKey = f'Robot/{self._config.moduleBaseKey}'
 
-    _encoderPositionConversionFactor: float = self._config.constants.leadscrewTravelDistance / self._config.constants.motorReduction
-    _encoderVelocityConversionFactor: float = _encoderPositionConversionFactor / 60.0
-    _motorMotionMaxVelocity: float = (self._config.constants.motorMotionMaxVelocityRate / _encoderPositionConversionFactor) * 60
-    _motorMotionMaxAcceleration: float = self._config.constants.motorMotionMaxAccelerationRate / _encoderVelocityConversionFactor 
+    encoderPositionConversionFactor: float = self._config.constants.leadscrewTravelDistance / self._config.constants.motorReduction
+    encoderVelocityConversionFactor: float = encoderPositionConversionFactor / 60.0
+    motorMotionMaxVelocity: float = (self._config.constants.motorMotionMaxVelocityRate / encoderPositionConversionFactor) * 60
+    motorMotionMaxAcceleration: float = self._config.constants.motorMotionMaxAccelerationRate / encoderVelocityConversionFactor 
 
     if self._config.constants.motorControllerType == MotorControllerType.SparkFlex:
       self._motor = SparkFlex(self._config.motorCANId, SparkLowLevel.MotorType.kBrushless)
@@ -28,15 +28,15 @@ class LeadscrewModule:
       .smartCurrentLimit(self._config.constants.motorCurrentLimit)
       .secondaryCurrentLimit(self._config.constants.motorCurrentLimit))
     (self._motorConfig.encoder
-      .positionConversionFactor(_encoderPositionConversionFactor)
-      .velocityConversionFactor(_encoderVelocityConversionFactor))
+      .positionConversionFactor(encoderPositionConversionFactor)
+      .velocityConversionFactor(encoderVelocityConversionFactor))
     (self._motorConfig.closedLoop
       .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
       .pid(*self._config.constants.motorPID)
       .outputRange(-1.0, 1.0)
       .maxMotion
-        .maxVelocity(_motorMotionMaxVelocity)
-        .maxAcceleration(_motorMotionMaxAcceleration)
+        .maxVelocity(motorMotionMaxVelocity)
+        .maxAcceleration(motorMotionMaxAcceleration)
         .allowedClosedLoopError(self._config.constants.allowedClosedLoopError))
     (self._motorConfig.softLimit
       .forwardSoftLimitEnabled(True)

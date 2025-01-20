@@ -15,6 +15,10 @@ class GyroSensor_ADIS16470():
       commandCalibrationTime: ADIS16470_IMU.CalibrationTime,
       commandCalibrationDelay: units.seconds
     ) -> None:
+    self._commandCalibrationTime = commandCalibrationTime
+    self._commandCalibrationDelay = commandCalibrationDelay
+    self._baseKey = f'Robot/Sensors/Gyro'
+    
     self._gyro = ADIS16470_IMU(
       imuAxisYaw,
       imuAxisPitch,
@@ -22,11 +26,7 @@ class GyroSensor_ADIS16470():
       spiPort,
       initCalibrationTime
     )
-    self._commandCalibrationTime = commandCalibrationTime
-    self._commandCalibrationDelay = commandCalibrationDelay
-
-    self._baseKey = f'Robot/Sensors/Gyro'
-
+    
     utils.addRobotPeriodic(self._updateTelemetry)
 
   def getHeading(self) -> units.degrees:

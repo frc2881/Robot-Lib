@@ -13,15 +13,16 @@ class DistanceSensor:
     self._sensorName = sensorName
     self._minTargetDistance = minTargetDistance
     self._maxTargetDistance = maxTargetDistance
-    
     self._baseKey = f'Robot/Sensors/Distance/{self._sensorName}'
-    self._valueTopic = NetworkTableInstance.getDefault().getTable("SmartDashboard").getDoubleTopic(f'{self._baseKey}/Value').subscribe(-1.0, PubSubOptions(periodic=0.01))
+
+    self._subscriber = NetworkTableInstance.getDefault().getTable("SmartDashboard").getDoubleTopic(f'{self._baseKey}/Value').subscribe(-1.0, PubSubOptions(periodic=0.01))
+
     self._isTriggered: bool = False
 
     utils.addRobotPeriodic(self._updateTelemetry)
 
   def getDistance(self) -> units.millimeters:
-    return self._valueTopic.get()
+    return self._subscriber.get()
 
   def hasTarget(self) -> bool:
     hasTarget = utils.isValueInRange(self.getDistance(), self._minTargetDistance, self._maxTargetDistance)
@@ -37,4 +38,4 @@ class DistanceSensor:
 
   def _updateTelemetry(self) -> None:
     SmartDashboard.putBoolean(f'{self._baseKey}/HasTarget', self.hasTarget())
-    SmartDashboard.putBoolean(f'{self._baseKey}/IsTriggered', self._isTriggered)
+    SmartDashboard.putBoolean(f'{self._baseKey}/IsTriggered', self.isTriggered())

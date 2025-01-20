@@ -10,9 +10,9 @@ class GyroSensor_NAVX2():
       self,
       comType: AHRS.NavXComType
     ) -> None:
-    self._gyro = AHRS(comType)
-
     self._baseKey = f'Robot/Sensors/Gyro'
+    
+    self._gyro = AHRS(comType)
 
     utils.addRobotPeriodic(self._updateTelemetry)
   
