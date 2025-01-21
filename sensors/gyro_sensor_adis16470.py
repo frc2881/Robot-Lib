@@ -27,7 +27,10 @@ class GyroSensor_ADIS16470():
       initCalibrationTime
     )
     
-    utils.addRobotPeriodic(self._updateTelemetry)
+    utils.addRobotPeriodic(self._periodic)
+
+  def _periodic(self) -> None:
+    self._updateTelemetry()
 
   def getHeading(self) -> units.degrees:
     return utils.wrapAngle(self._gyro.getAngle())

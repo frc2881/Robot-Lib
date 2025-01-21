@@ -43,7 +43,10 @@ class DifferentialModule:
 
     self._drivingTargetSpeed: units.meters_per_second = 0
 
-    utils.addRobotPeriodic(self._updateTelemetry)
+    utils.addRobotPeriodic(self._periodic)
+
+  def _periodic(self) -> None:
+    self._updateTelemetry()
 
   def getMotorController(self) -> SparkMax:
     return self._drivingMotor

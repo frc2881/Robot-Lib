@@ -19,7 +19,10 @@ class DistanceSensor:
 
     self._isTriggered: bool = False
 
-    utils.addRobotPeriodic(self._updateTelemetry)
+    utils.addRobotPeriodic(self._periodic)
+
+  def _periodic(self) -> None:
+    self._updateTelemetry()
 
   def getDistance(self) -> units.millimeters:
     return self._subscriber.get()

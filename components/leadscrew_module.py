@@ -56,7 +56,10 @@ class LeadscrewModule:
     self._encoder = self._motor.getEncoder()
     self._encoder.setPosition(0)
 
-    utils.addRobotPeriodic(self._updateTelemetry)
+    utils.addRobotPeriodic(self._periodic)
+
+  def _periodic(self) -> None:
+    self._updateTelemetry()
     
   def setSpeed(self, speed: units.percent) -> None:
     self._motor.set(speed)

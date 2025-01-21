@@ -14,7 +14,10 @@ class GyroSensor_NAVX2():
     
     self._gyro = AHRS(comType)
 
-    utils.addRobotPeriodic(self._updateTelemetry)
+    utils.addRobotPeriodic(self._periodic)
+
+  def _periodic(self) -> None:
+    self._updateTelemetry()
   
   def getHeading(self) -> units.degrees:
     return -utils.wrapAngle(self._gyro.getAngle())

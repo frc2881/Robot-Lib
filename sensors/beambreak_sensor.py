@@ -14,7 +14,10 @@ class BeamBreakSensor:
 
     self._isTriggered: bool = False
     
-    utils.addRobotPeriodic(self._updateTelemetry)
+    utils.addRobotPeriodic(self._periodic)
+
+  def _periodic(self) -> None:
+    self._updateTelemetry()
 
   def hasTarget(self) -> bool:
     hasTarget = not self._digitalInput.get()

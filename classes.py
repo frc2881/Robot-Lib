@@ -144,19 +144,18 @@ class DifferentialDriveModulePositions(NamedTuple):
   left: float
   right: float
 
-class PoseSensorLocation(Enum):
-  Front = auto(),
-  Rear = auto(),
-  Left = auto(),
-  Right = auto()
-
 @dataclass(frozen=True, slots=True)
 class PoseSensorConfig:
-  location: PoseSensorLocation
+  cameraName: str
   cameraTransform: Transform3d
   poseStrategy: PoseStrategy
   fallbackPoseStrategy: PoseStrategy
   aprilTagFieldLayout: AprilTagFieldLayout
+
+@dataclass(frozen=True, slots=True)
+class ObjectSensorConfig:
+  cameraName: str
+  cameraTransform: Transform3d
 
 @dataclass(frozen=True, slots=True)
 class LeadscrewModuleConstants:

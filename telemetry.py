@@ -3,8 +3,8 @@ from wpilib import Timer, DriverStation, RobotController, SmartDashboard, LiveWi
 from . import logger, utils
 
 def start() -> None:
-  utils.addRobotPeriodic(_updateRobotInfo, 1.0, 0.25)
-  utils.addRobotPeriodic(_updateTimingInfo, 0.25, 0.5)
+  utils.addRobotPeriodic(_updateTimingInfo, 0.3, 0.25)
+  utils.addRobotPeriodic(_updateRobotInfo, 1.0, 0.5)
   utils.addRobotPeriodic(_updateTelemetrySetting, 3.0, 0.75)
 
 def _updateTimingInfo() -> None:

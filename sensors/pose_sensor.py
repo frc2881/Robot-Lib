@@ -9,9 +9,10 @@ class PoseSensor:
       self, 
       config: PoseSensorConfig
     ) -> None:
-    self._baseKey = f'Robot/Sensors/Pose/{config.location.name}'
+    self._config = config
+    self._baseKey = f'Robot/Sensors/Pose/{config.cameraName}'
 
-    self._photonCamera = PhotonCamera(config.location.name)
+    self._photonCamera = PhotonCamera(config.cameraName)
     self._photonCamera.setDriverMode(False)
     self._photonPoseEstimator = PhotonPoseEstimator(
       config.aprilTagFieldLayout, 
@@ -23,16 +24,18 @@ class PoseSensor:
 
     self._hasTarget = False
     
-    utils.addRobotPeriodic(self._updateTelemetry)
+    utils.addRobotPeriodic(self._periodic)
+
+  def _periodic(self) -> None:
+    self._updateTelemetry()
 
   def getEstimatedRobotPose(self) -> EstimatedRobotPose | None:
-    self._hasTarget = False
+    estimatedRobotPose: EstimatedRobotPose | None = None
     if self._photonCamera.isConnected():
-      photonPipelineResult = self._photonCamera.getLatestResult()
-      self._hasTarget = photonPipelineResult.hasTargets()
-      if self._hasTarget:
-        return self._photonPoseEstimator.update(photonPipelineResult)
-    return None
+      for photonPipelineResult in self._photonCamera.getAllUnreadResults():
+        estimatedRobotPose = self._photonPoseEstimator.update(photonPipelineResult)
+    self._hasTarget = len(estimatedRobotPose.targetsUsed > 0) if estimatedRobotPose is not None else False
+    return estimatedRobotPose
   
   def hasTarget(self) -> bool:
     return self._hasTarget

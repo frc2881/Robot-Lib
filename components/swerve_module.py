@@ -77,7 +77,10 @@ class SwerveModule:
 
     self._drivingTargetSpeed: units.meters_per_second = 0
 
-    utils.addRobotPeriodic(self._updateTelemetry)
+    utils.addRobotPeriodic(self._periodic)
+
+  def _periodic(self) -> None:
+    self._updateTelemetry()
 
   def setTargetState(self, targetState: SwerveModuleState) -> None:
     targetState.angle = targetState.angle.__add__(Rotation2d(self._config.turningOffset))
