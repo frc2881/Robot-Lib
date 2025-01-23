@@ -1,4 +1,4 @@
-from wpilib import SmartDashboard
+from wpilib import SmartDashboard, Timer
 from photonlibpy.photonCamera import PhotonCamera
 from photonlibpy.photonPoseEstimator import PhotonPoseEstimator, EstimatedRobotPose
 from .. import logger, utils
@@ -23,6 +23,8 @@ class PoseSensor:
     self._photonPoseEstimator.multiTagFallbackStrategy = config.fallbackPoseStrategy
 
     self._hasTarget = False
+
+    self._pipelineResultBufferTimestamp = 0
     
     utils.addRobotPeriodic(self._periodic)
 
@@ -34,7 +36,12 @@ class PoseSensor:
     if self._photonCamera.isConnected():
       for photonPipelineResult in self._photonCamera.getAllUnreadResults():
         estimatedRobotPose = self._photonPoseEstimator.update(photonPipelineResult)
-    self._hasTarget = len(estimatedRobotPose.targetsUsed) > 0 if estimatedRobotPose is not None else False
+    if estimatedRobotPose is not None:
+      self._hasTarget = len(estimatedRobotPose.targetsUsed) > 0
+      self._pipelineResultBufferTimestamp = Timer.getFPGATimestamp()
+    else: 
+      if self._hasTarget and Timer.getFPGATimestamp() - self._pipelineResultBufferTimestamp > 0.2:
+        self._hasTarget = False
     return estimatedRobotPose
   
   def hasTarget(self) -> bool:
