@@ -34,7 +34,7 @@ class PoseSensor:
     if self._photonCamera.isConnected():
       for photonPipelineResult in self._photonCamera.getAllUnreadResults():
         estimatedRobotPose = self._photonPoseEstimator.update(photonPipelineResult)
-    self._hasTarget = len(estimatedRobotPose.targetsUsed > 0) if estimatedRobotPose is not None else False
+    self._hasTarget = len(estimatedRobotPose.targetsUsed) > 0 if estimatedRobotPose is not None else False
     return estimatedRobotPose
   
   def hasTarget(self) -> bool:
