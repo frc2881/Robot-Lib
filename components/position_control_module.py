@@ -1,19 +1,19 @@
 from wpimath import units
 from wpilib import SmartDashboard
 from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, ClosedLoopConfig
-from ..classes import LeadscrewModuleConfig, MotorControllerType
+from ..classes import PositionControlModuleConfig, MotorControllerType
 from .. import logger, utils
 
-class LeadscrewModule:
+class PositionControlModule:
   def __init__(
     self,
-    config: LeadscrewModuleConfig
+    config: PositionControlModuleConfig
   ) -> None:
     self._config = config
 
     self._baseKey = f'Robot/{self._config.moduleBaseKey}'
 
-    encoderPositionConversionFactor: float = self._config.constants.leadscrewTravelDistance / self._config.constants.motorReduction
+    encoderPositionConversionFactor: float = self._config.constants.motorTravelDistance / self._config.constants.motorReduction
     encoderVelocityConversionFactor: float = encoderPositionConversionFactor / 60.0
     motorMotionMaxVelocity: float = (self._config.constants.motorMotionMaxVelocityRate / encoderPositionConversionFactor) * 60
     motorMotionMaxAcceleration: float = self._config.constants.motorMotionMaxAccelerationRate / encoderVelocityConversionFactor 

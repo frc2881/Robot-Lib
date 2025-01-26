@@ -158,8 +158,8 @@ class ObjectSensorConfig:
   cameraTransform: Transform3d
 
 @dataclass(frozen=True, slots=True)
-class LeadscrewModuleConstants:
-  leadscrewTravelDistance: units.inches
+class PositionControlModuleConstants:
+  motorTravelDistance: units.inches
   motorControllerType: MotorControllerType
   motorCurrentLimit: int
   motorReduction: float
@@ -172,8 +172,8 @@ class LeadscrewModuleConstants:
   motorResetSpeed: units.percent
 
 @dataclass(frozen=True, slots=True)
-class LeadscrewModuleConfig:
+class PositionControlModuleConfig:
   moduleBaseKey: str
   motorCANId: int
   leaderMotorCANId: int | None
-  constants: LeadscrewModuleConstants
+  constants: PositionControlModuleConstants
