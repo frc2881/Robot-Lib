@@ -81,7 +81,7 @@ class DriftCorrectionConstants:
 class TargetAlignmentConstants:
   rotationPID: PID
   rotationTolerance: Tolerance
-  rotationSpeedMax: units.radians_per_second # type: ignore
+  rotationSpeedMax: units.radians_per_second
   rotationHeadingModeOffset: units.degrees
   rotationTranslationModeOffset: units.degrees
   translationPID: PID
