@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from wpimath import units
 from wpimath.geometry import Translation2d, Transform3d
 from robotpy_apriltag import AprilTagFieldLayout
+from rev import SparkLowLevel
 from photonlibpy.photonPoseEstimator import PoseStrategy
 
 class Alliance(IntEnum):
@@ -33,10 +34,6 @@ class MotorDirection(Enum):
 class MotorIdleMode(Enum):
   Brake = auto()
   Coast = auto()
-
-class MotorControllerType(Enum):
-  SparkMax = auto()
-  SparkFlex = auto()
 
 class DriveOrientation(Enum):
   Field = auto()
@@ -88,12 +85,6 @@ class TargetAlignmentConstants:
   translationTolerance: Tolerance
   translationSpeedMax: units.meters_per_second
 
-class SwerveModuleLocation(IntEnum):
-  FrontLeft = 0,
-  FrontRight = 1,
-  RearLeft = 2,
-  RearRight = 3
-
 @dataclass(frozen=True, slots=True)
 class SwerveModuleConstants:
   wheelDiameter: units.meters
@@ -102,11 +93,18 @@ class SwerveModuleConstants:
   wheelBevelPinionTeeth: int
   drivingMotorPinionTeeth: int
   drivingMotorFreeSpeed: units.revolutions_per_minute
-  drivingMotorControllerType: MotorControllerType
+  drivingMotorControllerType: SparkLowLevel.SparkModel
+  drivingMotorType: SparkLowLevel.MotorType
   drivingMotorCurrentLimit: int
   drivingMotorPID: PID
   turningMotorCurrentLimit: int
   turningMotorPID: PID
+
+class SwerveModuleLocation(IntEnum):
+  FrontLeft = 0,
+  FrontRight = 1,
+  RearLeft = 2,
+  RearRight = 3
 
 @dataclass(frozen=True, slots=True)
 class SwerveModuleConfig:
@@ -117,20 +115,17 @@ class SwerveModuleConfig:
   translation: Translation2d
   constants: SwerveModuleConstants
 
-class DifferentialModuleLocation(IntEnum):
-  LeftFront = 0,
-  LeftCenter = 1,
-  LeftRear = 2,
-  RightFront = 3,
-  RightCenter = 4,
-  RightRear = 5
-
 @dataclass(frozen=True, slots=True)
 class DifferentialModuleConstants:
   wheelDiameter: units.meters
-  drivingMotorControllerType: MotorControllerType
+  drivingMotorControllerType: SparkLowLevel.SparkModel
+  drivingMotorType: SparkLowLevel.MotorType
   drivingMotorCurrentLimit: int
   drivingMotorReduction: float
+
+class DifferentialModuleLocation(IntEnum):
+  Left = 0,
+  Right = 1
 
 @dataclass(frozen=True, slots=True)
 class DifferentialModuleConfig:
@@ -145,22 +140,10 @@ class DifferentialDriveModulePositions(NamedTuple):
   right: float
 
 @dataclass(frozen=True, slots=True)
-class PoseSensorConfig:
-  cameraName: str
-  cameraTransform: Transform3d
-  poseStrategy: PoseStrategy
-  fallbackPoseStrategy: PoseStrategy
-  aprilTagFieldLayout: AprilTagFieldLayout
-
-@dataclass(frozen=True, slots=True)
-class ObjectSensorConfig:
-  cameraName: str
-  cameraTransform: Transform3d
-
-@dataclass(frozen=True, slots=True)
 class PositionControlModuleConstants:
   motorTravelDistance: units.inches
-  motorControllerType: MotorControllerType
+  motorControllerType: SparkLowLevel.SparkModel
+  motorType: SparkLowLevel.MotorType
   motorCurrentLimit: int
   motorReduction: float
   motorPID: PID
@@ -177,3 +160,16 @@ class PositionControlModuleConfig:
   motorCANId: int
   leaderMotorCANId: int | None
   constants: PositionControlModuleConstants
+
+@dataclass(frozen=True, slots=True)
+class PoseSensorConfig:
+  cameraName: str
+  cameraTransform: Transform3d
+  poseStrategy: PoseStrategy
+  fallbackPoseStrategy: PoseStrategy
+  aprilTagFieldLayout: AprilTagFieldLayout
+
+@dataclass(frozen=True, slots=True)
+class ObjectSensorConfig:
+  cameraName: str
+  cameraTransform: Transform3d

@@ -2,7 +2,7 @@ import math
 from wpimath import units
 from wpilib import SmartDashboard
 from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex
-from ..classes import DifferentialModuleConfig, MotorIdleMode, MotorControllerType
+from ..classes import DifferentialModuleConfig, MotorIdleMode
 from .. import utils, logger
 
 class DifferentialModule:
@@ -16,10 +16,10 @@ class DifferentialModule:
 
     drivingMotorReduction: float = self._config.constants.drivingMotorReduction
     drivingEncoderPositionConversionFactor: float = (self._config.constants.wheelDiameter * math.pi) / drivingMotorReduction
-    if self._config.constants.drivingMotorControllerType == MotorControllerType.SparkFlex:
-      self._drivingMotor = SparkFlex(self._config.drivingMotorCANId, SparkLowLevel.MotorType.kBrushless)
+    if self._config.constants.drivingMotorControllerType == SparkLowLevel.SparkModel.kSparkFlex:
+      self._drivingMotor = SparkFlex(self._config.drivingMotorCANId, self._config.constants.drivingMotorType)
     else: 
-      self._drivingMotor = SparkMax(self._config.drivingMotorCANId, SparkLowLevel.MotorType.kBrushless)
+      self._drivingMotor = SparkMax(self._config.drivingMotorCANId, self._config.constants.drivingMotorType)
     self._drivingMotorConfig = SparkBaseConfig()
     (self._drivingMotorConfig
       .setIdleMode(SparkBaseConfig.IdleMode.kBrake)

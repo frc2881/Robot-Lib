@@ -1,7 +1,7 @@
 from wpimath import units
 from wpilib import SmartDashboard
 from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, ClosedLoopConfig
-from ..classes import PositionControlModuleConfig, MotorControllerType
+from ..classes import PositionControlModuleConfig
 from .. import logger, utils
 
 class PositionControlModule:
@@ -18,10 +18,10 @@ class PositionControlModule:
     motorMotionMaxVelocity: float = (self._config.constants.motorMotionMaxVelocityRate / encoderPositionConversionFactor) * 60
     motorMotionMaxAcceleration: float = self._config.constants.motorMotionMaxAccelerationRate / encoderVelocityConversionFactor 
 
-    if self._config.constants.motorControllerType == MotorControllerType.SparkFlex:
-      self._motor = SparkFlex(self._config.motorCANId, SparkLowLevel.MotorType.kBrushless)
+    if self._config.constants.motorControllerType == SparkLowLevel.SparkModel.kSparkFlex:
+      self._motor = SparkFlex(self._config.motorCANId, self._config.constants.motorType)
     else: 
-      self._motor = SparkMax(self._config.motorCANId, SparkLowLevel.MotorType.kBrushless)
+      self._motor = SparkMax(self._config.motorCANId, self._config.constants.motorType)
     self._motorConfig = SparkBaseConfig()
     (self._motorConfig
       .setIdleMode(SparkBaseConfig.IdleMode.kBrake)

@@ -4,7 +4,7 @@ from wpimath.geometry import Rotation2d
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpilib import SmartDashboard
 from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, ClosedLoopConfig
-from ..classes import SwerveModuleConfig, MotorIdleMode, MotorControllerType
+from ..classes import SwerveModuleConfig, MotorIdleMode
 from .. import logger, utils
 
 class SwerveModule:
@@ -21,10 +21,10 @@ class SwerveModule:
     drivingEncoderPositionConversionFactor: float = (self._config.constants.wheelDiameter * math.pi) / drivingMotorReduction
     turningEncoderPositionConversionFactor: float = 2 * math.pi
 
-    if self._config.constants.drivingMotorControllerType == MotorControllerType.SparkFlex:
-      self._drivingMotor = SparkFlex(self._config.drivingMotorCANId, SparkLowLevel.MotorType.kBrushless)
+    if self._config.constants.drivingMotorControllerType == SparkLowLevel.SparkModel.kSparkFlex:
+      self._drivingMotor = SparkFlex(self._config.drivingMotorCANId, self._config.constants.drivingMotorType)
     else: 
-      self._drivingMotor = SparkMax(self._config.drivingMotorCANId, SparkLowLevel.MotorType.kBrushless)
+      self._drivingMotor = SparkMax(self._config.drivingMotorCANId, self._config.constants.drivingMotorType)
     self._drivingMotorConfig = SparkBaseConfig()
     (self._drivingMotorConfig
       .setIdleMode(SparkBaseConfig.IdleMode.kBrake)
