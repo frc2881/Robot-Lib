@@ -150,8 +150,8 @@ class PositionControlModuleConstants:
   motorMotionMaxVelocityRate: units.percent
   motorMotionMaxAccelerationRate: units.percent
   allowedClosedLoopError: float
-  motorSoftLimitForward: float
-  motorSoftLimitReverse: float
+  motorSoftLimitForward: units.inches
+  motorSoftLimitReverse: units.inches
   motorResetSpeed: units.percent
 
 @dataclass(frozen=True, slots=True)

@@ -1,3 +1,4 @@
+import math
 from wpimath import units
 from wpilib import SmartDashboard
 from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, ClosedLoopConfig
@@ -69,6 +70,14 @@ class PositionControlModule:
 
   def getPosition(self) -> float:
     return self._encoder.getPosition()
+
+  def isForwardSoftLimitReached(self) -> bool:
+    # TODO: use motor faults to check for soft limit reached in place of math logic ... self._motor.getFaults()
+    return math.fabs(self.getPosition() - self._config.constants.motorSoftLimitForward) < 0.1
+  
+  def isReverseSoftLimitReached(self) -> bool:
+    # TODO: use motor faults to check for soft limit reached in place of math logic ... self._motor.getFaults()
+    return math.fabs(self.getPosition() - self._config.constants.motorSoftLimitReverse) < 0.1
   
   def startZeroReset(self) -> None:
     utils.setSparkSoftLimitsEnabled(self._motor, False)
