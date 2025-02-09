@@ -27,7 +27,8 @@ class PositionControlModule:
     (self._motorConfig
       .setIdleMode(SparkBaseConfig.IdleMode.kBrake)
       .smartCurrentLimit(self._config.constants.motorCurrentLimit)
-      .secondaryCurrentLimit(self._config.constants.motorCurrentLimit))
+      .secondaryCurrentLimit(self._config.constants.motorCurrentLimit)
+      .inverted(self._config.isInverted))
     (self._motorConfig.encoder
       .positionConversionFactor(encoderPositionConversionFactor)
       .velocityConversionFactor(encoderVelocityConversionFactor))

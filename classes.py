@@ -159,6 +159,7 @@ class PositionControlModuleConfig:
   moduleBaseKey: str
   motorCANId: int
   leaderMotorCANId: int | None
+  isInverted: bool
   constants: PositionControlModuleConstants
 
 @dataclass(frozen=True, slots=True)
