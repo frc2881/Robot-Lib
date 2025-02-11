@@ -2,7 +2,7 @@ import math
 from wpimath import units
 from wpilib import SmartDashboard
 from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, ClosedLoopConfig
-from ..classes import PositionControlModuleConfig
+from ..classes import PositionControlModuleConfig, MotorDirection
 from .. import logger, utils
 
 class PositionControlModule:
@@ -27,7 +27,6 @@ class PositionControlModule:
     (self._motorConfig
       .setIdleMode(SparkBaseConfig.IdleMode.kBrake)
       .smartCurrentLimit(self._config.constants.motorCurrentLimit)
-      .secondaryCurrentLimit(self._config.constants.motorCurrentLimit)
       .inverted(self._config.isInverted))
     (self._motorConfig.encoder
       .positionConversionFactor(encoderPositionConversionFactor)
@@ -39,7 +38,7 @@ class PositionControlModule:
       .maxMotion
         .maxVelocity(motorMotionMaxVelocity)
         .maxAcceleration(motorMotionMaxAcceleration)
-        .allowedClosedLoopError(self._config.constants.allowedClosedLoopError))
+        .allowedClosedLoopError(self._config.constants.motorMotionAllowedClosedLoopError))
     (self._motorConfig.softLimit
       .forwardSoftLimitEnabled(True)
       .forwardSoftLimit(self._config.constants.motorSoftLimitForward)
@@ -72,14 +71,13 @@ class PositionControlModule:
   def getPosition(self) -> float:
     return self._encoder.getPosition()
 
-  def isForwardSoftLimitReached(self) -> bool:
-    # TODO: use motor faults to check for soft limit reached in place of math logic ... self._motor.getFaults()
-    return math.fabs(self.getPosition() - self._config.constants.motorSoftLimitForward) < 0.1
-  
-  def isReverseSoftLimitReached(self) -> bool:
-    # TODO: use motor faults to check for soft limit reached in place of math logic ... self._motor.getFaults()
-    return math.fabs(self.getPosition() - self._config.constants.motorSoftLimitReverse) < 0.1
-  
+  def isPositionAtSoftLimit(self, direction: MotorDirection) -> bool:
+    return math.isclose(
+      self.getPosition(),
+      self._config.constants.motorSoftLimitReverse if direction == MotorDirection.Reverse else self._config.constants.motorSoftLimitForward, 
+      rel_tol = 0.01
+    )
+
   def startZeroReset(self) -> None:
     utils.setSparkSoftLimitsEnabled(self._motor, False)
     self._motor.set(-self._config.constants.motorResetSpeed)

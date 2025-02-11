@@ -24,8 +24,8 @@ class PoseSensor:
 
     self._hasTarget = False
 
-    self._pipelineResultBufferTimestamp = 0
-    
+    self._pipelineResultBufferTimer = Timer()
+
     utils.addRobotPeriodic(self._periodic)
 
   def _periodic(self) -> None:
@@ -38,9 +38,9 @@ class PoseSensor:
         estimatedRobotPose = self._photonPoseEstimator.update(photonPipelineResult)
     if estimatedRobotPose is not None:
       self._hasTarget = len(estimatedRobotPose.targetsUsed) > 0
-      self._pipelineResultBufferTimestamp = Timer.getFPGATimestamp()
+      self._pipelineResultBufferTimer.restart()
     else: 
-      if self._hasTarget and Timer.getFPGATimestamp() - self._pipelineResultBufferTimestamp > 0.2:
+      if self._hasTarget and self._pipelineResultBufferTimer.hasElapsed(0.2):
         self._hasTarget = False
     return estimatedRobotPose
   

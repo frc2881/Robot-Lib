@@ -29,7 +29,7 @@ class OptionState(Enum):
 class MotorDirection(Enum):
   Forward = auto()
   Reverse = auto()
-  Stopped = auto()
+  Stop = auto()
 
 class MotorIdleMode(Enum):
   Brake = auto()
@@ -149,7 +149,7 @@ class PositionControlModuleConstants:
   motorPID: PID
   motorMotionMaxVelocityRate: units.percent
   motorMotionMaxAccelerationRate: units.percent
-  allowedClosedLoopError: float
+  motorMotionAllowedClosedLoopError: float
   motorSoftLimitForward: units.inches
   motorSoftLimitReverse: units.inches
   motorResetSpeed: units.percent

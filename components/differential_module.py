@@ -24,7 +24,6 @@ class DifferentialModule:
     (self._drivingMotorConfig
       .setIdleMode(SparkBaseConfig.IdleMode.kBrake)
       .smartCurrentLimit(self._config.constants.drivingMotorCurrentLimit)
-      .secondaryCurrentLimit(self._config.constants.drivingMotorCurrentLimit)
       .inverted(self._config.isInverted))
     (self._drivingMotorConfig.encoder
       .positionConversionFactor(drivingEncoderPositionConversionFactor)

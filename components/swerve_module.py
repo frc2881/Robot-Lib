@@ -28,8 +28,7 @@ class SwerveModule:
     self._drivingMotorConfig = SparkBaseConfig()
     (self._drivingMotorConfig
       .setIdleMode(SparkBaseConfig.IdleMode.kBrake)
-      .smartCurrentLimit(self._config.constants.drivingMotorCurrentLimit)
-      .secondaryCurrentLimit(self._config.constants.drivingMotorCurrentLimit))
+      .smartCurrentLimit(self._config.constants.drivingMotorCurrentLimit))
     (self._drivingMotorConfig.encoder
       .positionConversionFactor(drivingEncoderPositionConversionFactor)
       .velocityConversionFactor(drivingEncoderPositionConversionFactor / 60.0))
@@ -53,8 +52,7 @@ class SwerveModule:
     self._turningMotorConfig = SparkBaseConfig()
     (self._turningMotorConfig
       .setIdleMode(SparkBaseConfig.IdleMode.kBrake)
-      .smartCurrentLimit(self._config.constants.turningMotorCurrentLimit)
-      .secondaryCurrentLimit(self._config.constants.turningMotorCurrentLimit))
+      .smartCurrentLimit(self._config.constants.turningMotorCurrentLimit))
     (self._turningMotorConfig.absoluteEncoder
       .inverted(True)
       .positionConversionFactor(turningEncoderPositionConversionFactor)
