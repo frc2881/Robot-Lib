@@ -71,11 +71,11 @@ class PositionControlModule:
   def getPosition(self) -> float:
     return self._encoder.getPosition()
 
-  def isPositionAtSoftLimit(self, direction: MotorDirection) -> bool:
+  def isPositionAtSoftLimit(self, direction: MotorDirection, tolerance: float) -> bool:
     return math.isclose(
       self.getPosition(),
       self._config.constants.motorSoftLimitReverse if direction == MotorDirection.Reverse else self._config.constants.motorSoftLimitForward, 
-      rel_tol = 0.01
+      abs_tol = tolerance
     )
 
   def startZeroReset(self) -> None:
