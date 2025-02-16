@@ -141,14 +141,14 @@ class DifferentialDriveModulePositions(NamedTuple):
 
 @dataclass(frozen=True, slots=True)
 class PositionControlModuleConstants:
-  motorTravelDistance: units.inches
+  distancePerRotation: units.inches
   motorControllerType: SparkLowLevel.SparkModel
   motorType: SparkLowLevel.MotorType
   motorCurrentLimit: int
   motorReduction: float
   motorPID: PID
-  motorMotionMaxVelocityRate: units.percent
-  motorMotionMaxAccelerationRate: units.percent
+  motorMotionMaxVelocityRate: units.units_per_second
+  motorMotionMaxAccelerationRate: units.units_per_second_squared
   motorMotionAllowedClosedLoopError: float
   motorSoftLimitForward: units.inches
   motorSoftLimitReverse: units.inches

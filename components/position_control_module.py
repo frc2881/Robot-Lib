@@ -14,7 +14,7 @@ class PositionControlModule:
 
     self._baseKey = f'Robot/{self._config.moduleBaseKey}'
 
-    encoderPositionConversionFactor: float = self._config.constants.motorTravelDistance / self._config.constants.motorReduction
+    encoderPositionConversionFactor: float = self._config.constants.distancePerRotation / self._config.constants.motorReduction
     encoderVelocityConversionFactor: float = encoderPositionConversionFactor / 60.0
     motorMotionMaxVelocity: float = (self._config.constants.motorMotionMaxVelocityRate / encoderPositionConversionFactor) * 60
     motorMotionMaxAcceleration: float = self._config.constants.motorMotionMaxAccelerationRate / encoderVelocityConversionFactor 
