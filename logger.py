@@ -17,8 +17,8 @@ def start() -> None:
     lambda command: log(f'----< Command End: {command.getName()}')
   )
 
-  SmartDashboard.putBoolean("Robot/Error/HasError", False)
-  SmartDashboard.putString("Robot/Error/LastError", "")
+  SmartDashboard.putBoolean("Robot/Status/HasError", False)
+  SmartDashboard.putString("Robot/Status/LastError", "")
 
   log("********** Robot Started **********")
 
@@ -33,8 +33,8 @@ def debug(message: str) -> None:
 
 def error(message: str) -> None:
   log(f'!!!!!!!!!! ERROR: {message} !!!!!!!!!!')
-  SmartDashboard.putBoolean("Robot/Error/HasError", True)
-  SmartDashboard.putString("Robot/Error/LastError", message)
+  SmartDashboard.putBoolean("Robot/Status/HasError", True)
+  SmartDashboard.putString("Robot/Status/LastError", message)
 
 def exception() -> None:
   error(traceback.format_exc())

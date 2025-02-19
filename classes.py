@@ -1,4 +1,5 @@
 from typing import NamedTuple
+import sys
 from enum import Enum, IntEnum, auto
 from dataclasses import dataclass
 from wpimath import units
@@ -25,6 +26,21 @@ class RobotState(Enum):
 class OptionState(Enum):
   Enabled = auto()
   Disabled = auto()
+
+class Position(Enum):
+  Unknown = auto()
+  Default = auto()
+  Up = auto()
+  Down = auto()
+  Left = auto()
+  Right = auto()
+  Front = auto()
+  Rear = auto()
+  Top = auto()
+  Bottom = auto()
+  Center = auto()
+  Open = auto()
+  Closed = auto()
 
 class MotorDirection(Enum):
   Forward = auto()
@@ -65,9 +81,18 @@ class PID(NamedTuple):
   I: float
   D: float
 
+class Range(NamedTuple):
+  min: float
+  max: float
+
 class Tolerance(NamedTuple):
   error: float
   errorDerivative: float
+
+@dataclass(frozen=True, slots=True)
+class Value:
+  min = sys.float_info.min
+  max = sys.float_info.max
 
 @dataclass(frozen=True, slots=True)
 class DriftCorrectionConstants:
@@ -147,8 +172,9 @@ class PositionControlModuleConstants:
   motorCurrentLimit: int
   motorReduction: float
   motorPID: PID
-  motorMotionMaxVelocityRate: units.units_per_second
-  motorMotionMaxAccelerationRate: units.units_per_second_squared
+  motorOutputRange: Range
+  motorMotionMaxVelocity: units.units_per_second
+  motorMotionMaxAcceleration: units.units_per_second_squared
   motorMotionAllowedClosedLoopError: float
   motorSoftLimitForward: units.inches
   motorSoftLimitReverse: units.inches

@@ -40,22 +40,16 @@ class GameController(CommandXboxController):
     return Trigger(lambda: math.fabs(self.getRightX()) > self._inputDeadband)
   
   def rumbleCommand(self, pattern: ControllerRumblePattern) -> Command:
-    match pattern:
-      case ControllerRumblePattern.Short:
-        return cmd.run(
-          lambda: self.setRumble(XboxController.RumbleType.kBothRumble, 1)
-        ).withTimeout(
-          0.5
-        ).finallyDo(
-          lambda end: self.setRumble(XboxController.RumbleType.kBothRumble, 0)
-        )
-      case ControllerRumblePattern.Long:
-        return cmd.run(
-          lambda: self.setRumble(XboxController.RumbleType.kBothRumble, 1)
-        ).withTimeout(
-          1.5
-        ).finallyDo(
-          lambda end: self.setRumble(XboxController.RumbleType.kBothRumble, 0)
-        )
-      case _:
-        return cmd.none()
+    return cmd.select(
+      {
+        ControllerRumblePattern.Short: cmd.startEnd(
+          lambda: self.setRumble(XboxController.RumbleType.kBothRumble, 1),
+          lambda: self.setRumble(XboxController.RumbleType.kBothRumble, 0)
+        ).withTimeout(0.5),
+        ControllerRumblePattern.Long: cmd.startEnd(
+          lambda: self.setRumble(XboxController.RumbleType.kBothRumble, 1),
+          lambda: self.setRumble(XboxController.RumbleType.kBothRumble, 0)
+        ).withTimeout(1.0),
+      }, 
+      lambda: pattern
+    )

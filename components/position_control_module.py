@@ -1,4 +1,5 @@
 import math
+from commands2 import Command, cmd
 from wpimath import units
 from wpilib import SmartDashboard
 from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, ClosedLoopConfig
@@ -14,10 +15,13 @@ class PositionControlModule:
 
     self._baseKey = f'Robot/{self._config.moduleBaseKey}'
 
+    self._hasInitialZeroReset: bool = False
+    self._targetPosition: float = math.nan
+
     encoderPositionConversionFactor: float = self._config.constants.distancePerRotation / self._config.constants.motorReduction
     encoderVelocityConversionFactor: float = encoderPositionConversionFactor / 60.0
-    motorMotionMaxVelocity: float = (self._config.constants.motorMotionMaxVelocityRate / encoderPositionConversionFactor) * 60
-    motorMotionMaxAcceleration: float = self._config.constants.motorMotionMaxAccelerationRate / encoderVelocityConversionFactor 
+    motorMotionMaxVelocity: float = (self._config.constants.motorMotionMaxVelocity / encoderPositionConversionFactor) * 60
+    motorMotionMaxAcceleration: float = self._config.constants.motorMotionMaxAcceleration / encoderVelocityConversionFactor 
 
     if self._config.constants.motorControllerType == SparkLowLevel.SparkModel.kSparkFlex:
       self._motor = SparkFlex(self._config.motorCANId, self._config.constants.motorType)
@@ -34,7 +38,7 @@ class PositionControlModule:
     (self._motorConfig.closedLoop
       .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
       .pid(*self._config.constants.motorPID)
-      .outputRange(-1.0, 1.0)
+      .outputRange(*self._config.constants.motorOutputRange)
       .maxMotion
         .maxVelocity(motorMotionMaxVelocity)
         .maxAcceleration(motorMotionMaxAcceleration)
@@ -63,32 +67,60 @@ class PositionControlModule:
     self._updateTelemetry()
     
   def setSpeed(self, speed: units.percent) -> None:
-    self._motor.set(speed)
-
+    self._resetTargetPosition()
+    self._motor.set(-speed if self._config.isInverted else speed)
+    
   def setPosition(self, position: float) -> None:
-    self._closedLoopController.setReference(position, SparkBase.ControlType.kMAXMotionPositionControl)
-
+    self._targetPosition = utils.clampValue(position, self._config.constants.motorSoftLimitReverse, self._config.constants.motorSoftLimitForward)
+    self._closedLoopController.setReference(self._targetPosition, SparkBase.ControlType.kMAXMotionPositionControl)
+    
   def getPosition(self) -> float:
     return self._encoder.getPosition()
 
-  def isPositionAtSoftLimit(self, direction: MotorDirection, tolerance: float) -> bool:
+  def isAtTargetPosition(self) -> bool:
+    return (
+      not math.isnan(self._targetPosition)
+      and (
+        math.isclose(self.getPosition(), self._targetPosition, abs_tol = self._config.constants.motorMotionAllowedClosedLoopError)
+        or
+        not utils.isValueInRange(self.getPosition(), self._config.constants.motorSoftLimitReverse, self._config.constants.motorSoftLimitForward)
+      )
+    )
+
+  def isAtSoftLimit(self, direction: MotorDirection, tolerance: float) -> bool:
     return math.isclose(
       self.getPosition(),
       self._config.constants.motorSoftLimitReverse if direction == MotorDirection.Reverse else self._config.constants.motorSoftLimitForward, 
       abs_tol = tolerance
     )
 
-  def startZeroReset(self) -> None:
-    utils.setSparkSoftLimitsEnabled(self._motor, False)
-    self._motor.set(-self._config.constants.motorResetSpeed)
+  def suspendSoftLimitsCommand(self) -> Command:
+    return cmd.startEnd(
+      lambda: utils.setSparkSoftLimitsEnabled(self._motor, False),
+      lambda: utils.setSparkSoftLimitsEnabled(self._motor, True)
+    )
 
-  def endZeroReset(self) -> None:
-    self._motor.stopMotor()
-    self._encoder.setPosition(0)
-    utils.setSparkSoftLimitsEnabled(self._motor, True)
+  def resetToZeroCommand(self) -> Command:
+    return cmd.startEnd(
+      lambda: self.setSpeed(-self._config.constants.motorResetSpeed),
+      lambda: [
+        self._motor.stopMotor(),
+        self._encoder.setPosition(0),
+        setattr(self, "_hasInitialZeroReset", True)
+      ]
+    ).deadlineFor(self.suspendSoftLimitsCommand())
+
+  def hasInitialZeroReset(self) -> bool:
+    return self._hasInitialZeroReset
+
+  def _resetTargetPosition(self) -> None:
+    self._targetPosition = math.nan
 
   def reset(self) -> None:
     self._motor.stopMotor()
+    self._resetTargetPosition()
 
   def _updateTelemetry(self) -> None:
-    SmartDashboard.putNumber(f'{self._baseKey}/Position', self._encoder.getPosition())
+    SmartDashboard.putNumber(f'{self._baseKey}/Position/Current', self._encoder.getPosition())
+    SmartDashboard.putNumber(f'{self._baseKey}/Position/Target', self._targetPosition)
+    SmartDashboard.putNumber(f'{self._baseKey}/Velocity', self._encoder.getVelocity())

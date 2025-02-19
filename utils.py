@@ -14,14 +14,14 @@ from .classes import Alliance, RobotMode, RobotState
 
 T = TypeVar("T")
 
-robot: TimedCommandRobot = None
+__robot__: TimedCommandRobot = None
 
 def setRobotInstance(instance: TimedCommandRobot) -> None:
-  global robot
-  robot = instance
+  global __robot__
+  __robot__ = instance
 
 def addRobotPeriodic(callback: Callable[[], None], period: units.seconds = 0.02, offset: units.seconds = 0) -> None:
-  robot.addPeriodic(callback, period, offset)
+  __robot__.addPeriodic(callback, period, offset)
 
 def getRobotState() -> RobotState:
   if wpilib.RobotState.isEnabled():
