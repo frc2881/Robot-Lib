@@ -15,7 +15,7 @@ def _updateRobotInfo() -> None:
   SmartDashboard.putString("Robot/Status/Mode", utils.getRobotMode().name)
   SmartDashboard.putString("Robot/Status/State", utils.getRobotState().name)
   SmartDashboard.putNumber("Robot/Power/Battery/Voltage", RobotController.getBatteryVoltage())
-  SmartDashboard.putNumber("Robot/Power/Battery/IsBrownedOut", RobotController.isBrownedOut())
+  SmartDashboard.putNumber("Robot/Power/IsBrownedOut", RobotController.isBrownedOut())
 
 def _updateGameInfo() -> None:
   SmartDashboard.putString("Game/Alliance", utils.getAlliance().name)
