@@ -1,5 +1,6 @@
 from typing import NamedTuple
 import sys
+import math
 from enum import Enum, IntEnum, auto
 from dataclasses import dataclass
 from wpimath import units
@@ -90,7 +91,8 @@ class Tolerance(NamedTuple):
   errorDerivative: float
 
 @dataclass(frozen=True, slots=True)
-class Value:
+class Value(float):
+  none = math.nan
   min = sys.float_info.min
   max = sys.float_info.max
 

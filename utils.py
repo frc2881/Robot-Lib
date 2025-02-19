@@ -10,7 +10,7 @@ from wpimath.geometry import Pose2d, Pose3d, Translation2d, Rotation2d
 from wpilib import DriverStation
 from rev import SparkBase, SparkBaseConfig, REVLibError
 from . import logger
-from .classes import Alliance, RobotMode, RobotState
+from .classes import Alliance, RobotMode, RobotState, Value
 
 T = TypeVar("T")
 
@@ -93,7 +93,7 @@ def getInterpolatedValue(x: float, xs: tuple[float, ...], ys: tuple[float, ...])
   try:
     return numpy.interp([x], xs, ys)[0]
   except:
-    return math.nan
+    return Value.none
 
 def setSparkSoftLimitsEnabled(motor: SparkBase, enabled: bool) -> None:
   config = SparkBaseConfig()

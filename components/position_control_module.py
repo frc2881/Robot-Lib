@@ -3,7 +3,7 @@ from commands2 import Command, cmd
 from wpimath import units
 from wpilib import SmartDashboard
 from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, ClosedLoopConfig
-from ..classes import PositionControlModuleConfig, MotorDirection
+from ..classes import PositionControlModuleConfig, MotorDirection, Value
 from .. import logger, utils
 
 class PositionControlModule:
@@ -16,7 +16,7 @@ class PositionControlModule:
     self._baseKey = f'Robot/{self._config.moduleBaseKey}'
 
     self._hasInitialZeroReset: bool = False
-    self._targetPosition: float = math.nan
+    self._targetPosition: float = Value.none
 
     encoderPositionConversionFactor: float = self._config.constants.distancePerRotation / self._config.constants.motorReduction
     encoderVelocityConversionFactor: float = encoderPositionConversionFactor / 60.0
@@ -114,7 +114,7 @@ class PositionControlModule:
     return self._hasInitialZeroReset
 
   def _resetTargetPosition(self) -> None:
-    self._targetPosition = math.nan
+    self._targetPosition = Value.none
 
   def reset(self) -> None:
     self._motor.stopMotor()
