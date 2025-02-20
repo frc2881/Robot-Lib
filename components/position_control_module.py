@@ -1,5 +1,5 @@
 import math
-from commands2 import Command, cmd
+from commands2 import Command, cmd, Subsystem
 from wpimath import units
 from wpilib import SmartDashboard
 from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, ClosedLoopConfig
@@ -100,16 +100,21 @@ class PositionControlModule:
       lambda: utils.setSparkSoftLimitsEnabled(self._motor, True)
     )
 
-  def resetToZeroCommand(self) -> Command:
+  def resetToZeroCommand(self, subsystem: Subsystem) -> Command:
     return cmd.startEnd(
-      lambda: self.setSpeed(-self._config.constants.motorResetSpeed),
+      lambda: [
+        utils.setSparkSoftLimitsEnabled(self._motor, False),
+        self._motor.set(-self._config.constants.motorResetSpeed)
+      ],
       lambda: [
         self._motor.stopMotor(),
         self._encoder.setPosition(0),
+        utils.setSparkSoftLimitsEnabled(self._motor, True),
         setattr(self, "_hasInitialZeroReset", True)
-      ]
-    ).deadlineFor(self.suspendSoftLimitsCommand())
-
+      ],
+      subsystem
+    )
+    
   def hasInitialZeroReset(self) -> bool:
     return self._hasInitialZeroReset
 
