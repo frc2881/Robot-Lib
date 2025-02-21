@@ -17,6 +17,7 @@ class PositionControlModule:
 
     self._hasInitialZeroReset: bool = False
     self._targetPosition: float = Value.none
+    self._isAlignedToPosition: bool = False
 
     encoderPositionConversionFactor: float = self._config.constants.distancePerRotation / self._config.constants.motorReduction
     encoderVelocityConversionFactor: float = encoderPositionConversionFactor / 60.0
@@ -67,25 +68,22 @@ class PositionControlModule:
     self._updateTelemetry()
     
   def setSpeed(self, speed: units.percent) -> None:
-    self._resetTargetPosition()
+    self.resetPositionAlignment()
     self._motor.set(-speed if self._config.isInverted else speed)
     
   def setPosition(self, position: float) -> None:
     self._targetPosition = utils.clampValue(position, self._config.constants.motorSoftLimitReverse, self._config.constants.motorSoftLimitForward)
     self._closedLoopController.setReference(self._targetPosition, SparkBase.ControlType.kMAXMotionPositionControl)
+    self._setIsAlignedToPosition()
     
   def getPosition(self) -> float:
     return self._encoder.getPosition()
 
-  def isAtTargetPosition(self) -> bool:
-    return (
-      not math.isnan(self._targetPosition)
-      and (
-        math.isclose(self.getPosition(), self._targetPosition, abs_tol = self._config.constants.motorMotionAllowedClosedLoopError)
-        or
-        not utils.isValueInRange(self.getPosition(), self._config.constants.motorSoftLimitReverse, self._config.constants.motorSoftLimitForward)
-      )
-    )
+  def _setIsAlignedToPosition(self) -> None:
+    self._isAlignedToPosition = math.isclose(self.getPosition(), self._targetPosition, abs_tol = self._config.constants.motorMotionAllowedClosedLoopError)
+
+  def isAlignedToPosition(self) -> bool:
+    return self._isAlignedToPosition
 
   def isAtSoftLimit(self, direction: MotorDirection, tolerance: float) -> bool:
     return math.isclose(
@@ -117,15 +115,14 @@ class PositionControlModule:
     
   def hasInitialZeroReset(self) -> bool:
     return self._hasInitialZeroReset
-
-  def _resetTargetPosition(self) -> None:
+  
+  def resetPositionAlignment(self) -> None:
     self._targetPosition = Value.none
+    self._isAlignedToPosition = False
 
   def reset(self) -> None:
     self._motor.stopMotor()
-    self._resetTargetPosition()
+    self.resetPositionAlignment()
 
   def _updateTelemetry(self) -> None:
     SmartDashboard.putNumber(f'{self._baseKey}/Position/Current', self._encoder.getPosition())
-    SmartDashboard.putNumber(f'{self._baseKey}/Position/Target', self._targetPosition)
-    SmartDashboard.putNumber(f'{self._baseKey}/Velocity', self._encoder.getVelocity())
