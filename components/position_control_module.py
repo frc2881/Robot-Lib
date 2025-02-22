@@ -103,13 +103,13 @@ class PositionControlModule:
   def resetToZero(self, subsystem: Subsystem) -> Command:
     return cmd.startEnd(
       lambda: [ 
-        lambda: utils.setSparkSoftLimitsEnabled(self._motor, False),
+        utils.setSparkSoftLimitsEnabled(self._motor, False),
         self._motor.set(-self._config.constants.motorResetSpeed) 
       ],
       lambda: [
         self._motor.stopMotor(),
         self._encoder.setPosition(0),
-        lambda: utils.setSparkSoftLimitsEnabled(self._motor, True),
+        utils.setSparkSoftLimitsEnabled(self._motor, True),
         setattr(self, "_hasZeroReset", True)
       ],
       subsystem
