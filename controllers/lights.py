@@ -1,8 +1,8 @@
 from wpilib import SmartDashboard
 
-class LightsController:
+class Lights:
   def __init__(self) -> None:
-    self.setLightsMode("Default")
+    self.setMode("Default")
 
-  def setLightsMode(self, mode: str) -> None:
+  def setMode(self, mode: str) -> None:
     SmartDashboard.putString("Robot/Lights/Mode", mode)

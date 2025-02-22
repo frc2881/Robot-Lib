@@ -6,7 +6,7 @@ from wpilib import XboxController
 from .. import logger, utils
 from ..classes import ControllerRumblePattern
 
-class GameController(CommandXboxController):
+class Xbox(CommandXboxController):
   def __init__(
       self, 
       port: int, 
@@ -39,7 +39,7 @@ class GameController(CommandXboxController):
   def rightX(self) -> Trigger:
     return Trigger(lambda: math.fabs(self.getRightX()) > self._inputDeadband)
   
-  def rumbleCommand(self, pattern: ControllerRumblePattern) -> Command:
+  def rumble(self, pattern: ControllerRumblePattern) -> Command:
     return cmd.select(
       {
         ControllerRumblePattern.Short: cmd.startEnd(

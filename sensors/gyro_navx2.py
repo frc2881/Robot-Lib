@@ -5,7 +5,7 @@ from wpimath.geometry import Rotation2d, Pose2d
 from navx import AHRS
 from .. import logger, utils
 
-class GyroSensor_NAVX2():
+class Gyro_NAVX2():
   def __init__(
       self,
       comType: AHRS.NavXComType
@@ -41,14 +41,14 @@ class GyroSensor_NAVX2():
   def resetRobotToField(self, robotPose: Pose2d) -> None:
     self._reset(utils.wrapAngle(robotPose.rotation().degrees() + utils.getValueForAlliance(0.0, 180.0)))
 
-  def resetCommand(self) -> Command:
+  def reset(self) -> Command:
     return cmd.runOnce(self._reset).ignoringDisable(True).withName("GyroSensor:Reset")
 
   def _calibrate(self) -> None:
     if RobotBase.isReal():
       pass # NO-OP as navX2 currently does automatic calibration
 
-  def calibrateCommand(self) -> Command:
+  def calibrate(self) -> Command:
     return cmd.sequence(
       cmd.runOnce(
         lambda: [

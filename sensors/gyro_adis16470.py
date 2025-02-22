@@ -4,7 +4,7 @@ from wpimath import units
 from wpimath.geometry import Rotation2d, Pose2d
 from .. import logger, utils
 
-class GyroSensor_ADIS16470():
+class Gyro_ADIS16470():
   def __init__(
       self, 
       spiPort: SPI.Port,
@@ -54,7 +54,7 @@ class GyroSensor_ADIS16470():
   def resetRobotToField(self, robotPose: Pose2d) -> None:
     self._reset(utils.wrapAngle(robotPose.rotation().degrees() + utils.getValueForAlliance(0.0, 180.0)))
 
-  def resetCommand(self) -> Command:
+  def reset(self) -> Command:
     return cmd.runOnce(self._reset).ignoringDisable(True).withName("GyroSensor:Reset")
   
   def _calibrate(self) -> None:
@@ -62,7 +62,7 @@ class GyroSensor_ADIS16470():
       self._gyro.configCalTime(self._commandCalibrationTime)
       self._gyro.calibrate()
 
-  def calibrateCommand(self) -> Command:
+  def calibrate(self) -> Command:
     return cmd.sequence(
       cmd.runOnce(
         lambda: [

@@ -15,7 +15,7 @@ class PositionControlModule:
 
     self._baseKey = f'Robot/{self._config.moduleBaseKey}'
 
-    self._hasInitialZeroReset: bool = False
+    self._hasZeroReset: bool = False
     self._targetPosition: float = Value.none
     self._isAlignedToPosition: bool = False
 
@@ -100,28 +100,23 @@ class PositionControlModule:
       abs_tol = tolerance
     )
 
-  def suspendSoftLimitsCommand(self) -> Command:
+  def resetToZero(self, subsystem: Subsystem) -> Command:
     return cmd.startEnd(
-      lambda: utils.setSparkSoftLimitsEnabled(self._motor, False),
-      lambda: utils.setSparkSoftLimitsEnabled(self._motor, True)
-    )
-
-  def resetToZeroCommand(self, subsystem: Subsystem) -> Command:
-    return cmd.parallel(
-      self.suspendSoftLimitsCommand(),
-      cmd.startEnd(
-        lambda: self._motor.set(-self._config.constants.motorResetSpeed),
-        lambda: [
-          self._motor.stopMotor(),
-          self._encoder.setPosition(0),
-          setattr(self, "_hasInitialZeroReset", True)
-        ],
-        subsystem
-      )
+      lambda: [ 
+        lambda: utils.setSparkSoftLimitsEnabled(self._motor, False),
+        self._motor.set(-self._config.constants.motorResetSpeed) 
+      ],
+      lambda: [
+        self._motor.stopMotor(),
+        self._encoder.setPosition(0),
+        lambda: utils.setSparkSoftLimitsEnabled(self._motor, True),
+        setattr(self, "_hasZeroReset", True)
+      ],
+      subsystem
     )
   
-  def hasInitialZeroReset(self) -> bool:
-    return self._hasInitialZeroReset
+  def hasZeroReset(self) -> bool:
+    return self._hasZeroReset
 
   def reset(self) -> None:
     self._motor.stopMotor()
