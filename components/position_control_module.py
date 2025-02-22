@@ -68,22 +68,30 @@ class PositionControlModule:
     self._updateTelemetry()
     
   def setSpeed(self, speed: units.percent) -> None:
-    self.resetPositionAlignment()
     self._motor.set(-speed if self._config.isInverted else speed)
+    if speed != 0:
+      self._resetPositionAlignment()
     
-  def setPosition(self, position: float) -> None:
-    self._targetPosition = utils.clampValue(position, self._config.constants.motorSoftLimitReverse, self._config.constants.motorSoftLimitForward)
+  def alignToPosition(self, position: float) -> None:
+    if position != self._targetPosition:
+      self._resetPositionAlignment()
+      self._targetPosition = utils.clampValue(position, self._config.constants.motorSoftLimitReverse, self._config.constants.motorSoftLimitForward)
     self._closedLoopController.setReference(self._targetPosition, SparkBase.ControlType.kMAXMotionPositionControl)
-    self._setIsAlignedToPosition()
+    self._isAlignedToPosition = math.isclose(self.getPosition(), self._targetPosition, abs_tol = self._config.constants.motorMotionAllowedClosedLoopError)
+
+  def setPosition(self, position: float) -> None:
+    self._resetPositionAlignment()
+    self._closedLoopController.setReference(position, SparkBase.ControlType.kMAXMotionPositionControl)
     
   def getPosition(self) -> float:
     return self._encoder.getPosition()
 
-  def _setIsAlignedToPosition(self) -> None:
-    self._isAlignedToPosition = math.isclose(self.getPosition(), self._targetPosition, abs_tol = self._config.constants.motorMotionAllowedClosedLoopError)
-
   def isAlignedToPosition(self) -> bool:
     return self._isAlignedToPosition
+
+  def _resetPositionAlignment(self) -> None:
+    self._targetPosition = Value.none
+    self._isAlignedToPosition = False
 
   def isAtSoftLimit(self, direction: MotorDirection, tolerance: float) -> bool:
     return math.isclose(
@@ -99,30 +107,26 @@ class PositionControlModule:
     )
 
   def resetToZeroCommand(self, subsystem: Subsystem) -> Command:
-    return cmd.startEnd(
-      lambda: [
-        utils.setSparkSoftLimitsEnabled(self._motor, False),
-        self._motor.set(-self._config.constants.motorResetSpeed)
-      ],
-      lambda: [
-        self._motor.stopMotor(),
-        self._encoder.setPosition(0),
-        utils.setSparkSoftLimitsEnabled(self._motor, True),
-        setattr(self, "_hasInitialZeroReset", True)
-      ],
-      subsystem
+    return cmd.parallel(
+      self.suspendSoftLimitsCommand(),
+      cmd.startEnd(
+        lambda: self._motor.set(-self._config.constants.motorResetSpeed),
+        lambda: [
+          self._motor.stopMotor(),
+          self._encoder.setPosition(0),
+          setattr(self, "_hasInitialZeroReset", True)
+        ],
+        subsystem
+      )
     )
-    
+  
   def hasInitialZeroReset(self) -> bool:
     return self._hasInitialZeroReset
-  
-  def resetPositionAlignment(self) -> None:
-    self._targetPosition = Value.none
-    self._isAlignedToPosition = False
 
   def reset(self) -> None:
     self._motor.stopMotor()
-    self.resetPositionAlignment()
+    self._resetPositionAlignment()
 
   def _updateTelemetry(self) -> None:
-    SmartDashboard.putNumber(f'{self._baseKey}/Position/Current', self._encoder.getPosition())
+    SmartDashboard.putNumber(f'{self._baseKey}/IsAlignedToPosition', self._isAlignedToPosition)
+    SmartDashboard.putNumber(f'{self._baseKey}/Position', self._encoder.getPosition())
