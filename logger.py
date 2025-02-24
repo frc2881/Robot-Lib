@@ -1,5 +1,5 @@
 import traceback
-from commands2 import CommandScheduler
+from commands2 import CommandScheduler, Command, cmd
 from wpilib import DataLogManager, DriverStation, Timer, SmartDashboard
 from .classes import RobotMode
 
@@ -30,6 +30,9 @@ def mode(mode: RobotMode) -> None:
 
 def debug(message: str) -> None:
   log(f'@@@@@@@@@@ DEBUG: {message} @@@@@@@@@@')
+
+def debug_(message: str) -> Command:
+  return cmd.runOnce(lambda: debug(message))
 
 def error(message: str) -> None:
   log(f'!!!!!!!!!! ERROR: {message} !!!!!!!!!!')
