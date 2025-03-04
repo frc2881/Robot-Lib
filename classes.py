@@ -191,12 +191,16 @@ class PositionControlModuleConfig:
   constants: PositionControlModuleConstants
 
 @dataclass(frozen=True, slots=True)
+class PoseSensorConstants:
+  aprilTagFieldLayout: AprilTagFieldLayout
+  poseStrategy: PoseStrategy
+  fallbackPoseStrategy: PoseStrategy
+
+@dataclass(frozen=True, slots=True)
 class PoseSensorConfig:
   cameraName: str
   cameraTransform: Transform3d
-  poseStrategy: PoseStrategy
-  fallbackPoseStrategy: PoseStrategy
-  aprilTagFieldLayout: AprilTagFieldLayout
+  constants: PoseSensorConstants
 
 @dataclass(frozen=True, slots=True)
 class ObjectSensorConfig:

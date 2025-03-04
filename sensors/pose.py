@@ -15,15 +15,14 @@ class PoseSensor:
     self._photonCamera = PhotonCamera(config.cameraName)
     self._photonCamera.setDriverMode(False)
     self._photonPoseEstimator = PhotonPoseEstimator(
-      config.aprilTagFieldLayout, 
-      config.poseStrategy, 
+      config.constants.aprilTagFieldLayout, 
+      config.constants.poseStrategy, 
       self._photonCamera, 
       config.cameraTransform
     )
-    self._photonPoseEstimator.multiTagFallbackStrategy = config.fallbackPoseStrategy
+    self._photonPoseEstimator.multiTagFallbackStrategy = config.constants.fallbackPoseStrategy
 
     self._hasTarget = False
-
     self._pipelineResultBufferTimer = Timer()
 
     utils.addRobotPeriodic(self._periodic)
@@ -40,10 +39,13 @@ class PoseSensor:
       self._hasTarget = len(estimatedRobotPose.targetsUsed) > 0
       self._pipelineResultBufferTimer.restart()
     else: 
-      if self._hasTarget and self._pipelineResultBufferTimer.hasElapsed(0.2):
+      if self._hasTarget and self._pipelineResultBufferTimer.hasElapsed(0.5):
         self._hasTarget = False
     return estimatedRobotPose
   
+  def getCameraName(self) -> str:
+    return self._config.cameraName
+
   def hasTarget(self) -> bool:
     return self._hasTarget
   
