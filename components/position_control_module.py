@@ -36,21 +36,22 @@ class PositionControlModule:
     (self._motorConfig.encoder
       .positionConversionFactor(encoderPositionConversionFactor)
       .velocityConversionFactor(encoderVelocityConversionFactor))
-    (self._motorConfig.closedLoop
-      .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
-      .pid(*self._config.constants.motorPID)
-      .outputRange(*self._config.constants.motorOutputRange)
-      .maxMotion
-        .maxVelocity(motorMotionMaxVelocity)
-        .maxAcceleration(motorMotionMaxAcceleration)
-        .allowedClosedLoopError(self._config.constants.motorMotionAllowedClosedLoopError))
-    (self._motorConfig.softLimit
-      .forwardSoftLimitEnabled(True)
-      .forwardSoftLimit(self._config.constants.motorSoftLimitForward)
-      .reverseSoftLimitEnabled(True)
-      .reverseSoftLimit(self._config.constants.motorSoftLimitReverse))
     if self._config.leaderMotorCANId is not None:
-      self._motorConfig.follow(self._config.leaderMotorCANId)
+      self._motorConfig.follow(self._config.leaderMotorCANId, self._config.isInverted)
+    else:
+      (self._motorConfig.closedLoop
+        .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
+        .pid(*self._config.constants.motorPID)
+        .outputRange(*self._config.constants.motorOutputRange)
+        .maxMotion
+          .maxVelocity(motorMotionMaxVelocity)
+          .maxAcceleration(motorMotionMaxAcceleration)
+          .allowedClosedLoopError(self._config.constants.motorMotionAllowedClosedLoopError))
+      (self._motorConfig.softLimit
+        .forwardSoftLimitEnabled(True)
+        .forwardSoftLimit(self._config.constants.motorSoftLimitForward)
+        .reverseSoftLimitEnabled(True)
+        .reverseSoftLimit(self._config.constants.motorSoftLimitReverse))
     utils.setSparkConfig(
       self._motor.configure(
         self._motorConfig,
