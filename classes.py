@@ -177,6 +177,7 @@ class PositionControlModuleConstants:
   motorOutputRange: Range
   motorMotionMaxVelocity: units.units_per_second
   motorMotionMaxAcceleration: units.units_per_second_squared
+  motorMotionVelocityFF: float
   motorMotionAllowedClosedLoopError: float
   motorSoftLimitForward: units.inches
   motorSoftLimitReverse: units.inches

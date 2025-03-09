@@ -35,7 +35,6 @@ class ObjectSensor:
         if target is not None:
           hasTarget = True
 
-          # TODO: replace hard-coded/temp linear interpolation for note objects with generalized homography calculation for coral/algae
           distances = (2.275, 1.783, 1.581, 1.097, 0.732, 0.424, 0.0)
           areas = (0.01, 1.2, 1.6, 3.2, 6.8, 18, 99)
           area = target.getArea()
