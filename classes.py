@@ -179,8 +179,8 @@ class PositionControlModuleConstants:
   motorMotionMaxAcceleration: units.units_per_second_squared
   motorMotionVelocityFF: float
   motorMotionAllowedClosedLoopError: float
-  motorSoftLimitForward: units.inches
   motorSoftLimitReverse: units.inches
+  motorSoftLimitForward: units.inches
   motorResetSpeed: units.percent
 
 @dataclass(frozen=True, slots=True)

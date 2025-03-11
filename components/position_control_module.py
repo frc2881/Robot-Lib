@@ -20,9 +20,6 @@ class PositionControlModule:
     self._isAlignedToPosition: bool = False
 
     encoderPositionConversionFactor: float = self._config.constants.distancePerRotation / self._config.constants.motorReduction
-    encoderVelocityConversionFactor: float = encoderPositionConversionFactor / 60.0
-    # motorMotionMaxVelocity: float = (self._config.constants.motorMotionMaxVelocity / encoderPositionConversionFactor) * 60
-    # motorMotionMaxAcceleration: float = self._config.constants.motorMotionMaxAcceleration / encoderVelocityConversionFactor 
 
     if self._config.constants.motorControllerType == SparkLowLevel.SparkModel.kSparkFlex:
       self._motor = SparkFlex(self._config.motorCANId, self._config.constants.motorType)
@@ -35,7 +32,7 @@ class PositionControlModule:
       .inverted(self._config.isInverted))
     (self._motorConfig.encoder
       .positionConversionFactor(encoderPositionConversionFactor)
-      .velocityConversionFactor(encoderVelocityConversionFactor))
+      .velocityConversionFactor(encoderPositionConversionFactor / 60.0))
     if self._config.leaderMotorCANId is not None:
       self._motorConfig.follow(self._config.leaderMotorCANId, self._config.isInverted)
     else:
@@ -50,10 +47,10 @@ class PositionControlModule:
       if self._config.constants.motorMotionVelocityFF is not None:
         self._motorConfig.closedLoop.velocityFF(self._config.constants.motorMotionVelocityFF)
       (self._motorConfig.softLimit
-        .forwardSoftLimitEnabled(True)
-        .forwardSoftLimit(self._config.constants.motorSoftLimitForward)
         .reverseSoftLimitEnabled(True)
-        .reverseSoftLimit(self._config.constants.motorSoftLimitReverse))
+        .reverseSoftLimit(self._config.constants.motorSoftLimitReverse)
+        .forwardSoftLimitEnabled(True)
+        .forwardSoftLimit(self._config.constants.motorSoftLimitForward))
     utils.setSparkConfig(
       self._motor.configure(
         self._motorConfig,
@@ -78,8 +75,7 @@ class PositionControlModule:
   def alignToPosition(self, position: float) -> None:
     if position != self._targetPosition:
       self._resetPositionAlignment()
-      # TODO: Re-enable this logic but make sure upper stage can still go past the forward soft limit for climb
-      self._targetPosition = position # utils.clampValue(position, self._config.constants.motorSoftLimitReverse, self._config.constants.motorSoftLimitForward)
+      self._targetPosition = utils.clampValue(position, self._config.constants.motorSoftLimitReverse, self._config.constants.motorSoftLimitForward)
     self._closedLoopController.setReference(self._targetPosition, SparkBase.ControlType.kMAXMotionPositionControl)
     self._isAlignedToPosition = math.isclose(self.getPosition(), self._targetPosition, abs_tol = self._config.constants.motorMotionAllowedClosedLoopError)
 
@@ -104,6 +100,24 @@ class PositionControlModule:
       abs_tol = tolerance
     )
   
+  def overrideDefaultSoftLimits(self, reversePosition: float, forwardPosition: float) -> None:
+    utils.setSparkConfig(
+      self._motor.configure(
+        SparkBaseConfig().softLimit.reverseSoftLimit(reversePosition).forwardSoftLimit(forwardPosition), 
+        SparkBase.ResetMode.kNoResetSafeParameters, 
+        SparkBase.PersistMode.kNoPersistParameters
+      )
+    )
+
+  def restoreDefaultSoftLimits(self) -> None:
+    utils.setSparkConfig(
+      self._motor.configure(
+        self._motorConfig.softLimit, 
+        SparkBase.ResetMode.kResetSafeParameters,
+        SparkBase.PersistMode.kPersistParameters
+      )
+    )
+
   def setSoftLimitsEnabled(self, softLimitsEnabled: bool) -> None:
     utils.setSparkSoftLimitsEnabled(self._motor, softLimitsEnabled)
 
