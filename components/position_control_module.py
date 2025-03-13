@@ -75,7 +75,7 @@ class PositionControlModule:
   def alignToPosition(self, position: float) -> None:
     if position != self._targetPosition:
       self._resetPositionAlignment()
-      self._targetPosition = utils.clampValue(position, self._config.constants.motorSoftLimitReverse, self._config.constants.motorSoftLimitForward)
+      self._targetPosition = position # utils.clampValue(position, self._config.constants.motorSoftLimitReverse, self._config.constants.motorSoftLimitForward)
     self._closedLoopController.setReference(self._targetPosition, SparkBase.ControlType.kMAXMotionPositionControl)
     self._isAlignedToPosition = math.isclose(self.getPosition(), self._targetPosition, abs_tol = self._config.constants.motorMotionAllowedClosedLoopError)
 
@@ -99,27 +99,9 @@ class PositionControlModule:
       self._config.constants.motorSoftLimitReverse if direction == MotorDirection.Reverse else self._config.constants.motorSoftLimitForward, 
       abs_tol = tolerance
     )
-  
-  def overrideDefaultSoftLimits(self, reversePosition: float, forwardPosition: float) -> None:
-    utils.setSparkConfig(
-      self._motor.configure(
-        SparkBaseConfig().softLimit.reverseSoftLimit(reversePosition).forwardSoftLimit(forwardPosition), 
-        SparkBase.ResetMode.kNoResetSafeParameters, 
-        SparkBase.PersistMode.kNoPersistParameters
-      )
-    )
 
-  def restoreDefaultSoftLimits(self) -> None:
-    utils.setSparkConfig(
-      self._motor.configure(
-        self._motorConfig.softLimit, 
-        SparkBase.ResetMode.kResetSafeParameters,
-        SparkBase.PersistMode.kPersistParameters
-      )
-    )
-
-  def setSoftLimitsEnabled(self, softLimitsEnabled: bool) -> None:
-    utils.setSparkSoftLimitsEnabled(self._motor, softLimitsEnabled)
+  def setSoftLimitsEnabled(self, isEnabled: bool) -> None:
+    utils.setSparkSoftLimitsEnabled(self._motor, isEnabled)
 
   def resetToZero(self, subsystem: Subsystem) -> Command:
     return cmd.startEnd(
