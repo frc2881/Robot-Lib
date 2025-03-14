@@ -126,7 +126,7 @@ class PositionControlModule:
     self._resetPositionAlignment()
 
   def _updateTelemetry(self) -> None:
-    SmartDashboard.putNumber(f'{self._baseKey}/IsAlignedToPosition', self._isAlignedToPosition)
+    SmartDashboard.putBoolean(f'{self._baseKey}/IsAlignedToPosition', self._isAlignedToPosition)
     SmartDashboard.putNumber(f'{self._baseKey}/Position', self._encoder.getPosition())
     SmartDashboard.putNumber(f'{self._baseKey}/Current', self._motor.getOutputCurrent())
     SmartDashboard.putNumber(f'{self._baseKey}/Velocity', self._encoder.getVelocity())
