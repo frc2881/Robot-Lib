@@ -1,5 +1,4 @@
 import math
-from wpimath import units
 from wpimath.geometry import Rotation2d
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpilib import SmartDashboard
@@ -73,19 +72,18 @@ class SwerveModule:
     self._turningClosedLoopController = self._turningMotor.getClosedLoopController()
     self._turningEncoder = self._turningMotor.getAbsoluteEncoder()
 
-    self._drivingTargetSpeed: units.meters_per_second = 0
-
     utils.addRobotPeriodic(self._periodic)
 
   def _periodic(self) -> None:
     self._updateTelemetry()
 
   def setTargetState(self, targetState: SwerveModuleState) -> None:
-    targetState.angle = targetState.angle.__add__(Rotation2d(self._config.turningOffset))
-    targetState.optimize(Rotation2d(self._turningEncoder.getPosition()))
+    currentAngle = Rotation2d(self._turningEncoder.getPosition())
+    targetState.angle += Rotation2d(self._config.turningOffset)
+    targetState.optimize(currentAngle)
+    targetState.cosineScale(currentAngle)
     self._drivingClosedLoopController.setReference(targetState.speed, SparkBase.ControlType.kVelocity)
     self._turningClosedLoopController.setReference(targetState.angle.radians(), SparkBase.ControlType.kPosition)
-    self._drivingTargetSpeed = targetState.speed
 
   def getState(self) -> SwerveModuleState:
     return SwerveModuleState(self._drivingEncoder.getVelocity(), Rotation2d(self._turningEncoder.getPosition() - self._config.turningOffset))
@@ -99,7 +97,4 @@ class SwerveModule:
     utils.setSparkConfig(self._turningMotor.configure(SparkBaseConfig().setIdleMode(idleMode), SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kNoPersistParameters))
     
   def _updateTelemetry(self) -> None:
-    SmartDashboard.putNumber(f'{self._baseKey}/Driving/Speed/Target', self._drivingTargetSpeed)
-    SmartDashboard.putNumber(f'{self._baseKey}/Driving/Speed/Actual', self._drivingEncoder.getVelocity())
     SmartDashboard.putNumber(f'{self._baseKey}/Driving/Current', self._drivingMotor.getOutputCurrent())
-    SmartDashboard.putNumber(f'{self._baseKey}/Turning/Position', self._turningEncoder.getPosition())

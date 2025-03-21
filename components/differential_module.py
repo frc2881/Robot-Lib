@@ -1,5 +1,4 @@
 import math
-from wpimath import units
 from wpilib import SmartDashboard
 from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex
 from ..classes import DifferentialModuleConfig, MotorIdleMode
@@ -40,8 +39,6 @@ class DifferentialModule:
     self._drivingEncoder = self._drivingMotor.getEncoder()
     self._drivingEncoder.setPosition(0)
 
-    self._drivingTargetSpeed: units.meters_per_second = 0
-
     utils.addRobotPeriodic(self._periodic)
 
   def _periodic(self) -> None:
@@ -64,7 +61,4 @@ class DifferentialModule:
     self._drivingEncoder.setPosition(0)
 
   def _updateTelemetry(self) -> None:
-    SmartDashboard.putNumber(f'{self._baseKey}/Driving/Speed/Target', self._drivingTargetSpeed)
-    SmartDashboard.putNumber(f'{self._baseKey}/Driving/Speed/Actual', self._drivingEncoder.getVelocity())
-    SmartDashboard.putNumber(f'{self._baseKey}/Driving/Position', self._drivingEncoder.getPosition())
     SmartDashboard.putNumber(f'{self._baseKey}/Driving/Current', self._drivingMotor.getOutputCurrent())
