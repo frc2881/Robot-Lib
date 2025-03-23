@@ -73,9 +73,11 @@ class PositionControlModule:
       self._resetPositionAlignment()
     
   def alignToPosition(self, position: float) -> None:
+    if position == Value.min: position = self._config.constants.motorSoftLimitReverse
+    if position == Value.max: position = self._config.constants.motorSoftLimitForward
     if position != self._targetPosition:
       self._resetPositionAlignment()
-      self._targetPosition = position # utils.clampValue(position, self._config.constants.motorSoftLimitReverse, self._config.constants.motorSoftLimitForward)
+      self._targetPosition = position
     self._closedLoopController.setReference(self._targetPosition, SparkBase.ControlType.kMAXMotionPositionControl)
     self._isAlignedToPosition = math.isclose(self.getPosition(), self._targetPosition, abs_tol = self._config.constants.motorMotionAllowedClosedLoopError)
 
