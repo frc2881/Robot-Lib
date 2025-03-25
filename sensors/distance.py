@@ -1,22 +1,19 @@
 from ntcore import NetworkTableInstance, PubSubOptions
 from wpilib import SmartDashboard
 from wpimath import units
+from ..classes import DistanceSensorConfig
 from .. import logger, utils
 
 class DistanceSensor:
   def __init__(
       self, 
-      sensorName: str,
-      minTargetDistance: units.millimeters,
-      maxTargetDistance: units.millimeters
+      config: DistanceSensorConfig
     ) -> None:
-    self._sensorName = sensorName
-    self._minTargetDistance = minTargetDistance
-    self._maxTargetDistance = maxTargetDistance
-    self._baseKey = f'Robot/Sensors/Distance/{self._sensorName}'
+    self._config = config
+
+    self._baseKey = f'Robot/Sensors/Distance/{self._config.sensorName}'
 
     self._subscriber = NetworkTableInstance.getDefault().getTable("SmartDashboard").getDoubleTopic(f'{self._baseKey}/Value').subscribe(-1.0, PubSubOptions(periodic=0.01))
-
     self._isTriggered: bool = False
 
     utils.addRobotPeriodic(self._periodic)
@@ -28,7 +25,7 @@ class DistanceSensor:
     return self._subscriber.get()
 
   def hasTarget(self) -> bool:
-    hasTarget = utils.isValueInRange(self.getDistance(), self._minTargetDistance, self._maxTargetDistance)
+    hasTarget = utils.isValueInRange(self.getDistance(), self._config.minTargetDistance, self._config.maxTargetDistance)
     if hasTarget and not self._isTriggered:
       self._isTriggered = True
     return hasTarget

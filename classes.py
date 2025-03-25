@@ -204,6 +204,12 @@ class PoseSensorConfig:
   constants: PoseSensorConstants
 
 @dataclass(frozen=True, slots=True)
+class DistanceSensorConfig:
+  sensorName: str
+  minTargetDistance: units.millimeters
+  maxTargetDistance: units.millimeters
+
+@dataclass(frozen=True, slots=True)
 class ObjectSensorConfig:
   cameraName: str
   cameraTransform: Transform3d
