@@ -61,4 +61,5 @@ class DifferentialModule:
     self._drivingEncoder.setPosition(0)
 
   def _updateTelemetry(self) -> None:
-    SmartDashboard.putNumber(f'{self._baseKey}/Driving/Current', self._drivingMotor.getOutputCurrent())
+    # SmartDashboard.putNumber(f'{self._baseKey}/Driving/Current', self._drivingMotor.getOutputCurrent())
+    pass
