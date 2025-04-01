@@ -39,7 +39,7 @@ class PoseSensor:
       self._hasTarget = len(estimatedRobotPose.targetsUsed) > 0
       self._pipelineResultBufferTimer.restart()
     else: 
-      if self._hasTarget and self._pipelineResultBufferTimer.hasElapsed(0.5):
+      if self._hasTarget and self._pipelineResultBufferTimer.hasElapsed(0.1):
         self._hasTarget = False
     return estimatedRobotPose
   
