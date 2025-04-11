@@ -42,6 +42,8 @@ class Position(Enum):
   Center = auto()
   Open = auto()
   Closed = auto()
+  In = auto()
+  Out = auto()
 
 class MotorDirection(Enum):
   Forward = auto()
