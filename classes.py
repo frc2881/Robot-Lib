@@ -105,14 +105,14 @@ class DriftCorrectionConstants:
 
 @dataclass(frozen=True, slots=True)
 class TargetAlignmentConstants:
+  translationPID: PID
+  translationTolerance: Tolerance
+  translationSpeedMax: units.meters_per_second
   rotationPID: PID
   rotationTolerance: Tolerance
   rotationSpeedMax: units.radians_per_second
   rotationHeadingModeOffset: units.degrees
   rotationTranslationModeOffset: units.degrees
-  translationPID: PID
-  translationTolerance: Tolerance
-  translationSpeedMax: units.meters_per_second
 
 @dataclass(frozen=True, slots=True)
 class SwerveModuleConstants:
