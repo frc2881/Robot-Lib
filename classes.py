@@ -24,9 +24,12 @@ class RobotState(Enum):
   Enabled = auto()
   EStopped = auto()
 
-class OptionState(Enum):
-  Enabled = auto()
+class State(Enum):
   Disabled = auto()
+  Enabled = auto()
+  Stopped = auto()
+  Running = auto()
+  Completed = auto()
 
 class Position(Enum):
   Unknown = auto()
@@ -44,6 +47,8 @@ class Position(Enum):
   Closed = auto()
   In = auto()
   Out = auto()
+  Unlocked = auto()
+  Locked = auto()
 
 class MotorDirection(Enum):
   Forward = auto()
@@ -61,10 +66,6 @@ class DriveOrientation(Enum):
 class SpeedMode(Enum):
   Competition = auto()
   Demo = auto()
-
-class LockState(Enum):
-  Unlocked = auto()
-  Locked = auto()
 
 class TargetAlignmentMode(Enum):
   Heading = auto()
