@@ -1,14 +1,14 @@
 from wpilib import DigitalInput, SmartDashboard
 from .. import logger, utils
 
-class BeamBreakSensor:
+class BinarySensor:
   def __init__(
       self, 
       sensorName: str,
       channel: int
     ) -> None:
     self._sensorName = sensorName
-    self._baseKey = f'Robot/Sensors/BeamBreak/{self._sensorName}'
+    self._baseKey = f'Robot/Sensors/Binary/{self._sensorName}'
 
     self._digitalInput = DigitalInput(channel)
 
