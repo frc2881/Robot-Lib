@@ -25,8 +25,8 @@ def start() -> None:
 def log(message: str) -> None:
   DataLogManager.log(f'[{"%.6f" % Timer.getFPGATimestamp()}] {message}')
 
-def mode(mode: RobotMode) -> None:
-  log(f'>>>>>>>>>> Robot Mode Changed: {mode.name} <<<<<<<<<<')
+def log_(message: str) -> Command:
+  return cmd.runOnce(lambda: log(message))
 
 def debug(message: str) -> None:
   log(f'@@@@@@@@@@ DEBUG: {message} @@@@@@@@@@')
@@ -41,3 +41,6 @@ def error(message: str) -> None:
 
 def exception() -> None:
   error(traceback.format_exc())
+
+def mode(mode: RobotMode) -> None:
+  log(f'>>>>>>>>>> Robot Mode Changed: {mode.name} <<<<<<<<<<')
