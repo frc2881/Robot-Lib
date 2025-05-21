@@ -17,7 +17,7 @@ class PositionControlModule:
 
     self._hasZeroReset: bool = False
     self._targetPosition: float = Value.none
-    self._isAlignedToPosition: bool = False
+    self._isAtTargetPosition: bool = False
 
     encoderPositionConversionFactor: float = self._config.constants.distancePerRotation / self._config.constants.motorReduction
 
@@ -70,30 +70,26 @@ class PositionControlModule:
   def setSpeed(self, speed: units.percent) -> None:
     self._motor.set(-speed if self._config.isInverted else speed)
     if speed != 0:
-      self._resetPositionAlignment()
+      self._resetPosition()
     
-  def alignToPosition(self, position: float) -> None:
+  def setPosition(self, position: float) -> None:
     if position == Value.min: position = self._config.constants.motorSoftLimitReverse
     if position == Value.max: position = self._config.constants.motorSoftLimitForward
     if position != self._targetPosition:
-      self._resetPositionAlignment()
+      self._resetPosition()
       self._targetPosition = position
     self._closedLoopController.setReference(self._targetPosition, SparkBase.ControlType.kMAXMotionPositionControl)
-    self._isAlignedToPosition = math.isclose(self.getPosition(), self._targetPosition, abs_tol = self._config.constants.motorMotionAllowedClosedLoopError)
+    self._isAtTargetPosition = math.isclose(self.getPosition(), self._targetPosition, abs_tol = self._config.constants.motorMotionAllowedClosedLoopError)
 
-  def setPosition(self, position: float) -> None:
-    self._resetPositionAlignment()
-    self._closedLoopController.setReference(position, SparkBase.ControlType.kMAXMotionPositionControl)
-    
   def getPosition(self) -> float:
     return self._encoder.getPosition()
 
-  def isAlignedToPosition(self) -> bool:
-    return self._isAlignedToPosition
-
-  def _resetPositionAlignment(self) -> None:
+  def _resetPosition(self) -> None:
     self._targetPosition = Value.none
-    self._isAlignedToPosition = False
+    self._isAtTargetPosition = False
+
+  def isAtTargetPosition(self) -> bool:
+    return self._isAtTargetPosition
 
   def isAtSoftLimit(self, direction: MotorDirection, tolerance: float) -> bool:
     return math.isclose(
@@ -125,10 +121,10 @@ class PositionControlModule:
 
   def reset(self) -> None:
     self._motor.stopMotor()
-    self._resetPositionAlignment()
+    self._resetPosition()
 
   def _updateTelemetry(self) -> None:
-    SmartDashboard.putBoolean(f'{self._baseKey}/IsAlignedToPosition', self._isAlignedToPosition)
+    SmartDashboard.putBoolean(f'{self._baseKey}/IsAtTargetPosition', self._isAtTargetPosition)
     SmartDashboard.putNumber(f'{self._baseKey}/Position', self._encoder.getPosition())
-    # SmartDashboard.putNumber(f'{self._baseKey}/Current', self._motor.getOutputCurrent())
-    # SmartDashboard.putNumber(f'{self._baseKey}/Velocity', self._encoder.getVelocity())
+    SmartDashboard.putNumber(f'{self._baseKey}/Current', self._motor.getOutputCurrent())
+    SmartDashboard.putNumber(f'{self._baseKey}/Velocity', self._encoder.getVelocity())
