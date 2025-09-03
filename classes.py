@@ -5,7 +5,6 @@ from enum import Enum, IntEnum, auto
 from dataclasses import dataclass
 from wpimath import units
 from wpimath.geometry import Translation2d, Transform3d
-from wpimath.trajectory import TrapezoidProfile
 from robotpy_apriltag import AprilTagFieldLayout
 from rev import SparkLowLevel
 from photonlibpy.photonPoseEstimator import PoseStrategy
@@ -108,11 +107,13 @@ class DriftCorrectionConstants:
 @dataclass(frozen=True, slots=True)
 class TargetAlignmentConstants:
   translationPID: PID
+  translationMaxVelocity: units.meters_per_second
+  translationMaxAcceleration: units.meters_per_second_squared
   translationTolerance: Tolerance
-  translationSpeedMax: units.meters_per_second
   rotationPID: PID
+  rotationMaxVelocity: units.degrees_per_second
+  rotationMaxAcceleration: units.degrees_per_second_squared
   rotationTolerance: Tolerance
-  rotationSpeedMax: units.degrees_per_second
   rotationHeadingModeOffset: units.degrees
   rotationTranslationModeOffset: units.degrees
 
