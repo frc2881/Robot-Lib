@@ -1,4 +1,5 @@
 import math
+from wpimath import units
 from wpimath.geometry import Rotation2d
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpilib import SmartDashboard
@@ -72,6 +73,8 @@ class SwerveModule:
     self._turningClosedLoopController = self._turningMotor.getClosedLoopController()
     self._turningEncoder = self._turningMotor.getAbsoluteEncoder()
 
+    self._turningOffset = units.degreesToRadians(self._config.turningOffset)
+
     utils.addRobotPeriodic(self._periodic)
 
   def _periodic(self) -> None:
@@ -79,17 +82,17 @@ class SwerveModule:
 
   def setTargetState(self, targetState: SwerveModuleState) -> None:
     currentAngle = Rotation2d(self._turningEncoder.getPosition())
-    targetState.angle += Rotation2d(self._config.turningOffset)
+    targetState.angle += Rotation2d(self._turningOffset)
     targetState.optimize(currentAngle)
     targetState.cosineScale(currentAngle)
     self._drivingClosedLoopController.setReference(targetState.speed, SparkBase.ControlType.kVelocity)
     self._turningClosedLoopController.setReference(targetState.angle.radians(), SparkBase.ControlType.kPosition)
 
   def getState(self) -> SwerveModuleState:
-    return SwerveModuleState(self._drivingEncoder.getVelocity(), Rotation2d(self._turningEncoder.getPosition() - self._config.turningOffset))
+    return SwerveModuleState(self._drivingEncoder.getVelocity(), Rotation2d(self._turningEncoder.getPosition() - self._turningOffset))
 
   def getPosition(self) -> SwerveModulePosition:
-    return SwerveModulePosition(self._drivingEncoder.getPosition(), Rotation2d(self._turningEncoder.getPosition() - self._config.turningOffset))
+    return SwerveModulePosition(self._drivingEncoder.getPosition(), Rotation2d(self._turningEncoder.getPosition() - self._turningOffset))
 
   def setIdleMode(self, motorIdleMode: MotorIdleMode) -> None:
     idleMode = SparkBaseConfig.IdleMode.kCoast if motorIdleMode == MotorIdleMode.Coast else SparkBaseConfig.IdleMode.kBrake

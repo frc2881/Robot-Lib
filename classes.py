@@ -112,7 +112,7 @@ class TargetAlignmentConstants:
   translationSpeedMax: units.meters_per_second
   rotationPID: PID
   rotationTolerance: Tolerance
-  rotationSpeedMax: units.meters_per_second
+  rotationSpeedMax: units.degrees_per_second
   rotationHeadingModeOffset: units.degrees
   rotationTranslationModeOffset: units.degrees
 
@@ -142,7 +142,7 @@ class SwerveModuleConfig:
   location: SwerveModuleLocation
   drivingMotorCANId: int
   turningMotorCANId: int
-  turningOffset: units.radians
+  turningOffset: units.degrees
   translation: Translation2d
   constants: SwerveModuleConstants
 
