@@ -44,8 +44,8 @@ class PositionControlModule:
           .maxVelocity(self._config.constants.motorMotionMaxVelocity)
           .maxAcceleration(self._config.constants.motorMotionMaxAcceleration)
           .allowedClosedLoopError(self._config.constants.motorMotionAllowedClosedLoopError))
-      if self._config.constants.motorMotionVelocityFF is not None:
-        self._motorConfig.closedLoop.velocityFF(self._config.constants.motorMotionVelocityFF)
+      # if self._config.constants.motorMotionVelocityFF is not None:
+      #   self._motorConfig.closedLoop.velocityFF(self._config.constants.motorMotionVelocityFF)
       (self._motorConfig.softLimit
         .reverseSoftLimitEnabled(True)
         .reverseSoftLimit(self._config.constants.motorSoftLimitReverse)
