@@ -168,8 +168,8 @@ class DifferentialModuleConfig:
   constants: DifferentialModuleConstants
 
 class DifferentialDriveModulePositions(NamedTuple):
-  left: float
-  right: float
+  left: units.meters
+  right: units.meters
 
 @dataclass(frozen=True, slots=True)
 class PositionControlModuleConstants:
