@@ -30,16 +30,18 @@ class PositionControlModule:
       .setIdleMode(SparkBaseConfig.IdleMode.kBrake)
       .smartCurrentLimit(self._config.constants.motorCurrentLimit)
       .inverted(self._config.isInverted))
-    (self._motorConfig.encoder
+    (self._motorConfig.absoluteEncoder
+      .inverted(True)
       .positionConversionFactor(encoderPositionConversionFactor)
       .velocityConversionFactor(encoderPositionConversionFactor / 60.0))
     if self._config.leaderMotorCANId is not None:
       self._motorConfig.follow(self._config.leaderMotorCANId, self._config.isInverted)
     else:
       (self._motorConfig.closedLoop
-        .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
+        .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kAbsoluteEncoder)
         .pid(*self._config.constants.motorPID)
         .outputRange(*self._config.constants.motorOutputRange)
+        .positionWrappingEnabled(False)
         .maxMotion
           .maxVelocity(self._config.constants.motorMotionMaxVelocity)
           .maxAcceleration(self._config.constants.motorMotionMaxAcceleration)
@@ -59,8 +61,8 @@ class PositionControlModule:
       )
     )
     self._closedLoopController = self._motor.getClosedLoopController()
-    self._encoder = self._motor.getEncoder()
-    self._encoder.setPosition(0)
+    self._encoder = self._motor.getAbsoluteEncoder()
+    # self._encoder.setPosition(0)
 
     utils.addRobotPeriodic(self._periodic)
 
@@ -109,7 +111,7 @@ class PositionControlModule:
       ],
       lambda: [
         self._motor.stopMotor(),
-        self._encoder.setPosition(0),
+        # self._encoder.setPosition(0),
         utils.setSparkSoftLimitsEnabled(self._motor, True),
         setattr(self, "_hasZeroReset", True)
       ],
