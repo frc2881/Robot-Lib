@@ -6,7 +6,7 @@ from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, 
 from ..classes import RelativePositionControlModuleConfig, MotorDirection, Value
 from .. import logger, utils
 
-class PositionControlModule:
+class RelativePositionControlModule:
   def __init__(
     self,
     config: RelativePositionControlModuleConfig
