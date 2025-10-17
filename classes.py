@@ -172,7 +172,7 @@ class DifferentialDriveModulePositions(NamedTuple):
   right: units.meters
 
 @dataclass(frozen=True, slots=True)
-class PositionControlModuleConstants:
+class RelativePositionControlModuleConstants:
   distancePerRotation: units.inches
   motorControllerType: SparkLowLevel.SparkModel
   motorType: SparkLowLevel.MotorType
@@ -182,19 +182,43 @@ class PositionControlModuleConstants:
   motorOutputRange: Range
   motorMotionMaxVelocity: units.units_per_second
   motorMotionMaxAcceleration: units.units_per_second_squared
-  motorMotionVelocityFF: float
   motorMotionAllowedClosedLoopError: float
   motorSoftLimitReverse: units.inches
   motorSoftLimitForward: units.inches
   motorResetSpeed: units.percent
 
 @dataclass(frozen=True, slots=True)
-class PositionControlModuleConfig:
+class RelativePositionControlModuleConfig:
   moduleBaseKey: str
   motorCANId: int
   leaderMotorCANId: int | None
   isInverted: bool
-  constants: PositionControlModuleConstants
+  constants: RelativePositionControlModuleConstants
+
+@dataclass(frozen=True, slots=True)
+class AbsolutePositionControlModuleConstants:
+  encoderPositionConversionFactor: float
+  isEncoderInverted: bool
+  motorControllerType: SparkLowLevel.SparkModel
+  motorType: SparkLowLevel.MotorType
+  motorCurrentLimit: int
+  motorReduction: float
+  motorPID: PID
+  motorOutputRange: Range
+  motorMotionMaxVelocity: units.units_per_second
+  motorMotionMaxAcceleration: units.units_per_second_squared
+  motorMotionAllowedClosedLoopError: float
+  motorSoftLimitReverse: units.inches
+  motorSoftLimitForward: units.inches
+  motorResetSpeed: units.percent
+
+@dataclass(frozen=True, slots=True)
+class AbsolutePositionControlModuleConfig:
+  moduleBaseKey: str
+  motorCANId: int
+  leaderMotorCANId: int | None
+  isInverted: bool
+  constants: AbsolutePositionControlModuleConstants
 
 @dataclass(frozen=True, slots=True)
 class PoseSensorConstants:
