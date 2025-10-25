@@ -17,6 +17,8 @@ class AbsolutePositionControlModule:
     self._targetPosition: float = Value.none
     self._isAtTargetPosition: bool = False
 
+    self._pcf = 360.0 / 250.0
+
     if self._config.constants.motorControllerType == SparkLowLevel.SparkModel.kSparkFlex:
       self._motor = SparkFlex(self._config.motorCANId, self._config.constants.motorType)
     else: 
@@ -26,24 +28,27 @@ class AbsolutePositionControlModule:
       .setIdleMode(SparkBaseConfig.IdleMode.kBrake)
       .smartCurrentLimit(self._config.constants.motorCurrentLimit)
       .inverted(self._config.isInverted))
-    (self._motorConfig.softLimit
-      .reverseSoftLimitEnabled(True)
-      .reverseSoftLimit(self._config.constants.motorSoftLimitReverse)
-      .forwardSoftLimitEnabled(True)
-      .forwardSoftLimit(self._config.constants.motorSoftLimitForward))
     if self._config.leaderMotorCANId is not None:
       self._motorConfig.follow(self._config.leaderMotorCANId, self._config.isInverted)
+      (self._motorConfig.softLimit
+        .reverseSoftLimitEnabled(False)
+        .forwardSoftLimitEnabled(False))
     else:
+      (self._motorConfig.softLimit
+        .reverseSoftLimitEnabled(False)
+        .reverseSoftLimit(self._config.constants.motorSoftLimitReverse)
+        .forwardSoftLimitEnabled(False)
+        .forwardSoftLimit(self._config.constants.motorSoftLimitForward))
       (self._motorConfig.absoluteEncoder
-        .inverted(self._config.constants.isEncoderInverted)
-        .positionConversionFactor(self._config.constants.encoderPositionConversionFactor)
-        .velocityConversionFactor(self._config.constants.encoderPositionConversionFactor / 60.0))
+        .positionConversionFactor(360.0)
+        .inverted(self._config.isInverted))
+      (self._motorConfig.encoder
+        .positionConversionFactor(self._pcf)
+        .velocityConversionFactor(self._pcf / 60.0))
       (self._motorConfig.closedLoop
-        .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kAbsoluteEncoder)
+        .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
         .pid(*self._config.constants.motorPID)
         .outputRange(*self._config.constants.motorOutputRange)
-        .positionWrappingEnabled(True)
-        .positionWrappingInputRange(0, self._config.constants.encoderPositionConversionFactor)
         .maxMotion
           .maxVelocity(self._config.constants.motorMotionMaxVelocity)
           .maxAcceleration(self._config.constants.motorMotionMaxAcceleration)
@@ -56,7 +61,8 @@ class AbsolutePositionControlModule:
       )
     )
     self._closedLoopController = self._motor.getClosedLoopController()
-    self._encoder = self._motor.getAbsoluteEncoder()
+    self._encoder = self._motor.getEncoder()
+    self._encoder.setPosition(self._motor.getAbsoluteEncoder().getPosition())
 
     utils.addRobotPeriodic(self._periodic)
 
@@ -101,5 +107,6 @@ class AbsolutePositionControlModule:
   def _updateTelemetry(self) -> None:
     SmartDashboard.putBoolean(f'{self._baseKey}/IsAtTargetPosition', self._isAtTargetPosition)
     SmartDashboard.putNumber(f'{self._baseKey}/Position', self._encoder.getPosition())
+    SmartDashboard.putNumber(f'{self._baseKey}/AbsolutePosition', self._motor.getAbsoluteEncoder().getPosition())
     SmartDashboard.putNumber(f'{self._baseKey}/Current', self._motor.getOutputCurrent())
     SmartDashboard.putNumber(f'{self._baseKey}/Velocity', self._encoder.getVelocity())
