@@ -1,16 +1,16 @@
 from wpilib import DigitalInput, SmartDashboard
+from ..classes import BinarySensorConfig
 from .. import logger, utils
 
 class BinarySensor:
   def __init__(
       self, 
-      sensorName: str,
-      channel: int
+      config: BinarySensorConfig
     ) -> None:
-    self._sensorName = sensorName
-    self._baseKey = f'Robot/Sensors/Binary/{self._sensorName}'
+    self._config = config
+    self._baseKey = f'Robot/Sensors/Binary/{self._config.sensorName}'
 
-    self._digitalInput = DigitalInput(channel)
+    self._digitalInput = DigitalInput(self._config.digitalInputChannel)
 
     self._isTriggered: bool = False
     

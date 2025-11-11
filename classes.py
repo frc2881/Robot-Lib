@@ -173,7 +173,6 @@ class DifferentialDriveModulePositions(NamedTuple):
 
 @dataclass(frozen=True, slots=True)
 class RelativePositionControlModuleConstants:
-  distancePerRotation: units.inches
   motorControllerType: SparkLowLevel.SparkModel
   motorType: SparkLowLevel.MotorType
   motorCurrentLimit: int
@@ -183,22 +182,20 @@ class RelativePositionControlModuleConstants:
   motorMotionMaxVelocity: units.units_per_second
   motorMotionMaxAcceleration: units.units_per_second_squared
   motorMotionAllowedClosedLoopError: float
-  motorSoftLimitReverse: units.inches
-  motorSoftLimitForward: units.inches
+  motorSoftLimitReverse: float
+  motorSoftLimitForward: float
   motorResetSpeed: units.percent
+  distancePerRotation: float
 
 @dataclass(frozen=True, slots=True)
 class RelativePositionControlModuleConfig:
   moduleBaseKey: str
   motorCANId: int
-  leaderMotorCANId: int | None
   isInverted: bool
   constants: RelativePositionControlModuleConstants
 
 @dataclass(frozen=True, slots=True)
 class AbsolutePositionControlModuleConstants:
-  encoderPositionConversionFactor: float
-  isEncoderInverted: bool
   motorControllerType: SparkLowLevel.SparkModel
   motorType: SparkLowLevel.MotorType
   motorCurrentLimit: int
@@ -216,9 +213,22 @@ class AbsolutePositionControlModuleConstants:
 class AbsolutePositionControlModuleConfig:
   moduleBaseKey: str
   motorCANId: int
-  leaderMotorCANId: int | None
   isInverted: bool
   constants: AbsolutePositionControlModuleConstants
+
+@dataclass(frozen=True, slots=True)
+class FollowerModuleConstants:
+  motorControllerType: SparkLowLevel.SparkModel
+  motorType: SparkLowLevel.MotorType
+  motorCurrentLimit: int
+
+@dataclass(frozen=True, slots=True)
+class FollowerModuleConfig:
+  moduleBaseKey: str
+  motorCANId: int
+  leaderMotorCANId: int
+  isInverted: bool
+  constants: FollowerModuleConstants
 
 @dataclass(frozen=True, slots=True)
 class PoseSensorConstants:
@@ -233,8 +243,15 @@ class PoseSensorConfig:
   constants: PoseSensorConstants
 
 @dataclass(frozen=True, slots=True)
+class BinarySensorConfig:
+  sensorName: str
+  digitalInputChannel: int
+
+@dataclass(frozen=True, slots=True)
 class DistanceSensorConfig:
   sensorName: str
+  digitalInputChannel: int
+  pulseWidthConversionFactor: float
   minTargetDistance: units.millimeters
   maxTargetDistance: units.millimeters
 

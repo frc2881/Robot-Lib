@@ -72,7 +72,6 @@ class SwerveModule:
     )
     self._turningClosedLoopController = self._turningMotor.getClosedLoopController()
     self._turningEncoder = self._turningMotor.getAbsoluteEncoder()
-
     self._turningOffset = units.degreesToRadians(self._config.turningOffset)
 
     utils.addRobotPeriodic(self._periodic)
@@ -100,5 +99,4 @@ class SwerveModule:
     utils.setSparkConfig(self._turningMotor.configure(SparkBaseConfig().setIdleMode(idleMode), SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kNoPersistParameters))
     
   def _updateTelemetry(self) -> None:
-    # SmartDashboard.putNumber(f'{self._baseKey}/Driving/Current', self._drivingMotor.getOutputCurrent())
-    pass
+    SmartDashboard.putNumber(f'{self._baseKey}/Driving/Current', self._drivingMotor.getOutputCurrent())
