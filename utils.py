@@ -6,7 +6,7 @@ from commands2 import TimedCommandRobot
 import wpilib
 import wpimath
 from wpimath import units
-from wpimath.geometry import Pose2d, Pose3d, Translation2d, Rotation2d
+from wpimath.geometry import Pose2d, Pose3d, Translation2d, Rotation2d, Transform3d
 from wpilib import DriverStation
 from rev import SparkBase, SparkBaseConfig, REVLibError
 from . import logger
@@ -88,6 +88,9 @@ def getTargetDistance(robotPose: Pose2d, targetPose: Pose3d) -> units.meters:
 
 def getTargetPitch(robotPose: Pose2d, targetPose: Pose3d) -> units.degrees:
   return math.degrees(math.atan2((targetPose - Pose3d(robotPose)).Z(), getTargetDistance(robotPose, targetPose)))
+
+def getRobotToCameraTransform(targetToRobot: Transform3d, targetToCamera: Transform3d) -> Transform3d:
+  return Pose3d().transformBy(targetToCamera.inverse()) - Pose3d().transformBy(targetToRobot)
 
 def getInterpolatedValue(x: float, xs: tuple[float, ...], ys: tuple[float, ...]) -> float:
   try:
