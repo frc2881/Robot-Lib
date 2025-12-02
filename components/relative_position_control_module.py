@@ -13,7 +13,7 @@ class RelativePositionControlModule:
   ) -> None:
     self._config = config
 
-    self._baseKey = f'Robot/{self._config.moduleBaseKey}'
+    self._baseKey = f'Robot/{self._config.baseKey}'
 
     self._isHomed: bool = False
     self._targetPosition: float = Value.none

@@ -10,15 +10,15 @@ class PoseSensor:
       config: PoseSensorConfig
     ) -> None:
     self._config = config
-    self._baseKey = f'Robot/Sensors/Pose/{config.cameraName}'
+    self._baseKey = f'Robot/Sensors/Pose/{config.name}'
 
-    self._photonCamera = PhotonCamera(config.cameraName)
+    self._photonCamera = PhotonCamera(config.name)
     self._photonCamera.setDriverMode(False)
     self._photonPoseEstimator = PhotonPoseEstimator(
       config.constants.aprilTagFieldLayout, 
       config.constants.poseStrategy, 
       self._photonCamera, 
-      config.cameraTransform
+      config.transform
     )
     self._photonPoseEstimator.multiTagFallbackStrategy = config.constants.fallbackPoseStrategy
 
@@ -46,7 +46,7 @@ class PoseSensor:
     return estimatedRobotPose
   
   def getCameraName(self) -> str:
-    return self._config.cameraName
+    return self._config.name
 
   def hasTarget(self) -> bool:
     return self._hasTarget

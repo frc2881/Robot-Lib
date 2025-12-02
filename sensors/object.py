@@ -11,9 +11,9 @@ class ObjectSensor:
       config: ObjectSensorConfig
     ) -> None:
     self._config = config
-    self._baseKey = f'Robot/Sensors/Object/{config.cameraName}'
+    self._baseKey = f'Robot/Sensors/Object/{config.name}'
     
-    self._photonCamera = PhotonCamera(config.cameraName)
+    self._photonCamera = PhotonCamera(config.name)
 
     self._objectTransform = Transform3d
     self._hasTarget = False

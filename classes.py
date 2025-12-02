@@ -189,7 +189,7 @@ class RelativePositionControlModuleConstants:
 
 @dataclass(frozen=True, slots=True)
 class RelativePositionControlModuleConfig:
-  moduleBaseKey: str
+  baseKey: str
   motorCANId: int
   isInverted: bool
   constants: RelativePositionControlModuleConstants
@@ -211,7 +211,7 @@ class AbsolutePositionControlModuleConstants:
 
 @dataclass(frozen=True, slots=True)
 class AbsolutePositionControlModuleConfig:
-  moduleBaseKey: str
+  baseKey: str
   motorCANId: int
   isInverted: bool
   constants: AbsolutePositionControlModuleConstants
@@ -224,7 +224,7 @@ class FollowerModuleConstants:
 
 @dataclass(frozen=True, slots=True)
 class FollowerModuleConfig:
-  moduleBaseKey: str
+  baseKey: str
   motorCANId: int
   leaderMotorCANId: int
   isInverted: bool
@@ -238,26 +238,26 @@ class PoseSensorConstants:
 
 @dataclass(frozen=True, slots=True)
 class PoseSensorConfig:
-  cameraName: str
-  cameraTransform: Transform3d
+  name: str
+  transform: Transform3d
   stream: str
   constants: PoseSensorConstants
 
 @dataclass(frozen=True, slots=True)
+class ObjectSensorConfig:
+  name: str
+  cameraTransform: Transform3d
+  stream: str
+
+@dataclass(frozen=True, slots=True)
 class BinarySensorConfig:
-  sensorName: str
+  name: str
   digitalInputChannel: int
 
 @dataclass(frozen=True, slots=True)
 class DistanceSensorConfig:
-  sensorName: str
+  name: str
   digitalInputChannel: int
   pulseWidthConversionFactor: float
   minTargetDistance: units.millimeters
   maxTargetDistance: units.millimeters
-
-@dataclass(frozen=True, slots=True)
-class ObjectSensorConfig:
-  cameraName: str
-  cameraTransform: Transform3d
-  stream: str

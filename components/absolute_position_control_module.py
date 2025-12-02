@@ -12,7 +12,7 @@ class AbsolutePositionControlModule:
   ) -> None:
     self._config = config
 
-    self._baseKey = f'Robot/{self._config.moduleBaseKey}'
+    self._baseKey = f'Robot/{self._config.baseKey}'
 
     self._targetPosition: float = Value.none
     self._isAtTargetPosition: bool = False

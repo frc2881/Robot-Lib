@@ -10,7 +10,7 @@ class DistanceSensor:
       config: DistanceSensorConfig
     ) -> None:
     self._config = config
-    self._baseKey = f'Robot/Sensors/Distance/{self._config.sensorName}'
+    self._baseKey = f'Robot/Sensors/Distance/{self._config.name}'
 
     self._dutycycle = DutyCycle(DigitalInput(self._config.digitalInputChannel))
 

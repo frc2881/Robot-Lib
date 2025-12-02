@@ -10,7 +10,7 @@ class FollowerModule:
   ) -> None:
     self._config = config
 
-    self._baseKey = f'Robot/{self._config.moduleBaseKey}'
+    self._baseKey = f'Robot/{self._config.baseKey}'
 
     if self._config.constants.motorControllerType == SparkLowLevel.SparkModel.kSparkFlex:
       self._motor = SparkFlex(self._config.motorCANId, self._config.constants.motorType)
