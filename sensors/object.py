@@ -18,6 +18,8 @@ class ObjectSensor:
     self._objectTransform = Transform3d
     self._hasTarget = False
 
+    SmartDashboard.putString(f'{self._baseKey}/Stream', config.stream)
+
     utils.addRobotPeriodic(self._periodic)
 
   def _periodic(self) -> None:

@@ -240,6 +240,7 @@ class PoseSensorConstants:
 class PoseSensorConfig:
   cameraName: str
   cameraTransform: Transform3d
+  stream: str
   constants: PoseSensorConstants
 
 @dataclass(frozen=True, slots=True)
@@ -259,3 +260,4 @@ class DistanceSensorConfig:
 class ObjectSensorConfig:
   cameraName: str
   cameraTransform: Transform3d
+  stream: str

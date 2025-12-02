@@ -25,6 +25,8 @@ class PoseSensor:
     self._hasTarget = False
     self._pipelineResultBufferTimer = Timer()
 
+    SmartDashboard.putString(f'{self._baseKey}/Stream', config.stream)
+
     utils.addRobotPeriodic(self._periodic)
 
   def _periodic(self) -> None:
