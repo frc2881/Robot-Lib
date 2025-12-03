@@ -25,7 +25,7 @@ topic category for the camera transform being calculated. Create a new
 Under both translation and rotation sections under targetPose, drag each
 individual value into the Measurements section so that the calculation of
 averages can begin. Wait at least 30 seconds for the Median value for each
-translation and rotation property can settle. Use each of those values
+translation and rotation property to settle. Use each of those Median values
 to set the appropriate constant value below for target to camera transform.
 
 6) After all of the script constant values have been set, save the script
