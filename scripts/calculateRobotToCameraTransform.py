@@ -37,6 +37,8 @@ activates, run the script with the following command (without quotes):
 paste it into the appropriate place in the robot constants for the associated 
 pose sensor configuration being calculated here.
 
+Example: Transform3d(Translation3d(0.149506, -0.055318, 0.271137), Rotation3d(-0.001852, -0.181301, 0.020370))
+
 8) Repeat this same process from the begining for all other pose sensor
 cameras on the robot
 
