@@ -50,13 +50,13 @@ TARGET_TO_ROBOT_TRANSLATION_Y = 0.0 # distance from center of robot to center of
 TARGET_TO_ROBOT_TRANSLATION_Z = -0.311 # distance from floor to center of AprilTag
 TARGET_TO_ROBOT_ROTATION_YAW = -180.0 # rotation of camera on robot to AprilTag (e.g. front facing camera/front of robot facing toward AprilTag)
 
-TARGET_TO_CAMERA_TRANSLATION_X = 0.707 # calculated/average median value under targetPose reported by PhotonVision
-TARGET_TO_CAMERA_TRANSLATION_Y = 0.041 # calculated/average median value under targetPose reported by PhotonVision
-TARGET_TO_CAMERA_TRANSLATION_Z = -0.089 # calculated/average median value under targetPose reported by PhotonVision
-TARGET_TO_CAMERA_QUATERNION_W = -0.01 # calculated/average median value under targetPose reported by PhotonVision
-TARGET_TO_CAMERA_QUATERNION_X = -0.09 # calculated/average median value under targetPose reported by PhotonVision
-TARGET_TO_CAMERA_QUATERNION_Y = 0.0 # calculated/average median value under targetPose reported by PhotonVision
-TARGET_TO_CAMERA_QUATERNION_Z = -0.99 # calculated/average median value under targetPose reported by PhotonVision
+TARGET_TO_CAMERA_TRANSLATION_X = 0.707 # calculated/average median value under targetPose reported by PhotonVision via AdvantageScope statistics
+TARGET_TO_CAMERA_TRANSLATION_Y = 0.041 # calculated/average median value under targetPose reported by PhotonVision via AdvantageScope statistics
+TARGET_TO_CAMERA_TRANSLATION_Z = -0.089 # calculated/average median value under targetPose reported by PhotonVision via AdvantageScope statistics
+TARGET_TO_CAMERA_QUATERNION_W = -0.01 # calculated/average median value under targetPose reported by PhotonVision via AdvantageScope statistics
+TARGET_TO_CAMERA_QUATERNION_X = -0.09 # calculated/average median value under targetPose reported by PhotonVision via AdvantageScope statistics
+TARGET_TO_CAMERA_QUATERNION_Y = 0.0 # calculated/average median value under targetPose reported by PhotonVision via AdvantageScope statistics
+TARGET_TO_CAMERA_QUATERNION_Z = -0.99 # calculated/average median value under targetPose reported by PhotonVision via AdvantageScope statistics
 
 # ===========================================================================
 
