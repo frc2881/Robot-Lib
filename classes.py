@@ -24,6 +24,12 @@ class RobotState(Enum):
   Enabled = auto()
   EStopped = auto()
 
+class RobotType(Enum):
+  Other = auto()
+  Competition = auto()
+  Practice = auto()
+  Demo = auto()
+
 class State(Enum):
   Disabled = auto()
   Enabled = auto()
