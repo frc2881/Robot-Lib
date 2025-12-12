@@ -52,7 +52,7 @@ from wpimath.geometry import Pose3d, Transform3d, Translation3d, Rotation3d, Qua
 TARGET_TO_ROBOT_TRANSLATION_X = 0.860 # distance from center of robot to face of AprilTag
 TARGET_TO_ROBOT_TRANSLATION_Y = 0.0 # distance from center of robot to center of AprilTag (should be zero using alignment method above)
 TARGET_TO_ROBOT_TRANSLATION_Z = -0.311 # distance from center of AprilTag to the floor (will be negative value as the robot is below the AprilTag)
-TARGET_TO_ROBOT_ROTATION_YAW = 180.0 # rotation of camera on robot to AprilTag (e.g. front facing camera/front of robot turned 180 degrees to face toward AprilTag, rear of robot will be 0 degrees, sides will be -90/90)
+TARGET_TO_ROBOT_ROTATION_YAW = 180.0 # rotation of robot to AprilTag (e.g. front of robot turned to face toward AprilTag is 180 degrees, rear of robot facing tag will be 0 degrees, sides will be -90/90 accordingly)
 
 TARGET_TO_CAMERA_TRANSLATION_X = 0.707 # calculated/average median value under targetPose reported by PhotonVision via AdvantageScope statistics
 TARGET_TO_CAMERA_TRANSLATION_Y = 0.041 # calculated/average median value under targetPose reported by PhotonVision via AdvantageScope statistics
