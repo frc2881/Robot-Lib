@@ -95,10 +95,6 @@ class Range(NamedTuple):
   min: float
   max: float
 
-class Tolerance(NamedTuple):
-  error: float
-  errorDerivative: float
-
 @dataclass(frozen=True, slots=True)
 class Value(float):
   none = math.nan
@@ -108,18 +104,20 @@ class Value(float):
 @dataclass(frozen=True, slots=True)
 class DriftCorrectionConstants:
   rotationPID: PID
-  rotationTolerance: Tolerance
+  rotationPositionTolerance: units.degrees
 
 @dataclass(frozen=True, slots=True)
 class TargetAlignmentConstants:
   translationPID: PID
   translationMaxVelocity: units.meters_per_second
   translationMaxAcceleration: units.meters_per_second_squared
-  translationTolerance: Tolerance
+  translationPositionTolerance: units.meters
+  translationVelocityTolerance: units.meters_per_second
   rotationPID: PID
   rotationMaxVelocity: units.degrees_per_second
   rotationMaxAcceleration: units.degrees_per_second_squared
-  rotationTolerance: Tolerance
+  rotationPositionTolerance: units.degrees
+  rotationVelocityTolerance: units.degrees_per_second
   rotationHeadingModeOffset: units.degrees
   rotationTranslationModeOffset: units.degrees
 
@@ -211,8 +209,8 @@ class AbsolutePositionControlModuleConstants:
   motorMotionMaxVelocity: units.units_per_second
   motorMotionMaxAcceleration: units.units_per_second_squared
   motorMotionAllowedClosedLoopError: float
-  motorSoftLimitReverse: units.inches
-  motorSoftLimitForward: units.inches
+  motorSoftLimitReverse: float
+  motorSoftLimitForward: float
   motorResetSpeed: units.percent
 
 @dataclass(frozen=True, slots=True)
