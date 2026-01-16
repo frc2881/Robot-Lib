@@ -1,7 +1,7 @@
 from commands2 import Command, cmd
-from wpilib import SmartDashboard, RobotBase
+from wpilib import SmartDashboard
 from wpimath import units
-from wpimath.geometry import Rotation2d, Pose2d
+from wpimath.geometry import Pose2d
 from navx import AHRS
 from .. import logger, utils
 
@@ -14,16 +14,15 @@ class Gyro_NAVX2():
     
     self._gyro = AHRS(comType)
 
+    self._angleAdjustment: units.degrees = 0
+
     utils.addRobotPeriodic(self._periodic)
 
   def _periodic(self) -> None:
     self._updateTelemetry()
   
   def getHeading(self) -> units.degrees:
-    return -utils.wrapAngle(self._gyro.getAngle())
-  
-  def getRotation(self) -> Rotation2d:
-    return Rotation2d.fromDegrees(self.getHeading())
+    return -utils.wrapAngle(self._gyro.getAngle() + self._angleAdjustment)
   
   def getPitch(self) -> units.degrees:
     return self._gyro.getPitch()
@@ -31,11 +30,8 @@ class Gyro_NAVX2():
   def getRoll(self) -> units.degrees:
     return self._gyro.getRoll()
   
-  def getTurnRate(self) -> units.degrees_per_second:
-    return self._gyro.getRate()
-  
   def _reset(self, heading: units.degrees = 0) -> None:
-    self._gyro.setAngleAdjustment(-heading if heading != 0 else 0)
+    self._angleAdjustment = -heading if heading != 0 else 0
     self._gyro.reset()
 
   def resetRobotToField(self, robotPose: Pose2d) -> None:
@@ -43,27 +39,8 @@ class Gyro_NAVX2():
 
   def reset(self) -> Command:
     return cmd.runOnce(self._reset).ignoringDisable(True).withName("GyroSensor:Reset")
-
-  def _calibrate(self) -> None:
-    if RobotBase.isReal():
-      pass # NO-OP as navX2 currently does automatic calibration
-
-  def calibrate(self) -> Command:
-    return cmd.sequence(
-      cmd.runOnce(
-        lambda: [
-          SmartDashboard.putBoolean(f'{self._baseKey}/IsCalibrating', True),
-          self._calibrate()
-        ]
-      ),
-      cmd.waitSeconds(0.2),
-      cmd.runOnce(
-        lambda: SmartDashboard.putBoolean(f'{self._baseKey}/IsCalibrating', False)
-      )
-    ).ignoringDisable(True).withName("GyroSensor:Calibrate")
   
   def _updateTelemetry(self) -> None:
     SmartDashboard.putNumber(f'{self._baseKey}/Heading', self.getHeading())
     SmartDashboard.putNumber(f'{self._baseKey}/Pitch', self.getPitch())
     SmartDashboard.putNumber(f'{self._baseKey}/Roll', self.getRoll())
-    SmartDashboard.putNumber(f'{self._baseKey}/TurnRate', self.getTurnRate())
