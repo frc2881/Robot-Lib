@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from wpimath import units
 from wpimath.geometry import Translation2d, Transform3d
 from robotpy_apriltag import AprilTagFieldLayout
-from rev import SparkLowLevel
+from rev import SparkLowLevel, AbsoluteEncoderConfig
 
 class Alliance(IntEnum):
   Red = 0
@@ -134,6 +134,7 @@ class SwerveModuleConstants:
   drivingMotorPID: PID
   turningMotorCurrentLimit: int
   turningMotorPID: PID
+  turningMotorAbsoluteEncoderConfig: AbsoluteEncoderConfig
 
 class SwerveModuleLocation(IntEnum):
   FrontLeft = 0,
@@ -243,7 +244,7 @@ class PoseSensorConfig:
 @dataclass(frozen=True, slots=True)
 class ObjectSensorConfig:
   name: str
-  cameraTransform: Transform3d
+  transform: Transform3d
   stream: str
 
 @dataclass(frozen=True, slots=True)

@@ -3,7 +3,7 @@ from wpimath import units
 from wpimath.geometry import Rotation2d
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpilib import SmartDashboard
-from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, FeedbackSensor, ResetMode, PersistMode
+from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, FeedbackSensor, ResetMode, PersistMode, AbsoluteEncoderConfig
 from ..classes import SwerveModuleConfig, MotorIdleMode
 from .. import logger, utils
 
@@ -16,8 +16,10 @@ class SwerveModule:
 
     self._baseKey = f'Robot/Drive/Modules/{self._config.location.name}'
 
+    nominalVoltage: units.volts = 12.0
     drivingMotorReduction: float = (self._config.constants.wheelBevelGearTeeth * self._config.constants.wheelSpurGearTeeth) / (self._config.constants.drivingMotorPinionTeeth * self._config.constants.wheelBevelPinionTeeth)
     driveWheelFreeSpeedRps: float = ((self._config.constants.drivingMotorFreeSpeed / 60) * (self._config.constants.wheelDiameter * math.pi)) / drivingMotorReduction
+    drivingVelocityFeedForward: float = nominalVoltage / driveWheelFreeSpeedRps
     drivingEncoderPositionConversionFactor: float = (self._config.constants.wheelDiameter * math.pi) / drivingMotorReduction
     turningEncoderPositionConversionFactor: float = 2 * math.pi
 
@@ -35,8 +37,8 @@ class SwerveModule:
     (self._drivingMotorConfig.closedLoop
       .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
       .pid(*self._config.constants.drivingMotorPID)
-      .velocityFF(1 / driveWheelFreeSpeedRps)
-      .outputRange(-1.0, 1.0))
+      .outputRange(-1.0, 1.0)
+      .feedForward.kV(drivingVelocityFeedForward))
     utils.setSparkConfig(self._drivingMotor.configure(self._drivingMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters))
     self._drivingClosedLoopController = self._drivingMotor.getClosedLoopController()
     self._drivingEncoder = self._drivingMotor.getEncoder()
@@ -50,7 +52,8 @@ class SwerveModule:
     (self._turningMotorConfig.absoluteEncoder
       .inverted(True)
       .positionConversionFactor(turningEncoderPositionConversionFactor)
-      .velocityConversionFactor(turningEncoderPositionConversionFactor / 60.0))
+      .velocityConversionFactor(turningEncoderPositionConversionFactor / 60.0)
+      .apply(self._config.constants.turningMotorAbsoluteEncoderConfig()))
     (self._turningMotorConfig.closedLoop
       .setFeedbackSensor(FeedbackSensor.kAbsoluteEncoder)
       .pid(*self._config.constants.turningMotorPID)
