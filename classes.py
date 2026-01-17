@@ -7,7 +7,6 @@ from wpimath import units
 from wpimath.geometry import Translation2d, Transform3d
 from robotpy_apriltag import AprilTagFieldLayout
 from rev import SparkLowLevel
-from photonlibpy.photonPoseEstimator import PoseStrategy
 
 class Alliance(IntEnum):
   Red = 0
@@ -235,17 +234,11 @@ class FollowerModuleConfig:
   constants: FollowerModuleConstants
 
 @dataclass(frozen=True, slots=True)
-class PoseSensorConstants:
-  aprilTagFieldLayout: AprilTagFieldLayout
-  poseStrategy: PoseStrategy
-  fallbackPoseStrategy: PoseStrategy
-
-@dataclass(frozen=True, slots=True)
 class PoseSensorConfig:
   name: str
   transform: Transform3d
   stream: str
-  constants: PoseSensorConstants
+  aprilTagFieldLayout: AprilTagFieldLayout
 
 @dataclass(frozen=True, slots=True)
 class ObjectSensorConfig:

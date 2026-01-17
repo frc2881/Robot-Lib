@@ -1,6 +1,6 @@
 import math
 from wpilib import SmartDashboard
-from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex
+from rev import SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, ResetMode, PersistMode
 from ..classes import DifferentialModuleConfig, MotorIdleMode
 from .. import utils, logger
 
@@ -29,13 +29,7 @@ class DifferentialModule:
       .velocityConversionFactor(drivingEncoderPositionConversionFactor / 60.0))
     if self._config.leaderMotorCANId is not None:
       self._drivingMotorConfig.follow(self._config.leaderMotorCANId)
-    utils.setSparkConfig(
-      self._drivingMotor.configure(
-        self._drivingMotorConfig,
-        SparkBase.ResetMode.kResetSafeParameters,
-        SparkBase.PersistMode.kPersistParameters
-      )
-    )
+    utils.setSparkConfig(self._drivingMotor.configure(self._drivingMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters))
     self._drivingEncoder = self._drivingMotor.getEncoder()
     self._drivingEncoder.setPosition(0)
 
@@ -55,7 +49,7 @@ class DifferentialModule:
   
   def setIdleMode(self, motorIdleMode: MotorIdleMode) -> None:
     idleMode = SparkBaseConfig.IdleMode.kCoast if motorIdleMode == MotorIdleMode.Coast else SparkBaseConfig.IdleMode.kBrake
-    utils.setSparkConfig(self._drivingMotor.configure(SparkBaseConfig().setIdleMode(idleMode), SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kNoPersistParameters))
+    utils.setSparkConfig(self._drivingMotor.configure(SparkBaseConfig().setIdleMode(idleMode), ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters))
     
   def reset(self) -> None:
     self._drivingEncoder.setPosition(0)

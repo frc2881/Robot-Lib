@@ -3,7 +3,7 @@ from wpimath import units
 from wpimath.geometry import Rotation2d
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpilib import SmartDashboard
-from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, ClosedLoopConfig
+from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, FeedbackSensor, ResetMode, PersistMode
 from ..classes import SwerveModuleConfig, MotorIdleMode
 from .. import logger, utils
 
@@ -33,17 +33,11 @@ class SwerveModule:
       .positionConversionFactor(drivingEncoderPositionConversionFactor)
       .velocityConversionFactor(drivingEncoderPositionConversionFactor / 60.0))
     (self._drivingMotorConfig.closedLoop
-      .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
+      .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
       .pid(*self._config.constants.drivingMotorPID)
       .velocityFF(1 / driveWheelFreeSpeedRps)
       .outputRange(-1.0, 1.0))
-    utils.setSparkConfig(
-      self._drivingMotor.configure(
-        self._drivingMotorConfig,
-        SparkBase.ResetMode.kResetSafeParameters,
-        SparkBase.PersistMode.kPersistParameters
-      )
-    )
+    utils.setSparkConfig(self._drivingMotor.configure(self._drivingMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters))
     self._drivingClosedLoopController = self._drivingMotor.getClosedLoopController()
     self._drivingEncoder = self._drivingMotor.getEncoder()
     self._drivingEncoder.setPosition(0)
@@ -58,18 +52,12 @@ class SwerveModule:
       .positionConversionFactor(turningEncoderPositionConversionFactor)
       .velocityConversionFactor(turningEncoderPositionConversionFactor / 60.0))
     (self._turningMotorConfig.closedLoop
-      .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kAbsoluteEncoder)
+      .setFeedbackSensor(FeedbackSensor.kAbsoluteEncoder)
       .pid(*self._config.constants.turningMotorPID)
       .outputRange(-1.0, 1.0)
       .positionWrappingEnabled(True)
       .positionWrappingInputRange(0, turningEncoderPositionConversionFactor))
-    utils.setSparkConfig(
-      self._turningMotor.configure(
-        self._turningMotorConfig,
-        SparkBase.ResetMode.kResetSafeParameters,
-        SparkBase.PersistMode.kPersistParameters
-      )
-    )
+    utils.setSparkConfig(self._turningMotor.configure(self._turningMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters))
     self._turningClosedLoopController = self._turningMotor.getClosedLoopController()
     self._turningEncoder = self._turningMotor.getAbsoluteEncoder()
     self._turningOffset = units.degreesToRadians(self._config.turningOffset)
@@ -95,8 +83,8 @@ class SwerveModule:
 
   def setIdleMode(self, motorIdleMode: MotorIdleMode) -> None:
     idleMode = SparkBaseConfig.IdleMode.kCoast if motorIdleMode == MotorIdleMode.Coast else SparkBaseConfig.IdleMode.kBrake
-    utils.setSparkConfig(self._drivingMotor.configure(SparkBaseConfig().setIdleMode(idleMode), SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kNoPersistParameters))
-    utils.setSparkConfig(self._turningMotor.configure(SparkBaseConfig().setIdleMode(idleMode), SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kNoPersistParameters))
+    utils.setSparkConfig(self._drivingMotor.configure(SparkBaseConfig().setIdleMode(idleMode), ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters))
+    utils.setSparkConfig(self._turningMotor.configure(SparkBaseConfig().setIdleMode(idleMode), ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters))
     
   def _updateTelemetry(self) -> None:
     SmartDashboard.putNumber(f'{self._baseKey}/Driving/Current', self._drivingMotor.getOutputCurrent())

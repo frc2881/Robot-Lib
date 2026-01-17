@@ -15,12 +15,9 @@ class PoseSensor:
     self._photonCamera = PhotonCamera(config.name)
     self._photonCamera.setDriverMode(False)
     self._photonPoseEstimator = PhotonPoseEstimator(
-      config.constants.aprilTagFieldLayout, 
-      config.constants.poseStrategy, 
-      self._photonCamera, 
+      config.aprilTagFieldLayout, 
       config.transform
     )
-    self._photonPoseEstimator.multiTagFallbackStrategy = config.constants.fallbackPoseStrategy
 
     self._hasTarget = False
     self._pipelineResultBufferTimer = Timer()
@@ -36,7 +33,9 @@ class PoseSensor:
     estimatedRobotPose: EstimatedRobotPose | None = None
     if self._photonCamera.isConnected():
       for photonPipelineResult in self._photonCamera.getAllUnreadResults():
-        estimatedRobotPose = self._photonPoseEstimator.update(photonPipelineResult)
+        estimatedRobotPose = self._photonPoseEstimator.estimateCoprocMultiTagPose(photonPipelineResult)
+        if estimatedRobotPose is None:
+          estimatedRobotPose = self._photonPoseEstimator.estimateLowestAmbiguityPose(photonPipelineResult)
     if estimatedRobotPose is not None:
       self._hasTarget = len(estimatedRobotPose.targetsUsed) > 0
       self._pipelineResultBufferTimer.restart()

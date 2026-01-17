@@ -2,7 +2,7 @@ import math
 from commands2 import Command, cmd, Subsystem
 from wpimath import units
 from wpilib import SmartDashboard
-from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, ClosedLoopConfig
+from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, FeedbackSensor, ResetMode, PersistMode
 from ..classes import RelativePositionControlModuleConfig, MotorDirection, Value
 from .. import logger, utils
 
@@ -39,20 +39,14 @@ class RelativePositionControlModule:
       .forwardSoftLimitEnabled(True)
       .forwardSoftLimit(self._config.constants.motorSoftLimitForward))
     (self._motorConfig.closedLoop
-      .setFeedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
+      .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
       .pid(*self._config.constants.motorPID)
       .outputRange(*self._config.constants.motorOutputRange)
       .maxMotion
         .maxVelocity(self._config.constants.motorMotionMaxVelocity)
         .maxAcceleration(self._config.constants.motorMotionMaxAcceleration)
         .allowedClosedLoopError(self._config.constants.motorMotionAllowedClosedLoopError))
-    utils.setSparkConfig(
-      self._motor.configure(
-        self._motorConfig,
-        SparkBase.ResetMode.kResetSafeParameters,
-        SparkBase.PersistMode.kPersistParameters
-      )
-    )
+    utils.setSparkConfig(self._motor.configure(self._motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters))
     self._closedLoopController = self._motor.getClosedLoopController()
     self._relativeEncoder = self._motor.getEncoder()
     self._relativeEncoder.setPosition(0)

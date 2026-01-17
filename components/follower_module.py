@@ -1,5 +1,5 @@
 from wpilib import SmartDashboard
-from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex
+from rev import SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, ResetMode, PersistMode
 from ..classes import FollowerModuleConfig
 from .. import logger, utils
 
@@ -21,13 +21,7 @@ class FollowerModule:
       .setIdleMode(SparkBaseConfig.IdleMode.kBrake)
       .smartCurrentLimit(self._config.constants.motorCurrentLimit))
     self._motorConfig.follow(self._config.leaderMotorCANId, self._config.isInverted)
-    utils.setSparkConfig(
-      self._motor.configure(
-        self._motorConfig,
-        SparkBase.ResetMode.kResetSafeParameters,
-        SparkBase.PersistMode.kPersistParameters
-      )
-    )
+    utils.setSparkConfig(self._motor.configure(self._motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters))
 
     utils.addRobotPeriodic(self._periodic)
 
