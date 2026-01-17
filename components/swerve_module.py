@@ -16,7 +16,7 @@ class SwerveModule:
 
     self._baseKey = f'Robot/Drive/Modules/{self._config.location.name}'
 
-    nominalVoltage: units.volts = 1.0
+    nominalVoltage: units.volts = 12.0
     drivingMotorReduction: float = (self._config.constants.wheelBevelGearTeeth * self._config.constants.wheelSpurGearTeeth) / (self._config.constants.drivingMotorPinionTeeth * self._config.constants.wheelBevelPinionTeeth)
     driveWheelFreeSpeedRps: float = ((self._config.constants.drivingMotorFreeSpeed / 60) * (self._config.constants.wheelDiameter * math.pi)) / drivingMotorReduction
     drivingVelocityFeedForward: float = nominalVoltage / driveWheelFreeSpeedRps
