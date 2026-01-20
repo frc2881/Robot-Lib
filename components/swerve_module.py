@@ -3,7 +3,7 @@ from wpimath import units
 from wpimath.geometry import Rotation2d
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpilib import SmartDashboard
-from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, FeedbackSensor, ResetMode, PersistMode, AbsoluteEncoderConfig
+from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, FeedbackSensor, ResetMode, PersistMode
 from ..classes import SwerveModuleConfig, MotorIdleMode
 from .. import logger, utils
 
@@ -17,10 +17,9 @@ class SwerveModule:
     self._baseKey = f'Robot/Drive/Modules/{self._config.location.name}'
 
     nominalVoltage: units.volts = 12.0
-    drivingMotorReduction: float = (self._config.constants.wheelBevelGearTeeth * self._config.constants.wheelSpurGearTeeth) / (self._config.constants.drivingMotorPinionTeeth * self._config.constants.wheelBevelPinionTeeth)
-    driveWheelFreeSpeedRps: float = ((self._config.constants.drivingMotorFreeSpeed / 60) * (self._config.constants.wheelDiameter * math.pi)) / drivingMotorReduction
+    driveWheelFreeSpeedRps: float = ((self._config.constants.drivingMotorFreeSpeed / 60) * (self._config.constants.wheelDiameter * math.pi)) / self._config.constants.drivingMotorReduction
     drivingVelocityFeedForward: float = nominalVoltage / driveWheelFreeSpeedRps
-    drivingEncoderPositionConversionFactor: float = (self._config.constants.wheelDiameter * math.pi) / drivingMotorReduction
+    drivingEncoderPositionConversionFactor: float = (self._config.constants.wheelDiameter * math.pi) / self._config.constants.drivingMotorReduction
     turningEncoderPositionConversionFactor: float = 2 * math.pi
 
     if self._config.constants.drivingMotorControllerType == SparkLowLevel.SparkModel.kSparkFlex:
@@ -90,4 +89,5 @@ class SwerveModule:
     utils.setSparkConfig(self._turningMotor.configure(SparkBaseConfig().setIdleMode(idleMode), ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters))
     
   def _updateTelemetry(self) -> None:
-    SmartDashboard.putNumber(f'{self._baseKey}/Driving/Current', self._drivingMotor.getOutputCurrent())
+    SmartDashboard.putNumber(f'{self._baseKey}/Driving/Velocity', self._drivingEncoder.getVelocity())
+    SmartDashboard.putNumber(f'{self._baseKey}/Turning/Velocity', self._turningEncoder.getVelocity())

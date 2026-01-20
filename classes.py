@@ -100,6 +100,73 @@ class Value(float):
   min = sys.float_info.min
   max = sys.float_info.max
 
+class MotorModel(Enum):
+  NEO = auto()
+  NEOVortex = auto()
+  NEO550 = auto()
+
+class SwerveModuleGearKit(Enum):
+  Low = auto()
+  Medium = auto()
+  High = auto()
+  ExtraHigh1 = auto()
+  ExtraHigh2 = auto()
+  ExtraHigh3 = auto()
+  ExtraHigh4 = auto()
+  ExtraHigh5 = auto()
+
+class SwerveModuleLocation(IntEnum):
+  FrontLeft = 0,
+  FrontRight = 1,
+  RearLeft = 2,
+  RearRight = 3
+
+@dataclass(frozen=True, slots=True)
+class SwerveModuleConstants:
+  wheelDiameter: units.meters
+  drivingMotorType: SparkLowLevel.MotorType
+  drivingMotorControllerType: SparkLowLevel.SparkModel
+  drivingMotorFreeSpeed: units.revolutions_per_minute
+  drivingMotorReduction: float
+  drivingMotorCurrentLimit: int
+  drivingMotorPID: PID
+  turningMotorCurrentLimit: int
+  turningMotorPID: PID
+  turningMotorAbsoluteEncoderConfig: AbsoluteEncoderConfig
+
+@dataclass(frozen=True, slots=True)
+class SwerveModuleConfig:
+  location: SwerveModuleLocation
+  drivingMotorCANId: int
+  turningMotorCANId: int
+  turningOffset: units.degrees
+  translation: Translation2d
+  constants: SwerveModuleConstants
+
+class DifferentialModuleLocation(IntEnum):
+  Left = 0,
+  Right = 1
+
+class DifferentialModulePositions(NamedTuple):
+  left: units.meters
+  right: units.meters
+
+@dataclass(frozen=True, slots=True)
+class DifferentialModuleConstants:
+  wheelDiameter: units.meters
+  drivingMotorControllerType: SparkLowLevel.SparkModel
+  drivingMotorType: SparkLowLevel.MotorType
+  drivingMotorCurrentLimit: int
+  drivingMotorReduction: float
+
+@dataclass(frozen=True, slots=True)
+class DifferentialModuleConfig:
+  location: DifferentialModuleLocation
+  drivingMotorCANId: int
+  leaderMotorCANId: int | None
+  isInverted: bool
+  constants: DifferentialModuleConstants
+
 @dataclass(frozen=True, slots=True)
 class DriftCorrectionConstants:
   rotationPID: PID
@@ -121,59 +188,18 @@ class TargetAlignmentConstants:
   rotationTranslationModeOffset: units.degrees
 
 @dataclass(frozen=True, slots=True)
-class SwerveModuleConstants:
-  wheelDiameter: units.meters
-  wheelBevelGearTeeth: int
-  wheelSpurGearTeeth: int
-  wheelBevelPinionTeeth: int
-  drivingMotorPinionTeeth: int
-  drivingMotorFreeSpeed: units.revolutions_per_minute
-  drivingMotorControllerType: SparkLowLevel.SparkModel
-  drivingMotorType: SparkLowLevel.MotorType
-  drivingMotorCurrentLimit: int
-  drivingMotorPID: PID
-  turningMotorCurrentLimit: int
-  turningMotorPID: PID
-  turningMotorAbsoluteEncoderConfig: AbsoluteEncoderConfig
-
-class SwerveModuleLocation(IntEnum):
-  FrontLeft = 0,
-  FrontRight = 1,
-  RearLeft = 2,
-  RearRight = 3
+class FollowerModuleConstants:
+  motorControllerType: SparkLowLevel.SparkModel
+  motorType: SparkLowLevel.MotorType
+  motorCurrentLimit: int
 
 @dataclass(frozen=True, slots=True)
-class SwerveModuleConfig:
-  location: SwerveModuleLocation
-  drivingMotorCANId: int
-  turningMotorCANId: int
-  turningOffset: units.degrees
-  translation: Translation2d
-  constants: SwerveModuleConstants
-
-@dataclass(frozen=True, slots=True)
-class DifferentialModuleConstants:
-  wheelDiameter: units.meters
-  drivingMotorControllerType: SparkLowLevel.SparkModel
-  drivingMotorType: SparkLowLevel.MotorType
-  drivingMotorCurrentLimit: int
-  drivingMotorReduction: float
-
-class DifferentialModuleLocation(IntEnum):
-  Left = 0,
-  Right = 1
-
-@dataclass(frozen=True, slots=True)
-class DifferentialModuleConfig:
-  location: DifferentialModuleLocation
-  drivingMotorCANId: int
-  leaderMotorCANId: int | None
+class FollowerModuleConfig:
+  baseKey: str
+  motorCANId: int
+  leaderMotorCANId: int
   isInverted: bool
-  constants: DifferentialModuleConstants
-
-class DifferentialDriveModulePositions(NamedTuple):
-  left: units.meters
-  right: units.meters
+  constants: FollowerModuleConstants
 
 @dataclass(frozen=True, slots=True)
 class RelativePositionControlModuleConstants:
@@ -219,20 +245,6 @@ class AbsolutePositionControlModuleConfig:
   motorCANId: int
   isInverted: bool
   constants: AbsolutePositionControlModuleConstants
-
-@dataclass(frozen=True, slots=True)
-class FollowerModuleConstants:
-  motorControllerType: SparkLowLevel.SparkModel
-  motorType: SparkLowLevel.MotorType
-  motorCurrentLimit: int
-
-@dataclass(frozen=True, slots=True)
-class FollowerModuleConfig:
-  baseKey: str
-  motorCANId: int
-  leaderMotorCANId: int
-  isInverted: bool
-  constants: FollowerModuleConstants
 
 @dataclass(frozen=True, slots=True)
 class PoseSensorConfig:
