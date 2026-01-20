@@ -17,6 +17,8 @@ class AbsolutePositionControlModule:
     self._targetPosition: float = Value.none
     self._isAtTargetPosition: bool = False
 
+    nominalVoltage: units.volts = 12.0
+    motorVelocityFeedForward: float = nominalVoltage / self._config.constants.motorFreeSpeed
     absoluteEncoderPositionConversionFactor: float = 360.0
     relativeEncoderPositionConversionFactor: float = absoluteEncoderPositionConversionFactor / self._config.constants.motorReduction
 
@@ -36,18 +38,19 @@ class AbsolutePositionControlModule:
       .positionConversionFactor(absoluteEncoderPositionConversionFactor)
       .inverted(self._config.isInverted))
     (self._motorConfig.softLimit
-      .reverseSoftLimitEnabled(False)
+      .reverseSoftLimitEnabled(True)
       .reverseSoftLimit(self._config.constants.motorSoftLimitReverse)
-      .forwardSoftLimitEnabled(False)
+      .forwardSoftLimitEnabled(True)
       .forwardSoftLimit(self._config.constants.motorSoftLimitForward))
     (self._motorConfig.closedLoop
       .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
       .pid(*self._config.constants.motorPID)
       .outputRange(*self._config.constants.motorOutputRange)
-      .maxMotion
-        .maxVelocity(self._config.constants.motorMotionMaxVelocity)
-        .maxAcceleration(self._config.constants.motorMotionMaxAcceleration)
-        .allowedClosedLoopError(self._config.constants.motorMotionAllowedClosedLoopError))
+      .feedForward.kV(motorVelocityFeedForward))
+    (self._motorConfig.closedLoop.maxMotion
+      .cruiseVelocity(self._config.constants.motorMotionCruiseVelocity)
+      .maxAcceleration(self._config.constants.motorMotionMaxAcceleration)
+      .allowedProfileError(self._config.constants.motorMotionAllowedProfileError))
     utils.setSparkConfig(self._motor.configure(self._motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters))
     self._closedLoopController = self._motor.getClosedLoopController()
     self._relativeEncoder = self._motor.getEncoder()
@@ -70,8 +73,8 @@ class AbsolutePositionControlModule:
     if position != self._targetPosition:
       self._resetPosition()
       self._targetPosition = position
-    self._closedLoopController.setReference(self._targetPosition, SparkBase.ControlType.kMAXMotionPositionControl)
-    self._isAtTargetPosition = math.isclose(self.getPosition(), self._targetPosition, abs_tol = self._config.constants.motorMotionAllowedClosedLoopError)
+    self._closedLoopController.setSetpoint(self._targetPosition, SparkBase.ControlType.kMAXMotionPositionControl)
+    self._isAtTargetPosition = math.isclose(self.getPosition(), self._targetPosition, abs_tol = self._config.constants.motorMotionAllowedProfileError)
 
   def getPosition(self) -> float:
     return self._relativeEncoder.getPosition()

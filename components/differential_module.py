@@ -15,6 +15,7 @@ class DifferentialModule:
 
     drivingMotorReduction: float = self._config.constants.drivingMotorReduction
     drivingEncoderPositionConversionFactor: float = (self._config.constants.wheelDiameter * math.pi) / drivingMotorReduction
+    
     if self._config.constants.drivingMotorControllerType == SparkLowLevel.SparkModel.kSparkFlex:
       self._drivingMotor = SparkFlex(self._config.drivingMotorCANId, self._config.constants.drivingMotorType)
     else: 
@@ -55,5 +56,4 @@ class DifferentialModule:
     self._drivingEncoder.setPosition(0)
 
   def _updateTelemetry(self) -> None:
-    # SmartDashboard.putNumber(f'{self._baseKey}/Driving/Current', self._drivingMotor.getOutputCurrent())
-    pass
+    SmartDashboard.putNumber(f'{self._baseKey}/Driving/Velocity', self._drivingEncoder.getVelocity())

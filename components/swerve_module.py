@@ -18,7 +18,7 @@ class SwerveModule:
 
     nominalVoltage: units.volts = 12.0
     driveWheelFreeSpeedRps: float = ((self._config.constants.drivingMotorFreeSpeed / 60) * (self._config.constants.wheelDiameter * math.pi)) / self._config.constants.drivingMotorReduction
-    drivingVelocityFeedForward: float = nominalVoltage / driveWheelFreeSpeedRps
+    drivingMotorVelocityFeedForward: float = nominalVoltage / driveWheelFreeSpeedRps
     drivingEncoderPositionConversionFactor: float = (self._config.constants.wheelDiameter * math.pi) / self._config.constants.drivingMotorReduction
     turningEncoderPositionConversionFactor: float = 2 * math.pi
 
@@ -37,7 +37,7 @@ class SwerveModule:
       .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
       .pid(*self._config.constants.drivingMotorPID)
       .outputRange(-1.0, 1.0)
-      .feedForward.kV(drivingVelocityFeedForward))
+      .feedForward.kV(drivingMotorVelocityFeedForward))
     utils.setSparkConfig(self._drivingMotor.configure(self._drivingMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters))
     self._drivingClosedLoopController = self._drivingMotor.getClosedLoopController()
     self._drivingEncoder = self._drivingMotor.getEncoder()
@@ -74,8 +74,8 @@ class SwerveModule:
     targetState.angle += Rotation2d(self._turningOffset)
     targetState.optimize(currentAngle)
     targetState.cosineScale(currentAngle)
-    self._drivingClosedLoopController.setReference(targetState.speed, SparkBase.ControlType.kVelocity)
-    self._turningClosedLoopController.setReference(targetState.angle.radians(), SparkBase.ControlType.kPosition)
+    self._drivingClosedLoopController.setSetpoint(targetState.speed, SparkBase.ControlType.kVelocity)
+    self._turningClosedLoopController.setSetpoint(targetState.angle.radians(), SparkBase.ControlType.kPosition)
 
   def getState(self) -> SwerveModuleState:
     return SwerveModuleState(self._drivingEncoder.getVelocity(), Rotation2d(self._turningEncoder.getPosition() - self._turningOffset))

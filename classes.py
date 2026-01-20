@@ -124,8 +124,8 @@ class SwerveModuleLocation(IntEnum):
 @dataclass(frozen=True, slots=True)
 class SwerveModuleConstants:
   wheelDiameter: units.meters
-  drivingMotorType: SparkLowLevel.MotorType
   drivingMotorControllerType: SparkLowLevel.SparkModel
+  drivingMotorType: SparkLowLevel.MotorType
   drivingMotorFreeSpeed: units.revolutions_per_minute
   drivingMotorReduction: float
   drivingMotorCurrentLimit: int
@@ -156,8 +156,8 @@ class DifferentialModuleConstants:
   wheelDiameter: units.meters
   drivingMotorControllerType: SparkLowLevel.SparkModel
   drivingMotorType: SparkLowLevel.MotorType
-  drivingMotorCurrentLimit: int
   drivingMotorReduction: float
+  drivingMotorCurrentLimit: int
 
 @dataclass(frozen=True, slots=True)
 class DifferentialModuleConfig:
@@ -205,13 +205,14 @@ class FollowerModuleConfig:
 class RelativePositionControlModuleConstants:
   motorControllerType: SparkLowLevel.SparkModel
   motorType: SparkLowLevel.MotorType
-  motorCurrentLimit: int
+  motorFreeSpeed: units.revolutions_per_minute
   motorReduction: float
+  motorCurrentLimit: int
   motorPID: PID
   motorOutputRange: Range
-  motorMotionMaxVelocity: units.units_per_second
+  motorMotionCruiseVelocity: units.units_per_second
   motorMotionMaxAcceleration: units.units_per_second_squared
-  motorMotionAllowedClosedLoopError: float
+  motorMotionAllowedProfileError: float
   motorSoftLimitReverse: float
   motorSoftLimitForward: float
   motorResetSpeed: units.percent
@@ -228,13 +229,14 @@ class RelativePositionControlModuleConfig:
 class AbsolutePositionControlModuleConstants:
   motorControllerType: SparkLowLevel.SparkModel
   motorType: SparkLowLevel.MotorType
-  motorCurrentLimit: int
+  motorFreeSpeed: units.revolutions_per_minute
   motorReduction: float
+  motorCurrentLimit: int
   motorPID: PID
   motorOutputRange: Range
-  motorMotionMaxVelocity: units.units_per_second
+  motorMotionCruiseVelocity: units.units_per_second
   motorMotionMaxAcceleration: units.units_per_second_squared
-  motorMotionAllowedClosedLoopError: float
+  motorMotionAllowedProfileError: float
   motorSoftLimitReverse: float
   motorSoftLimitForward: float
   motorResetSpeed: units.percent
