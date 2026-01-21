@@ -74,7 +74,7 @@ class SpeedMode(Enum):
 
 class TargetAlignmentMode(Enum):
   Heading = auto()
-  Translation = auto()
+  Pose = auto()
 
 class ControllerRumbleMode(Enum):
   Both = auto()
@@ -143,6 +143,25 @@ class SwerveModuleConfig:
   translation: Translation2d
   constants: SwerveModuleConstants
 
+@dataclass(frozen=True, slots=True)
+class RotationAlignmentConstants:
+  rotationPID: PID
+  rotationPositionTolerance: units.degrees
+  rotationAlignmentOffset: units.degrees = 0
+
+@dataclass(frozen=True, slots=True)
+class TargetAlignmentConstants:
+  translationPID: PID
+  translationMaxVelocity: units.meters_per_second
+  translationMaxAcceleration: units.meters_per_second_squared
+  translationPositionTolerance: units.meters
+  translationVelocityTolerance: units.meters_per_second
+  rotationPID: PID
+  rotationMaxVelocity: units.degrees_per_second
+  rotationMaxAcceleration: units.degrees_per_second_squared
+  rotationPositionTolerance: units.degrees
+  rotationVelocityTolerance: units.degrees_per_second
+
 class DifferentialModuleLocation(IntEnum):
   Left = 0,
   Right = 1
@@ -166,26 +185,6 @@ class DifferentialModuleConfig:
   leaderMotorCANId: int | None
   isInverted: bool
   constants: DifferentialModuleConstants
-
-@dataclass(frozen=True, slots=True)
-class DriftCorrectionConstants:
-  rotationPID: PID
-  rotationPositionTolerance: units.degrees
-
-@dataclass(frozen=True, slots=True)
-class TargetAlignmentConstants:
-  translationPID: PID
-  translationMaxVelocity: units.meters_per_second
-  translationMaxAcceleration: units.meters_per_second_squared
-  translationPositionTolerance: units.meters
-  translationVelocityTolerance: units.meters_per_second
-  rotationPID: PID
-  rotationMaxVelocity: units.degrees_per_second
-  rotationMaxAcceleration: units.degrees_per_second_squared
-  rotationPositionTolerance: units.degrees
-  rotationVelocityTolerance: units.degrees_per_second
-  rotationHeadingModeOffset: units.degrees
-  rotationTranslationModeOffset: units.degrees
 
 @dataclass(frozen=True, slots=True)
 class FollowerModuleConstants:
