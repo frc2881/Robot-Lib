@@ -72,10 +72,6 @@ class SpeedMode(Enum):
   Competition = auto()
   Demo = auto()
 
-class TargetAlignmentMode(Enum):
-  Heading = auto()
-  Pose = auto()
-
 class ControllerRumbleMode(Enum):
   Both = auto()
   Driver = auto()
@@ -147,7 +143,6 @@ class SwerveModuleConfig:
 class RotationAlignmentConstants:
   rotationPID: PID
   rotationPositionTolerance: units.degrees
-  rotationAlignmentOffset: units.degrees = 0
 
 @dataclass(frozen=True, slots=True)
 class TargetAlignmentConstants:
