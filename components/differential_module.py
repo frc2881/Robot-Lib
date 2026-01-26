@@ -13,8 +13,7 @@ class DifferentialModule:
 
     self._baseKey = f'Robot/Drive/Modules/{self._config.location.name}'
 
-    drivingMotorReduction: float = self._config.constants.drivingMotorReduction
-    drivingEncoderPositionConversionFactor: float = (self._config.constants.wheelDiameter * math.pi) / drivingMotorReduction
+    drivingEncoderPositionConversionFactor: float = (self._config.constants.wheelDiameter * math.pi) / self._config.constants.drivingMotorReduction
     
     if self._config.constants.drivingMotorControllerType == SparkLowLevel.SparkModel.kSparkFlex:
       self._drivingMotor = SparkFlex(self._config.drivingMotorCANId, self._config.constants.drivingMotorType)

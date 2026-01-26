@@ -82,9 +82,15 @@ class ControllerRumblePattern(Enum):
   Long = auto()
 
 class PID(NamedTuple):
-  P: float
-  I: float
-  D: float
+  P: float = 0
+  I: float = 0
+  D: float = 0
+
+class FeedForwardGains(NamedTuple):
+  static: units.volts = 0
+  velocity: units.volts = 0
+  acceleration: units.volts = 0
+  gravity: units.volts = 0
 
 class Range(NamedTuple):
   min: float
@@ -199,18 +205,18 @@ class FollowerModuleConfig:
 class RelativePositionControlModuleConstants:
   motorControllerType: SparkLowLevel.SparkModel
   motorType: SparkLowLevel.MotorType
-  motorFreeSpeed: units.revolutions_per_minute
-  motorReduction: float
   motorCurrentLimit: int
   motorPID: PID
   motorOutputRange: Range
+  motorFeedForwardGains: FeedForwardGains
   motorMotionCruiseVelocity: units.units_per_second
   motorMotionMaxAcceleration: units.units_per_second_squared
   motorMotionAllowedProfileError: float
+  motorRelativeEncoderPositionConversionFactor: float
   motorSoftLimitReverse: float
   motorSoftLimitForward: float
-  motorResetSpeed: units.percent
-  distancePerRotation: float
+  motorHomedPosition: float
+  motorHomingSpeed: units.percent
 
 @dataclass(frozen=True, slots=True)
 class RelativePositionControlModuleConfig:
@@ -223,17 +229,17 @@ class RelativePositionControlModuleConfig:
 class AbsolutePositionControlModuleConstants:
   motorControllerType: SparkLowLevel.SparkModel
   motorType: SparkLowLevel.MotorType
-  motorFreeSpeed: units.revolutions_per_minute
-  motorReduction: float
   motorCurrentLimit: int
   motorPID: PID
   motorOutputRange: Range
+  motorFeedForwardGains: FeedForwardGains
   motorMotionCruiseVelocity: units.units_per_second
   motorMotionMaxAcceleration: units.units_per_second_squared
   motorMotionAllowedProfileError: float
+  motorRelativeEncoderPositionConversionFactor: float
+  motorAbsoluteEncoderPositionConversionFactor: float
   motorSoftLimitReverse: float
   motorSoftLimitForward: float
-  motorResetSpeed: units.percent
 
 @dataclass(frozen=True, slots=True)
 class AbsolutePositionControlModuleConfig:

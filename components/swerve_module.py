@@ -16,9 +16,8 @@ class SwerveModule:
 
     self._baseKey = f'Robot/Drive/Modules/{self._config.location.name}'
 
-    nominalVoltage: units.volts = 12.0
     driveWheelFreeSpeedRps: float = ((self._config.constants.drivingMotorFreeSpeed / 60) * (self._config.constants.wheelDiameter * math.pi)) / self._config.constants.drivingMotorReduction
-    drivingMotorVelocityFeedForward: float = nominalVoltage / driveWheelFreeSpeedRps
+    drivingMotorFeedForwardVelocityGain: float = 12.0 / driveWheelFreeSpeedRps
     drivingEncoderPositionConversionFactor: float = (self._config.constants.wheelDiameter * math.pi) / self._config.constants.drivingMotorReduction
     turningEncoderPositionConversionFactor: float = 2 * math.pi
 
@@ -37,7 +36,7 @@ class SwerveModule:
       .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
       .pid(*self._config.constants.drivingMotorPID)
       .outputRange(-1.0, 1.0)
-      .feedForward.kV(drivingMotorVelocityFeedForward))
+      .feedForward.kV(drivingMotorFeedForwardVelocityGain))
     utils.setSparkConfig(self._drivingMotor.configure(self._drivingMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters))
     self._drivingClosedLoopController = self._drivingMotor.getClosedLoopController()
     self._drivingEncoder = self._drivingMotor.getEncoder()

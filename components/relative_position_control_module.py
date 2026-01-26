@@ -19,10 +19,6 @@ class RelativePositionControlModule:
     self._targetPosition: float = Value.none
     self._isAtTargetPosition: bool = False
 
-    nominalVoltage: units.volts = 12.0
-    motorVelocityFeedForward: float = nominalVoltage / self._config.constants.motorFreeSpeed
-    relativeEncoderPositionConversionFactor: float = self._config.constants.distancePerRotation / self._config.constants.motorReduction
-
     if self._config.constants.motorControllerType == SparkLowLevel.SparkModel.kSparkFlex:
       self._motor = SparkFlex(self._config.motorCANId, self._config.constants.motorType)
     else: 
@@ -33,8 +29,8 @@ class RelativePositionControlModule:
       .smartCurrentLimit(self._config.constants.motorCurrentLimit)
       .inverted(self._config.isInverted))
     (self._motorConfig.encoder
-      .positionConversionFactor(relativeEncoderPositionConversionFactor)
-      .velocityConversionFactor(relativeEncoderPositionConversionFactor / 60.0))
+      .positionConversionFactor(self._config.constants.motorRelativeEncoderPositionConversionFactor)
+      .velocityConversionFactor(self._config.constants.motorRelativeEncoderPositionConversionFactor / 60.0))
     (self._motorConfig.softLimit
       .reverseSoftLimitEnabled(True)
       .reverseSoftLimit(self._config.constants.motorSoftLimitReverse)
@@ -44,7 +40,7 @@ class RelativePositionControlModule:
       .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
       .pid(*self._config.constants.motorPID)
       .outputRange(*self._config.constants.motorOutputRange)
-      .feedForward.kV(motorVelocityFeedForward))
+      .feedForward.svag(*self._config.constants.motorFeedForwardGains))
     (self._motorConfig.closedLoop.maxMotion
       .cruiseVelocity(self._config.constants.motorMotionCruiseVelocity)
       .maxAcceleration(self._config.constants.motorMotionMaxAcceleration)
@@ -52,7 +48,7 @@ class RelativePositionControlModule:
     utils.setSparkConfig(self._motor.configure(self._motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters))
     self._closedLoopController = self._motor.getClosedLoopController()
     self._relativeEncoder = self._motor.getEncoder()
-    self._relativeEncoder.setPosition(0)
+    self._relativeEncoder.setPosition(self._config.constants.motorHomedPosition)
 
     utils.addRobotPeriodic(self._periodic)
 
@@ -98,11 +94,11 @@ class RelativePositionControlModule:
       lambda: [ 
         setattr(self, "_isHomed", False),
         utils.setSparkSoftLimitsEnabled(self._motor, False),
-        self._motor.set(-self._config.constants.motorResetSpeed) 
+        self._motor.set(-self._config.constants.motorHomingSpeed) 
       ],
       lambda: [
         self._motor.stopMotor(),
-        self._relativeEncoder.setPosition(0),
+        self._relativeEncoder.setPosition(self._config.constants.motorHomedPosition),
         utils.setSparkSoftLimitsEnabled(self._motor, True),
         setattr(self, "_isHomed", True)
       ],
