@@ -1,6 +1,6 @@
 from typing import Any, Callable, Tuple, TypeVar
 import math
-from bisect import bisect_left
+import numpy
 import json
 from commands2 import TimedCommandRobot
 import wpilib
@@ -82,23 +82,8 @@ def getTargetDistance(robotPose: Pose2d, targetPose: Pose3d) -> units.meters:
 def getTargetPitch(robotPose: Pose2d, targetPose: Pose3d) -> units.degrees:
   return math.degrees(math.atan2((targetPose - Pose3d(robotPose)).Z(), getTargetDistance(robotPose, targetPose)))
 
-def _interpolate(x, xp, fp):
-  if len(xp) != len(fp): raise ValueError("xp and fp must have the same length")
-  if sorted(xp) != list(xp): raise ValueError("xp must be in strictly increasing order")
-  def _interp_one(val):
-    if val <= xp[0]: return fp[0]
-    if val >= xp[-1]: return fp[-1]
-    idx = bisect_left(xp, val)
-    x0, x1 = xp[idx - 1], xp[idx]
-    y0, y1 = fp[idx - 1], fp[idx]
-    slope = (y1 - y0) / (x1 - x0)
-    return y0 + slope * (val - x0)
-  if isinstance(x, (int, float)): return _interp_one(x)
-  elif hasattr(x, "__iter__"): return [_interp_one(val) for val in x]
-  else: raise TypeError("x must be a number or an iterable of numbers")
-
 def getInterpolatedValue(x: float, xs: tuple[float, ...], ys: tuple[float, ...]) -> float:
-  try: return _interpolate([x], xs, ys)[0]
+  try: return numpy.interp([x], xs, ys)[0]
   except: return Value.none
 
 def setSparkSoftLimitsEnabled(motor: SparkBase, enabled: bool) -> None:
