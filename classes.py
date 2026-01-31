@@ -156,12 +156,10 @@ class TargetAlignmentConstants:
   translationMaxVelocity: units.meters_per_second
   translationMaxAcceleration: units.meters_per_second_squared
   translationPositionTolerance: units.meters
-  translationVelocityTolerance: units.meters_per_second
   rotationPID: PID
   rotationMaxVelocity: units.degrees_per_second
   rotationMaxAcceleration: units.degrees_per_second_squared
   rotationPositionTolerance: units.degrees
-  rotationVelocityTolerance: units.degrees_per_second
 
 class DifferentialModuleLocation(IntEnum):
   Left = 0,
