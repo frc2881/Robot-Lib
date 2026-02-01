@@ -48,7 +48,7 @@ class RelativePositionControlModule:
     utils.setSparkConfig(self._motor.configure(self._motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters))
     self._closedLoopController = self._motor.getClosedLoopController()
     self._relativeEncoder = self._motor.getEncoder()
-    self._relativeEncoder.setPosition(self._config.constants.motorHomedPosition)
+    self._relativeEncoder.setPosition(0)
 
     utils.addRobotPeriodic(self._periodic)
 
