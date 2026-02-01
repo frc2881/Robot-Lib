@@ -58,18 +58,23 @@ def isValueInRange(value: float, minValue: float, maxValue: float) -> bool:
 def clampValue(value: float, minValue: float, maxValue: float) -> float:
   return max(min(value, maxValue), minValue)
 
-def squareControllerInput(input: units.percent, deadband: units.percent) -> units.percent:
-  deadbandInput: units.percent = wpimath.applyDeadband(input, deadband)
-  return math.copysign(deadbandInput * deadbandInput, input)
-
 def wrapAngle(angle: units.degrees) -> units.degrees:
   return wpimath.inputModulus(angle, -180, 180)
+
+def getInterpolatedValue(x: float, xs: tuple[float, ...], ys: tuple[float, ...]) -> float:
+  try: return numpy.interp([x], xs, ys)[0]
+  except: return Value.none
 
 def isPoseInBounds(pose: Pose2d, bounds: Tuple[Translation2d, Translation2d]) -> bool:
   return isValueInRange(pose.X(), bounds[0].X(), bounds[1].X()) and isValueInRange(pose.Y(), bounds[0].Y(), bounds[1].Y())
 
-def getTargetHash(pose: Pose2d) -> int:
-  return hash((pose.X(), pose.Y(), pose.rotation().radians()))
+def isPoseAlignedToTarget(robotPose: Pose2d, targetPose: Pose3d, translationTolerance: units.meters, rotationTolerance: units.degrees) -> bool:
+  transform = robotPose - targetPose.toPose2d()
+  return (
+    isValueInRange(transform.translation().X(), -translationTolerance, translationTolerance) and 
+    isValueInRange(transform.translation().Y(), -translationTolerance, translationTolerance) and
+    isValueInRange(transform.rotation().degrees(), -rotationTolerance, rotationTolerance)
+  )
 
 def getTargetHeading(robotPose: Pose2d, targetPose: Pose3d) -> units.degrees:
   translation = targetPose.toPose2d().relativeTo(robotPose).translation()
@@ -82,9 +87,12 @@ def getTargetDistance(robotPose: Pose2d, targetPose: Pose3d) -> units.meters:
 def getTargetPitch(robotPose: Pose2d, targetPose: Pose3d) -> units.degrees:
   return math.degrees(math.atan2((targetPose - Pose3d(robotPose)).Z(), getTargetDistance(robotPose, targetPose)))
 
-def getInterpolatedValue(x: float, xs: tuple[float, ...], ys: tuple[float, ...]) -> float:
-  try: return numpy.interp([x], xs, ys)[0]
-  except: return Value.none
+def getTargetHash(pose: Pose2d) -> int:
+  return hash((pose.X(), pose.Y(), pose.rotation().radians()))
+
+def squareControllerInput(input: units.percent, deadband: units.percent) -> units.percent:
+  deadbandInput: units.percent = wpimath.applyDeadband(input, deadband)
+  return math.copysign(deadbandInput * deadbandInput, input)
 
 def setSparkSoftLimitsEnabled(motor: SparkBase, enabled: bool) -> None:
   config = SparkBaseConfig()
