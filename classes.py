@@ -265,6 +265,12 @@ class BinarySensorConfig:
   digitalInputChannel: int
 
 @dataclass(frozen=True, slots=True)
+class ButtonSensorConfig:
+  name: str
+  digitalInputChannel: int
+  isInverted: bool
+
+@dataclass(frozen=True, slots=True)
 class DistanceSensorConfig:
   name: str
   digitalInputChannel: int
