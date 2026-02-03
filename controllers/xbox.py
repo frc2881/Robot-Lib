@@ -2,11 +2,11 @@ import math
 from commands2 import Command, cmd
 from commands2.button import CommandXboxController, Trigger
 from wpimath import units
-from wpilib import XboxController
+from wpilib import XboxController as _XboxController
 from .. import logger, utils
 from ..classes import ControllerRumblePattern
 
-class Xbox(CommandXboxController):
+class XboxController(CommandXboxController):
   def __init__(
       self, 
       port: int, 
@@ -43,12 +43,12 @@ class Xbox(CommandXboxController):
     return cmd.select(
       {
         ControllerRumblePattern.Short: cmd.startEnd(
-          lambda: self.setRumble(XboxController.RumbleType.kBothRumble, 1),
-          lambda: self.setRumble(XboxController.RumbleType.kBothRumble, 0)
+          lambda: self.setRumble(_XboxController.RumbleType.kBothRumble, 1),
+          lambda: self.setRumble(_XboxController.RumbleType.kBothRumble, 0)
         ).withTimeout(0.5),
         ControllerRumblePattern.Long: cmd.startEnd(
-          lambda: self.setRumble(XboxController.RumbleType.kBothRumble, 1),
-          lambda: self.setRumble(XboxController.RumbleType.kBothRumble, 0)
+          lambda: self.setRumble(_XboxController.RumbleType.kBothRumble, 1),
+          lambda: self.setRumble(_XboxController.RumbleType.kBothRumble, 0)
         ).withTimeout(1.0),
       }, 
       lambda: pattern

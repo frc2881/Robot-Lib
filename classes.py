@@ -262,18 +262,17 @@ class ObjectSensorConfig:
 @dataclass(frozen=True, slots=True)
 class BinarySensorConfig:
   name: str
-  digitalInputChannel: int
-
-@dataclass(frozen=True, slots=True)
-class ButtonSensorConfig:
-  name: str
-  digitalInputChannel: int
-  isInverted: bool
+  channel: int
 
 @dataclass(frozen=True, slots=True)
 class DistanceSensorConfig:
   name: str
-  digitalInputChannel: int
+  channel: int
   pulseWidthConversionFactor: float
   minTargetDistance: units.millimeters
   maxTargetDistance: units.millimeters
+
+@dataclass(frozen=True, slots=True)
+class ButtonControllerConfig:
+  name: str
+  channel: int

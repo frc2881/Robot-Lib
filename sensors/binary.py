@@ -10,7 +10,7 @@ class BinarySensor:
     self._config = config
     self._baseKey = f'Robot/Sensors/Binary/{self._config.name}'
 
-    self._digitalInput = DigitalInput(self._config.digitalInputChannel)
+    self._digitalInput = DigitalInput(self._config.channel)
 
     self._isTriggered: bool = False
     
