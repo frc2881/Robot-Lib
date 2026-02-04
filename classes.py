@@ -146,12 +146,12 @@ class SwerveModuleConfig:
   constants: SwerveModuleConstants
 
 @dataclass(frozen=True, slots=True)
-class RotationAlignmentConstants:
+class HeadingAlignmentConstants:
   rotationPID: PID
   rotationPositionTolerance: units.degrees
 
 @dataclass(frozen=True, slots=True)
-class TargetAlignmentConstants:
+class PoseAlignmentConstants:
   translationPID: PID
   translationMaxVelocity: units.meters_per_second
   translationMaxAcceleration: units.meters_per_second_squared
