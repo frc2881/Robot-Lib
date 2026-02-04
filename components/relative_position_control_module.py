@@ -40,7 +40,11 @@ class RelativePositionControlModule:
       .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
       .pid(*self._config.constants.motorPID)
       .outputRange(*self._config.constants.motorOutputRange)
-      .feedForward.svag(*self._config.constants.motorFeedForwardGains))
+      .feedForward
+        .kS(self._config.constants.motorFeedForwardGains.static)
+        .kV(self._config.constants.motorFeedForwardGains.velocity)
+        .kA(self._config.constants.motorFeedForwardGains.acceleration)
+        .kG(self._config.constants.motorFeedForwardGains.gravity))
     (self._motorConfig.closedLoop.maxMotion
       .cruiseVelocity(self._config.constants.motorMotionCruiseVelocity)
       .maxAcceleration(self._config.constants.motorMotionMaxAcceleration)
