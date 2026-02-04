@@ -83,9 +83,8 @@ class SwerveModule:
     return SwerveModulePosition(self._drivingEncoder.getPosition(), Rotation2d(self._turningEncoder.getPosition() - self._turningOffset))
 
   def setIdleMode(self, motorIdleMode: MotorIdleMode) -> None:
-    idleMode = SparkBaseConfig.IdleMode.kCoast if motorIdleMode == MotorIdleMode.Coast else SparkBaseConfig.IdleMode.kBrake
-    utils.setSparkConfig(self._drivingMotor.configure(SparkBaseConfig().setIdleMode(idleMode), ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters))
-    utils.setSparkConfig(self._turningMotor.configure(SparkBaseConfig().setIdleMode(idleMode), ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters))
+    utils.setMotorIdleMode(self._drivingMotor, motorIdleMode)
+    utils.setMotorIdleMode(self._turningMotor, motorIdleMode)
     
   def _updateTelemetry(self) -> None:
     SmartDashboard.putNumber(f'{self._baseKey}/Driving/Velocity', self._drivingEncoder.getVelocity())

@@ -3,7 +3,7 @@ from commands2 import Command, cmd, Subsystem
 from wpimath import units
 from wpilib import SmartDashboard
 from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, FeedbackSensor, ResetMode, PersistMode
-from ..classes import RelativePositionControlModuleConfig, MotorDirection, Value
+from ..classes import RelativePositionControlModuleConfig, MotorDirection, MotorIdleMode, RobotState, Value
 from .. import logger, utils
 
 class RelativePositionControlModule:
@@ -62,13 +62,13 @@ class RelativePositionControlModule:
   def setSpeed(self, speed: units.percent) -> None:
     self._motor.set(-speed if self._config.isInverted else speed)
     if speed != 0:
-      self._resetPosition()
+      self._resetTargetPosition()
     
   def setPosition(self, position: float) -> None:
     if position == Value.min: position = self._config.constants.motorSoftLimitReverse
     if position == Value.max: position = self._config.constants.motorSoftLimitForward
     if position != self._targetPosition:
-      self._resetPosition()
+      self._resetTargetPosition()
       self._targetPosition = position
     self._closedLoopController.setSetpoint(self._targetPosition, SparkBase.ControlType.kMAXMotionPositionControl)
     self._isAtTargetPosition = math.isclose(self.getPosition(), self._targetPosition, abs_tol = self._config.constants.motorMotionAllowedProfileError)
@@ -76,7 +76,7 @@ class RelativePositionControlModule:
   def getPosition(self) -> float:
     return self._relativeEncoder.getPosition()
 
-  def _resetPosition(self) -> None:
+  def _resetTargetPosition(self) -> None:
     self._targetPosition = Value.none
     self._isAtTargetPosition = False
 
@@ -91,30 +91,41 @@ class RelativePositionControlModule:
     )
 
   def setSoftLimitsEnabled(self, isEnabled: bool) -> None:
-    utils.setSparkSoftLimitsEnabled(self._motor, isEnabled)
+    utils.setSoftLimitsEnabled(self._motor, isEnabled)
+
+  def setIdleMode(self, motorIdleMode: MotorIdleMode) -> None:
+    utils.setMotorIdleMode(self._motor, motorIdleMode)
 
   def resetToHome(self, subsystem: Subsystem) -> Command:
     return cmd.startEnd(
-      lambda: [ 
-        setattr(self, "_isHomed", False),
-        utils.setSparkSoftLimitsEnabled(self._motor, False),
-        self._motor.set(-self._config.constants.motorHomingSpeed) 
-      ],
-      lambda: [
-        self._motor.stopMotor(),
-        self._relativeEncoder.setPosition(self._config.constants.motorHomedPosition),
-        utils.setSparkSoftLimitsEnabled(self._motor, True),
-        setattr(self, "_isHomed", True)
-      ],
+      lambda: self._startHoming(),
+      lambda: self._endHoming(),
       subsystem
-    )
+    ).runsWhenDisabled(True)
+  
+  def _startHoming(self) -> None:
+    self._isHomed = False
+    utils.setSoftLimitsEnabled(self._motor, False)
+    if utils.getRobotState() == RobotState.Enabled:
+      self._motor.set(-self._config.constants.motorHomingSpeed)
+    else:
+      self.setIdleMode(MotorIdleMode.Coast)
+
+  def _endHoming(self) -> None:
+    if utils.getRobotState() == RobotState.Enabled:
+      self._motor.stopMotor()
+    else:
+      self.setIdleMode(MotorIdleMode.Brake)
+    self._relativeEncoder.setPosition(self._config.constants.motorHomedPosition)
+    utils.setSoftLimitsEnabled(self._motor, True)
+    self._isHomed = True
   
   def isHomed(self) -> bool:
     return self._isHomed
 
   def reset(self) -> None:
     self._motor.stopMotor()
-    self._resetPosition()
+    self._resetTargetPosition()
 
   def _updateTelemetry(self) -> None:
     SmartDashboard.putBoolean(f'{self._baseKey}/IsHomed', self._isHomed)

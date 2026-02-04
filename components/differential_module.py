@@ -48,8 +48,7 @@ class DifferentialModule:
     return self._drivingEncoder.getVelocity()
   
   def setIdleMode(self, motorIdleMode: MotorIdleMode) -> None:
-    idleMode = SparkBaseConfig.IdleMode.kCoast if motorIdleMode == MotorIdleMode.Coast else SparkBaseConfig.IdleMode.kBrake
-    utils.setSparkConfig(self._drivingMotor.configure(SparkBaseConfig().setIdleMode(idleMode), ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters))
+    utils.setMotorIdleMode(self._drivingMotor, motorIdleMode)
     
   def reset(self) -> None:
     self._drivingEncoder.setPosition(0)

@@ -2,7 +2,7 @@ import math
 from wpimath import units
 from wpilib import SmartDashboard
 from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, FeedbackSensor, ResetMode, PersistMode
-from ..classes import AbsolutePositionControlModuleConfig, MotorDirection, Value
+from ..classes import AbsolutePositionControlModuleConfig, MotorDirection, MotorIdleMode, Value
 from .. import logger, utils
 
 class AbsolutePositionControlModule:
@@ -91,6 +91,12 @@ class AbsolutePositionControlModule:
       self._config.constants.motorSoftLimitReverse if direction == MotorDirection.Reverse else self._config.constants.motorSoftLimitForward, 
       abs_tol = tolerance
     )
+  
+  def setSoftLimitsEnabled(self, isEnabled: bool) -> None:
+    utils.setSoftLimitsEnabled(self._motor, isEnabled)
+
+  def setIdleMode(self, motorIdleMode: MotorIdleMode) -> None:
+    utils.setMotorIdleMode(self._motor, motorIdleMode)
 
   def reset(self) -> None:
     self._motor.stopMotor()

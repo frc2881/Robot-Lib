@@ -10,7 +10,7 @@ from wpimath.geometry import Pose2d, Pose3d, Translation2d, Rotation2d, Transfor
 from wpilib import DriverStation
 from rev import SparkBase, SparkBaseConfig, REVLibError, ResetMode, PersistMode
 from . import logger
-from .classes import Alliance, RobotMode, RobotState, Value
+from .classes import Alliance, RobotMode, RobotState, MotorIdleMode, Value
 
 T = TypeVar("T")
 
@@ -94,10 +94,15 @@ def squareControllerInput(input: units.percent, deadband: units.percent) -> unit
   deadbandInput: units.percent = wpimath.applyDeadband(input, deadband)
   return math.copysign(deadbandInput * deadbandInput, input)
 
-def setSparkSoftLimitsEnabled(motor: SparkBase, enabled: bool) -> None:
+def setSoftLimitsEnabled(motor: SparkBase, enabled: bool) -> None:
   config = SparkBaseConfig()
   config.softLimit.reverseSoftLimitEnabled(enabled).forwardSoftLimitEnabled(enabled)
   setSparkConfig(motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters))
+
+def setMotorIdleMode(motor: SparkBase, motorIdleMode: MotorIdleMode) -> None:
+  setSparkConfig(motor.configure(SparkBaseConfig().setIdleMode(
+    SparkBaseConfig.IdleMode.kCoast if motorIdleMode == MotorIdleMode.Coast else SparkBaseConfig.IdleMode.kBrake
+  ), ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters))
 
 def setSparkConfig(error: REVLibError) -> None:
   if error != REVLibError.kOk: logger.error(f'REVLibError: {error}')
