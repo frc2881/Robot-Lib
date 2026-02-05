@@ -231,6 +231,7 @@ class VelocityControlModuleConstants:
   motorPID: PID
   motorOutputRange: Range
   motorFeedForwardGains: FeedForwardGains
+  motorMotionMaxVelocity: units.revolutions_per_minute
   motorMotionMaxAcceleration: units.units_per_second_squared
 
 @dataclass(frozen=True, slots=True)

@@ -44,7 +44,7 @@ class VelocityControlModule:
     self._updateTelemetry()
     
   def setSpeed(self, speed: units.percent) -> None:
-    self._closedLoopController.setSetpoint(speed, SparkBase.ControlType.kMAXMotionVelocityControl)
+    self._closedLoopController.setSetpoint(self._config.constants.motorMotionMaxVelocity * speed, SparkBase.ControlType.kMAXMotionVelocityControl)
 
   def setIdleMode(self, motorIdleMode: MotorIdleMode) -> None:
     utils.setMotorIdleMode(self._motor, motorIdleMode)
