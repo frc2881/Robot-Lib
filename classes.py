@@ -224,6 +224,23 @@ class RelativePositionControlModuleConfig:
   constants: RelativePositionControlModuleConstants
 
 @dataclass(frozen=True, slots=True)
+class VelocityControlModuleConstants:
+  motorControllerType: SparkLowLevel.SparkModel
+  motorType: SparkLowLevel.MotorType
+  motorCurrentLimit: int
+  motorPID: PID
+  motorOutputRange: Range
+  motorFeedForwardGains: FeedForwardGains
+  motorMotionMaxAcceleration: units.units_per_second_squared
+
+@dataclass(frozen=True, slots=True)
+class VelocityControlModuleConfig:
+  baseKey: str
+  motorCANId: int
+  isInverted: bool
+  constants: VelocityControlModuleConstants
+
+@dataclass(frozen=True, slots=True)
 class AbsolutePositionControlModuleConstants:
   motorControllerType: SparkLowLevel.SparkModel
   motorType: SparkLowLevel.MotorType
