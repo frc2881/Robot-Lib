@@ -4,7 +4,7 @@ import math
 from enum import Enum, IntEnum, auto
 from dataclasses import dataclass
 from wpimath import units
-from wpimath.geometry import Translation2d, Transform3d
+from wpimath.geometry import Translation2d, Transform2d, Transform3d
 from robotpy_apriltag import AprilTagFieldLayout
 from rev import SparkLowLevel, AbsoluteEncoderConfig
 
@@ -81,6 +81,16 @@ class ControllerRumblePattern(Enum):
   Short = auto()
   Long = auto()
 
+@dataclass(frozen=True, slots=True)
+class Value(float):
+  none = math.nan
+  min = sys.float_info.min
+  max = sys.float_info.max
+
+class Range(NamedTuple):
+  min: float
+  max: float
+
 class PID(NamedTuple):
   P: float = 0
   I: float = 0
@@ -91,16 +101,6 @@ class FeedForwardGains(NamedTuple):
   velocity: units.volts = 0
   acceleration: units.volts = 0
   gravity: units.volts = 0
-
-class Range(NamedTuple):
-  min: float
-  max: float
-
-@dataclass(frozen=True, slots=True)
-class Value(float):
-  none = math.nan
-  min = sys.float_info.min
-  max = sys.float_info.max
 
 class MotorModel(Enum):
   NEO = auto()
@@ -207,8 +207,8 @@ class RelativePositionControlModuleConstants:
   motorPID: PID
   motorOutputRange: Range
   motorFeedForwardGains: FeedForwardGains
-  motorMotionCruiseVelocity: units.units_per_second
-  motorMotionMaxAcceleration: units.units_per_second_squared
+  motorMotionCruiseVelocity: units.revolutions_per_minute
+  motorMotionMaxAcceleration: units.units_per_second
   motorMotionAllowedProfileError: float
   motorRelativeEncoderPositionConversionFactor: float
   motorSoftLimitReverse: float
@@ -232,7 +232,7 @@ class VelocityControlModuleConstants:
   motorOutputRange: Range
   motorFeedForwardGains: FeedForwardGains
   motorMotionMaxVelocity: units.revolutions_per_minute
-  motorMotionMaxAcceleration: units.units_per_second_squared
+  motorMotionMaxAcceleration: units.units_per_second
 
 @dataclass(frozen=True, slots=True)
 class VelocityControlModuleConfig:
@@ -249,8 +249,8 @@ class AbsolutePositionControlModuleConstants:
   motorPID: PID
   motorOutputRange: Range
   motorFeedForwardGains: FeedForwardGains
-  motorMotionCruiseVelocity: units.units_per_second
-  motorMotionMaxAcceleration: units.units_per_second_squared
+  motorMotionCruiseVelocity: units.revolutions_per_minute
+  motorMotionMaxAcceleration: units.units_per_second
   motorMotionAllowedProfileError: float
   motorRelativeEncoderPositionConversionFactor: float
   motorAbsoluteEncoderPositionConversionFactor: float
@@ -265,17 +265,16 @@ class AbsolutePositionControlModuleConfig:
   constants: AbsolutePositionControlModuleConstants
 
 @dataclass(frozen=True, slots=True)
+class ButtonControllerConfig:
+  name: str
+  channel: int
+
+@dataclass(frozen=True, slots=True)
 class PoseSensorConfig:
   name: str
   transform: Transform3d
   stream: str
   aprilTagFieldLayout: AprilTagFieldLayout
-
-@dataclass(frozen=True, slots=True)
-class ObjectSensorConfig:
-  name: str
-  transform: Transform3d
-  stream: str
 
 @dataclass(frozen=True, slots=True)
 class BinarySensorConfig:
@@ -291,6 +290,13 @@ class DistanceSensorConfig:
   maxTargetDistance: units.millimeters
 
 @dataclass(frozen=True, slots=True)
-class ButtonControllerConfig:
+class ObjectSensorConfig:
   name: str
-  channel: int
+  transform: Transform3d
+  stream: str
+  objectHeight: units.meters
+
+@dataclass(frozen=True, slots=True)
+class Objects:
+  transform: Transform2d
+  count: int

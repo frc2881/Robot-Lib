@@ -32,7 +32,9 @@ class PoseSensor:
   def getEstimatedRobotPose(self) -> EstimatedRobotPose | None:
     estimatedRobotPose: EstimatedRobotPose | None = None
     if self._photonCamera.isConnected():
-      for photonPipelineResult in self._photonCamera.getAllUnreadResults():
+      photonPipelineResults = self._photonCamera.getAllUnreadResults()
+      if len(photonPipelineResults) > 0:
+        photonPipelineResult = photonPipelineResults[-1]
         estimatedRobotPose = self._photonPoseEstimator.estimateCoprocMultiTagPose(photonPipelineResult)
         if estimatedRobotPose is None:
           estimatedRobotPose = self._photonPoseEstimator.estimateLowestAmbiguityPose(photonPipelineResult)

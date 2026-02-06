@@ -1,9 +1,10 @@
-from wpilib import SmartDashboard
-from wpimath.geometry import Transform3d, Rotation3d, Rotation2d
-from photonlibpy.targeting import PhotonTrackedTarget
+import math
+from wpilib import SmartDashboard, Timer
+from wpimath import units
+from wpimath.geometry import Translation2d, Rotation2d, Transform2d
 from photonlibpy.photonCamera import PhotonCamera
 from .. import logger, utils
-from ..classes import ObjectSensorConfig
+from ..classes import ObjectSensorConfig, Objects
 
 class ObjectSensor:
   def __init__(
@@ -14,47 +15,49 @@ class ObjectSensor:
     self._baseKey = f'Robot/Sensors/Object/{config.name}'
     
     self._photonCamera = PhotonCamera(config.name)
+    self._photonCamera.setDriverMode(False)
 
-    self._objectTransform = Transform3d
+    self._cameraTranslation = self._config.transform.translation().toTranslation2d()
+    self._cameraRotation = self._config.transform.rotation().toRotation2d()
+    self._cameraPitch = self._config.transform.rotation().Y()
+    self._cameraHeight = self._config.transform.translation().Z()
+    self._targetHeightDelta = self._cameraHeight - (self._config.objectHeight / 2)
+    
     self._hasTarget = False
+    self._pipelineResultBufferTimer = Timer()
 
     SmartDashboard.putString(f'{self._baseKey}/Stream', config.stream)
 
     utils.addRobotPeriodic(self._periodic)
 
   def _periodic(self) -> None:
-    self._updateObjectTransform()
     self._updateTelemetry()
 
-  def _updateObjectTransform(self) -> None:
-    objectTransform = Transform3d()
-    hasTarget = False
+  def getObjects(self) -> Objects | None:
+    objects: Objects | None = None
     if self._photonCamera.isConnected():
-      results = self._photonCamera.getAllUnreadResults()
-      if len(results) > 0:
-        result = results[-1]
-        target = result.getBestTarget()
-        if target is not None:
-          hasTarget = True
+      photonPipelineResults = self._photonCamera.getAllUnreadResults()
+      if len(photonPipelineResults) > 0:
+        photonPipelineResult = photonPipelineResults[-1]
+        if photonPipelineResult.hasTargets():
+          self._hasTarget = True
+          targets = photonPipelineResult.getTargets()
+          distance = self._targetHeightDelta / math.tan(self._cameraPitch - units.degreesToRadians(targets[0].getPitch()))
+          rotation = Rotation2d().fromDegrees(targets[0].getYaw())
+          translation = Translation2d(rotation.cos() * distance, rotation.sin() * distance)
+          objects = Objects(Transform2d(translation - self._cameraTranslation, rotation - self._cameraRotation), len(targets))
+          self._pipelineResultBufferTimer.restart()
+        else:
+          if self._hasTarget and self._pipelineResultBufferTimer.hasElapsed(0.1):
+            self._hasTarget = False
+    return objects
 
-          distances = (2.275, 1.783, 1.581, 1.097, 0.732, 0.424, 0.0)
-          areas = (0.01, 1.2, 1.6, 3.2, 6.8, 18, 99)
-          area = target.getArea()
-          if area > 0:
-            distance = utils.getInterpolatedValue(area, areas, distances)
-            yaw = -target.getYaw() + 185.0
-            objectTransform = Transform3d(distance, 0, 0, Rotation3d(Rotation2d.fromDegrees(yaw)))
-            
-    self._hasTarget = hasTarget
-    self._objectTransform = objectTransform
-
-  def getObjectTransform(self) -> Transform3d:
-    return self._objectTransform
-
+  def getCameraName(self) -> str:
+    return self._config.name
+  
   def hasTarget(self) -> bool:
     return self._hasTarget
 
   def _updateTelemetry(self) -> None:
     SmartDashboard.putBoolean(f'{self._baseKey}/IsConnected', self._photonCamera.isConnected())
     SmartDashboard.putBoolean(f'{self._baseKey}/HasTarget', self.hasTarget())
-    SmartDashboard.putString(f'{self._baseKey}/Transform', utils.toJson(self.getObjectTransform()))

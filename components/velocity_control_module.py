@@ -22,6 +22,9 @@ class VelocityControlModule:
       .setIdleMode(SparkBaseConfig.IdleMode.kBrake)
       .smartCurrentLimit(self._config.constants.motorCurrentLimit)
       .inverted(self._config.isInverted))
+    (self._motorConfig.encoder
+      .positionConversionFactor(1)
+      .velocityConversionFactor(1))
     (self._motorConfig.closedLoop
       .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
       .pid(*self._config.constants.motorPID)
@@ -32,7 +35,8 @@ class VelocityControlModule:
         .kA(self._config.constants.motorFeedForwardGains.acceleration)
         .kG(self._config.constants.motorFeedForwardGains.gravity))
     (self._motorConfig.closedLoop.maxMotion
-      .maxAcceleration(self._config.constants.motorMotionMaxAcceleration))
+      .maxAcceleration(self._config.constants.motorMotionMaxAcceleration)
+      .allowedProfileError(1))
     utils.setSparkConfig(self._motor.configure(self._motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters))
     self._closedLoopController = self._motor.getClosedLoopController()
     self._relativeEncoder = self._motor.getEncoder()
