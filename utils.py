@@ -8,6 +8,7 @@ import wpimath
 from wpimath import units
 from wpimath.geometry import Pose2d, Pose3d, Translation2d, Rotation2d, Transform3d
 from wpilib import DriverStation
+from wpimath.kinematics import ChassisSpeeds
 from rev import SparkBase, SparkBaseConfig, REVLibError, ResetMode, PersistMode
 from . import logger
 from .classes import Alliance, RobotMode, RobotState, MotorIdleMode, Value
@@ -93,6 +94,13 @@ def getTargetHash(pose: Pose2d) -> int:
 def squareControllerInput(input: units.percent, deadband: units.percent) -> units.percent:
   deadbandInput: units.percent = wpimath.applyDeadband(input, deadband)
   return math.copysign(deadbandInput * deadbandInput, input)
+
+def clampTranslationVelocity(chassisSpeeds: ChassisSpeeds, translationMaxVelocity: units.meters_per_second) -> ChassisSpeeds:
+  mv = abs(max(chassisSpeeds.vx, chassisSpeeds.vy, key = abs))
+  if (mv > translationMaxVelocity):
+    dv = translationMaxVelocity / mv
+    chassisSpeeds = ChassisSpeeds(chassisSpeeds.vx * dv, chassisSpeeds.vy * dv, chassisSpeeds.omega)
+  return chassisSpeeds
 
 def setSoftLimitsEnabled(motor: SparkBase, enabled: bool) -> None:
   config = SparkBaseConfig()
