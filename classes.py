@@ -1,4 +1,4 @@
-from typing import NamedTuple
+from typing import NamedTuple, Optional
 import sys
 import math
 from enum import Enum, IntEnum, auto
@@ -181,7 +181,7 @@ class DifferentialModuleConstants:
 class DifferentialModuleConfig:
   location: DifferentialModuleLocation
   drivingMotorCANId: int
-  leaderMotorCANId: int | None
+  leaderMotorCANId: Optional[int]
   isInverted: bool
   constants: DifferentialModuleConstants
 

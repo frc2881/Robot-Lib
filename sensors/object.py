@@ -1,3 +1,4 @@
+from typing import Optional
 import math
 from wpilib import SmartDashboard, Timer
 from wpimath import units
@@ -33,8 +34,8 @@ class ObjectSensor:
   def _periodic(self) -> None:
     self._updateTelemetry()
 
-  def getObjects(self) -> Objects | None:
-    objects: Objects | None = None
+  def getObjects(self) -> Optional[Objects]:
+    objects: Optional[Objects] = None
     if self._photonCamera.isConnected():
       photonPipelineResults = self._photonCamera.getAllUnreadResults()
       if len(photonPipelineResults) > 0:

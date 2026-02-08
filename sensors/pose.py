@@ -1,3 +1,4 @@
+from typing import Optional
 from wpilib import SmartDashboard, Timer
 from photonlibpy.photonCamera import PhotonCamera
 from photonlibpy.photonPoseEstimator import PhotonPoseEstimator, EstimatedRobotPose
@@ -29,8 +30,8 @@ class PoseSensor:
   def _periodic(self) -> None:
     self._updateTelemetry()
 
-  def getEstimatedRobotPose(self) -> EstimatedRobotPose | None:
-    estimatedRobotPose: EstimatedRobotPose | None = None
+  def getEstimatedRobotPose(self) -> Optional[EstimatedRobotPose]:
+    estimatedRobotPose: Optional[EstimatedRobotPose] = None
     if self._photonCamera.isConnected():
       photonPipelineResults = self._photonCamera.getAllUnreadResults()
       if len(photonPipelineResults) > 0:
