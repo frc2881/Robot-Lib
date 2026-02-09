@@ -96,9 +96,8 @@ def squareControllerInput(input: units.percent, deadband: units.percent) -> unit
   return math.copysign(deadbandInput * deadbandInput, input)
 
 def clampTranslationVelocity(chassisSpeeds: ChassisSpeeds, translationMaxVelocity: units.meters_per_second) -> ChassisSpeeds:
-  mv = abs(max(chassisSpeeds.vx, chassisSpeeds.vy, key = abs))
-  if (mv > translationMaxVelocity):
-    dv = translationMaxVelocity / mv
+  if not isValueInRange(chassisSpeeds.vx, -translationMaxVelocity, translationMaxVelocity) or not isValueInRange(chassisSpeeds.vy, -translationMaxVelocity, translationMaxVelocity):
+    dv = translationMaxVelocity / abs(max(chassisSpeeds.vx, chassisSpeeds.vy, key = abs))
     chassisSpeeds = ChassisSpeeds(chassisSpeeds.vx * dv, chassisSpeeds.vy * dv, chassisSpeeds.omega)
   return chassisSpeeds
 
