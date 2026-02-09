@@ -1,3 +1,4 @@
+import math
 from wpimath import units
 from wpilib import SmartDashboard
 from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, FeedbackSensor, ResetMode, PersistMode
@@ -50,6 +51,9 @@ class VelocityControlModule:
   def setSpeed(self, speed: units.percent) -> None:
     self._closedLoopController.setSetpoint(self._config.constants.motorMotionMaxVelocity * speed, SparkBase.ControlType.kMAXMotionVelocityControl)
 
+  def isAtTargetSpeed(self) -> bool:
+    return self._closedLoopController.isAtSetpoint()
+
   def setIdleMode(self, motorIdleMode: MotorIdleMode) -> None:
     utils.setMotorIdleMode(self._motor, motorIdleMode)
 
@@ -57,5 +61,6 @@ class VelocityControlModule:
     self._motor.stopMotor()
 
   def _updateTelemetry(self) -> None:
+    SmartDashboard.putBoolean(f'{self._baseKey}/IsAtTargetSpeed', self.isAtTargetSpeed())
     SmartDashboard.putNumber(f'{self._baseKey}/Current', self._motor.getOutputCurrent())
     SmartDashboard.putNumber(f'{self._baseKey}/Velocity', self._relativeEncoder.getVelocity())
