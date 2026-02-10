@@ -21,8 +21,8 @@ class DifferentialModule:
       self._drivingMotor = SparkMax(self._config.drivingMotorCANId, self._config.constants.drivingMotorType)
     self._drivingMotorConfig = SparkBaseConfig()
     (self._drivingMotorConfig
-      .setIdleMode(SparkBaseConfig.IdleMode.kBrake)
       .smartCurrentLimit(self._config.constants.drivingMotorCurrentLimit)
+      .setIdleMode(SparkBaseConfig.IdleMode.kBrake)
       .inverted(self._config.isInverted))
     (self._drivingMotorConfig.encoder
       .positionConversionFactor(drivingEncoderPositionConversionFactor)

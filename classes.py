@@ -186,20 +186,6 @@ class DifferentialModuleConfig:
   constants: DifferentialModuleConstants
 
 @dataclass(frozen=True, slots=True)
-class FollowerModuleConstants:
-  motorControllerType: SparkLowLevel.SparkModel
-  motorType: SparkLowLevel.MotorType
-  motorCurrentLimit: int
-
-@dataclass(frozen=True, slots=True)
-class FollowerModuleConfig:
-  baseKey: str
-  motorCANId: int
-  leaderMotorCANId: int
-  isInverted: bool
-  constants: FollowerModuleConstants
-
-@dataclass(frozen=True, slots=True)
 class RelativePositionControlModuleConstants:
   motorControllerType: SparkLowLevel.SparkModel
   motorType: SparkLowLevel.MotorType
@@ -224,24 +210,6 @@ class RelativePositionControlModuleConfig:
   constants: RelativePositionControlModuleConstants
 
 @dataclass(frozen=True, slots=True)
-class VelocityControlModuleConstants:
-  motorControllerType: SparkLowLevel.SparkModel
-  motorType: SparkLowLevel.MotorType
-  motorCurrentLimit: int
-  motorPID: PID
-  motorOutputRange: Range
-  motorFeedForwardGains: FeedForwardGains
-  motorMotionMaxVelocity: units.revolutions_per_minute
-  motorMotionMaxAcceleration: units.units_per_second
-
-@dataclass(frozen=True, slots=True)
-class VelocityControlModuleConfig:
-  baseKey: str
-  motorCANId: int
-  isInverted: bool
-  constants: VelocityControlModuleConstants
-
-@dataclass(frozen=True, slots=True)
 class AbsolutePositionControlModuleConstants:
   motorControllerType: SparkLowLevel.SparkModel
   motorType: SparkLowLevel.MotorType
@@ -263,6 +231,38 @@ class AbsolutePositionControlModuleConfig:
   motorCANId: int
   isInverted: bool
   constants: AbsolutePositionControlModuleConstants
+
+@dataclass(frozen=True, slots=True)
+class VelocityControlModuleConstants:
+  motorControllerType: SparkLowLevel.SparkModel
+  motorType: SparkLowLevel.MotorType
+  motorCurrentLimit: int
+  motorPID: PID
+  motorOutputRange: Range
+  motorFeedForwardGains: FeedForwardGains
+  motorMotionMaxVelocity: units.revolutions_per_minute
+  motorMotionMaxAcceleration: units.units_per_second
+
+@dataclass(frozen=True, slots=True)
+class VelocityControlModuleConfig:
+  baseKey: str
+  motorCANId: int
+  isInverted: bool
+  constants: VelocityControlModuleConstants
+
+@dataclass(frozen=True, slots=True)
+class FollowerModuleConstants:
+  motorControllerType: SparkLowLevel.SparkModel
+  motorType: SparkLowLevel.MotorType
+  motorCurrentLimit: int
+
+@dataclass(frozen=True, slots=True)
+class FollowerModuleConfig:
+  baseKey: str
+  motorCANId: int
+  leaderMotorCANId: int
+  isInverted: bool
+  constants: FollowerModuleConstants
 
 @dataclass(frozen=True, slots=True)
 class ButtonControllerConfig:

@@ -20,8 +20,8 @@ class VelocityControlModule:
       self._motor = SparkMax(self._config.motorCANId, self._config.constants.motorType)
     self._motorConfig = SparkBaseConfig()
     (self._motorConfig
-      .setIdleMode(SparkBaseConfig.IdleMode.kBrake)
       .smartCurrentLimit(self._config.constants.motorCurrentLimit)
+      .setIdleMode(SparkBaseConfig.IdleMode.kBrake)
       .inverted(self._config.isInverted))
     (self._motorConfig.encoder
       .positionConversionFactor(1)
