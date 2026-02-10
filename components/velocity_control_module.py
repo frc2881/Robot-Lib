@@ -51,6 +51,9 @@ class VelocityControlModule:
   def setSpeed(self, speed: units.percent) -> None:
     self._closedLoopController.setSetpoint(self._config.constants.motorMotionMaxVelocity * speed, SparkBase.ControlType.kMAXMotionVelocityControl)
 
+  def getSpeed(self) -> units.percent:
+    return self._relativeEncoder.getVelocity() / self._config.constants.motorMotionMaxVelocity
+
   def isAtTargetSpeed(self) -> bool:
     return self._closedLoopController.isAtSetpoint()
 
@@ -62,5 +65,6 @@ class VelocityControlModule:
 
   def _updateTelemetry(self) -> None:
     SmartDashboard.putBoolean(f'{self._baseKey}/IsAtTargetSpeed', self.isAtTargetSpeed())
+    SmartDashboard.putBoolean(f'{self._baseKey}/Speed', self.getSpeed())
     SmartDashboard.putNumber(f'{self._baseKey}/Current', self._motor.getOutputCurrent())
     SmartDashboard.putNumber(f'{self._baseKey}/Velocity', self._relativeEncoder.getVelocity())

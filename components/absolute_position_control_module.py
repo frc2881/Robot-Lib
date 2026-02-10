@@ -78,12 +78,12 @@ class AbsolutePositionControlModule:
   def getPosition(self) -> float:
     return self._relativeEncoder.getPosition()
 
+  def isAtTargetPosition(self) -> bool:
+    return self._isAtTargetPosition
+
   def _resetPosition(self) -> None:
     self._targetPosition = Value.none
     self._isAtTargetPosition = False
-
-  def isAtTargetPosition(self) -> bool:
-    return self._isAtTargetPosition
 
   def isAtSoftLimit(self, direction: MotorDirection, tolerance: float) -> bool:
     return math.isclose(

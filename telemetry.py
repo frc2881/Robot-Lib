@@ -5,10 +5,10 @@ from . import logger, utils
 def start() -> None:
   _updateTimingInfo()
   _updateRobotInfo()
-  _updateMatchInfo()
+  _updateGameMatchInfo()
   utils.addRobotPeriodic(_updateTimingInfo, 0.2, 0.25)
   utils.addRobotPeriodic(_updateRobotInfo, 1.0, 0.50)
-  utils.addRobotPeriodic(_updateMatchInfo, 3.0, 0.75)
+  utils.addRobotPeriodic(_updateGameMatchInfo, 3.0, 0.75)
 
 def _updateTimingInfo() -> None:
   SmartDashboard.putNumber("Robot/Status/Time", Timer.getFPGATimestamp())
@@ -20,7 +20,7 @@ def _updateRobotInfo() -> None:
   SmartDashboard.putNumber("Robot/Power/Battery/Voltage", RobotController.getBatteryVoltage())
   SmartDashboard.putNumber("Robot/Power/IsBrownedOut", RobotController.isBrownedOut())
 
-def _updateMatchInfo() -> None:
+def _updateGameMatchInfo() -> None:
+  SmartDashboard.putNumber("Game/Team", RobotController.getTeamNumber())
   SmartDashboard.putString("Match/Alliance", utils.getAlliance().name)
-  SmartDashboard.putNumber("Match/Team", RobotController.getTeamNumber())
   SmartDashboard.putNumber("Match/Station", DriverStation.getLocation() or 0)
