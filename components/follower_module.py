@@ -22,6 +22,8 @@ class FollowerModule:
       .setIdleMode(SparkBaseConfig.IdleMode.kBrake))
     self._motorConfig.follow(self._config.leaderMotorCANId, self._config.isInverted)
     utils.setSparkConfig(self._motor.configure(self._motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters))
+    self._relativeEncoder = self._motor.getEncoder()
+    self._relativeEncoder.setPosition(0)
 
     utils.addRobotPeriodic(self._periodic)
 
@@ -33,3 +35,4 @@ class FollowerModule:
 
   def _updateTelemetry(self) -> None:
     SmartDashboard.putNumber(f'{self._baseKey}/Current', self._motor.getOutputCurrent())
+    SmartDashboard.putNumber(f'{self._baseKey}/Velocity', self._relativeEncoder.getVelocity())

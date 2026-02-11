@@ -64,7 +64,6 @@ class VelocityControlModule:
     self._motor.stopMotor()
 
   def _updateTelemetry(self) -> None:
-    SmartDashboard.putBoolean(f'{self._baseKey}/IsAtTargetSpeed', self.isAtTargetSpeed())
     SmartDashboard.putBoolean(f'{self._baseKey}/Speed', self.getSpeed())
     SmartDashboard.putNumber(f'{self._baseKey}/Current', self._motor.getOutputCurrent())
     SmartDashboard.putNumber(f'{self._baseKey}/Velocity', self._relativeEncoder.getVelocity())
