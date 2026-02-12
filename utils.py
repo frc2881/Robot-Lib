@@ -77,20 +77,14 @@ def isPoseAlignedToTarget(sourcePose: Pose2d, targetPose: Pose3d, translationTol
     isValueInRange(transform.rotation().degrees(), -rotationTolerance, rotationTolerance)
   )
 
-def getTargetHeading(sourcePose: Pose2d | Pose3d, targetPose: Pose2d | Pose3d) -> units.degrees:
-  if isinstance(sourcePose, Pose2d): sourcePose = Pose3d(sourcePose)
-  if isinstance(targetPose, Pose2d): targetPose = Pose3d(targetPose)
-  translation = (targetPose - sourcePose).translation()
-  return wrapAngle(Rotation2d(translation.X(), translation.Y()).degrees())
+def getTargetHeading(sourcePose: Pose2d, targetPose: Pose2d) -> units.degrees:
+  translation = targetPose.relativeTo(sourcePose).translation()
+  return wrapAngle(Rotation2d(translation.X(), translation.Y()).rotateBy(sourcePose.rotation()).degrees())
 
-def getTargetDistance(sourcePose: Pose2d | Pose3d, targetPose: Pose2d | Pose3d) -> units.meters:
-  if isinstance(sourcePose, Pose2d): sourcePose = Pose3d(sourcePose)
-  if isinstance(targetPose, Pose2d): targetPose = Pose3d(targetPose)
+def getTargetDistance(sourcePose: Pose3d, targetPose: Pose3d) -> units.meters:
   return sourcePose.translation().distance(targetPose.translation())
 
-def getTargetPitch(sourcePose: Pose2d | Pose3d, targetPose: Pose2d | Pose3d) -> units.degrees:
-  if isinstance(sourcePose, Pose2d): sourcePose = Pose3d(sourcePose)
-  if isinstance(targetPose, Pose2d): targetPose = Pose3d(targetPose)
+def getTargetPitch(sourcePose: Pose3d, targetPose: Pose3d) -> units.degrees:
   return units.radiansToDegrees(math.atan2((targetPose - sourcePose).Z(), getTargetDistance(sourcePose, targetPose)))
 
 def getTargetHash(pose: Pose2d) -> int:
