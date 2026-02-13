@@ -154,11 +154,9 @@ class HeadingAlignmentConstants:
 class PoseAlignmentConstants:
   translationPID: PID
   translationMaxVelocity: units.meters_per_second
-  translationMaxAcceleration: units.meters_per_second_squared
   translationPositionTolerance: units.meters
   rotationPID: PID
   rotationMaxVelocity: units.degrees_per_second
-  rotationMaxAcceleration: units.degrees_per_second_squared
   rotationPositionTolerance: units.degrees
 
 class DifferentialModuleLocation(IntEnum):
