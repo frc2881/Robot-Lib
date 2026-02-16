@@ -6,7 +6,7 @@ from commands2 import TimedCommandRobot
 import wpilib
 import wpimath
 from wpimath import units
-from wpimath.geometry import Pose2d, Pose3d, Translation2d, Rotation2d
+from wpimath.geometry import Pose2d, Pose3d, Translation2d
 from wpilib import DriverStation
 from wpimath.kinematics import ChassisSpeeds
 from rev import SparkBase, SparkBaseConfig, REVLibError, ResetMode, PersistMode
