@@ -77,8 +77,11 @@ def isPoseAlignedToTarget(sourcePose: Pose2d, targetPose: Pose3d, translationTol
     isValueInRange(transform.rotation().degrees(), -rotationTolerance, rotationTolerance)
   )
 
-def getTargetDistance(sourcePose: Pose3d, targetPose: Pose3d) -> units.meters:
-  return sourcePose.translation().distance(targetPose.translation())
+def getTargetDistance(sourcePose: Pose2d | Pose3d, targetPose: Pose2d | Pose3d) -> units.meters:
+  return math.dist(
+    (sourcePose.X(), sourcePose.Y(), sourcePose.Z() if isinstance(sourcePose, Pose3d) else 0), 
+    (targetPose.X(), targetPose.Y(), targetPose.Z() if isinstance(targetPose, Pose3d) else 0)
+  )
 
 def getTargetHeading(sourcePose: Pose2d, targetPose: Pose2d, isRobotRelative: bool = False) -> units.degrees:
   return wrapAngle(units.radiansToDegrees(math.atan2(targetPose.Y() - sourcePose.Y(), targetPose.X() - sourcePose.X()) - (sourcePose.rotation().radians() if isRobotRelative else 0)))
