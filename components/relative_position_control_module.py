@@ -101,7 +101,7 @@ class RelativePositionControlModule:
       lambda: self._startHoming(),
       lambda: self._endHoming(),
       subsystem
-    ).ignoringDisable(True)
+    )
   
   def _startHoming(self) -> None:
     self._isHomed = False

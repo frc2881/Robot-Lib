@@ -38,7 +38,7 @@ class Gyro_NAVX2():
     self._reset(utils.wrapAngle(robotPose.rotation().degrees() + utils.getValueForAlliance(0.0, 180.0)))
 
   def reset(self) -> Command:
-    return cmd.runOnce(self._reset).ignoringDisable(True).withName("GyroSensor:Reset")
+    return cmd.runOnce(self._reset).withName("GyroSensor:Reset")
   
   def _updateTelemetry(self) -> None:
     SmartDashboard.putNumber(f'{self._baseKey}/Heading', self.getHeading())
