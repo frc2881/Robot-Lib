@@ -11,7 +11,7 @@ from wpilib import DriverStation
 from wpimath.kinematics import ChassisSpeeds
 from rev import SparkBase, SparkBaseConfig, REVLibError, ResetMode, PersistMode
 from . import logger
-from .classes import Alliance, RobotMode, RobotState, MotorIdleMode, Value
+from .classes import Alliance, RobotMode, RobotState, MotorIdleMode, Value, Range
 
 T = TypeVar("T")
 
@@ -59,8 +59,8 @@ def isValueInRange(value: float, minValue: float, maxValue: float) -> bool:
 def clampValue(value: float, minValue: float, maxValue: float) -> float:
   return max(min(value, maxValue), minValue)
 
-def wrapAngle(angle: units.degrees) -> units.degrees:
-  return wpimath.inputModulus(angle, -180, 180)
+def wrapAngle(angle: units.degrees, inputRange = Range(-180, 180)) -> units.degrees:
+  return wpimath.inputModulus(angle, inputRange.min, inputRange.max)
 
 def getInterpolatedValue(x: float, xs: tuple[float, ...], ys: tuple[float, ...]) -> float:
   try: return numpy.interp([x], xs, ys)[0]
@@ -84,10 +84,10 @@ def getTargetDistance(sourcePose: Pose2d | Pose3d, targetPose: Pose2d | Pose3d) 
   )
 
 def getTargetHeading(sourcePose: Pose2d, targetPose: Pose2d, isRobotRelative: bool = False) -> units.degrees:
-  return wrapAngle(units.radiansToDegrees(math.atan2(targetPose.Y() - sourcePose.Y(), targetPose.X() - sourcePose.X()) - (sourcePose.rotation().radians() if isRobotRelative else 0)))
+  return units.radiansToDegrees(math.atan2(targetPose.Y() - sourcePose.Y(), targetPose.X() - sourcePose.X()) - (sourcePose.rotation().radians() if isRobotRelative else 0))
 
 def getTargetPitch(sourcePose: Pose3d, targetPose: Pose3d) -> units.degrees:
-  return wrapAngle(units.radiansToDegrees(math.atan2((targetPose - sourcePose).Z(), getTargetDistance(sourcePose, targetPose))))
+  return units.radiansToDegrees(math.atan2((targetPose - sourcePose).Z(), getTargetDistance(sourcePose, targetPose)))
 
 def getTargetHash(pose: Pose2d) -> int:
   return hash((pose.X(), pose.Y(), pose.rotation().radians()))
