@@ -37,7 +37,7 @@ class VelocityControlModule:
         .kG(self._config.constants.motorFeedForwardGains.gravity))
     (self._motorConfig.closedLoop.maxMotion
       .maxAcceleration(self._config.constants.motorMotionMaxAcceleration)
-      .allowedProfileError(1))
+      .allowedProfileError(10))
     utils.setSparkConfig(self._motor.configure(self._motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters))
     self._closedLoopController = self._motor.getClosedLoopController()
     self._relativeEncoder = self._motor.getEncoder()
