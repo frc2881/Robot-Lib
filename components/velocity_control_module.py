@@ -14,6 +14,8 @@ class VelocityControlModule:
 
     self._baseKey = f'Robot/{self._config.baseKey}'
 
+    self._targetSpeed: float = 0
+
     if self._config.constants.motorControllerType == SparkLowLevel.SparkModel.kSparkFlex:
       self._motor = SparkFlex(self._config.motorCANId, self._config.constants.motorType)
     else: 
@@ -37,7 +39,7 @@ class VelocityControlModule:
         .kG(self._config.constants.motorFeedForwardGains.gravity))
     (self._motorConfig.closedLoop.maxMotion
       .maxAcceleration(self._config.constants.motorMotionMaxAcceleration)
-      .allowedProfileError(self._config.constants.motorMotionAllowedProfileError))
+      .allowedProfileError(1))
     utils.setSparkConfig(self._motor.configure(self._motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters))
     self._closedLoopController = self._motor.getClosedLoopController()
     self._relativeEncoder = self._motor.getEncoder()
@@ -49,21 +51,27 @@ class VelocityControlModule:
     self._updateTelemetry()
     
   def setSpeed(self, speed: units.percent) -> None:
+    self._targetSpeed = speed
     self._closedLoopController.setSetpoint(self._config.constants.motorMotionMaxVelocity * speed, SparkBase.ControlType.kMAXMotionVelocityControl)
 
   def getSpeed(self) -> units.percent:
     return self._relativeEncoder.getVelocity() / self._config.constants.motorMotionMaxVelocity
 
   def isAtTargetSpeed(self) -> bool:
-    return self._closedLoopController.isAtSetpoint()
+    return self._targetSpeed != 0 and math.isclose(self.getSpeed(), self._targetSpeed, abs_tol = 0.05)
+  
+  def _resetTargetSpeed(self) -> None:
+    self._targetSpeed = 0
 
   def setIdleMode(self, motorIdleMode: MotorIdleMode) -> None:
     utils.setMotorIdleMode(self._motor, motorIdleMode)
 
   def reset(self) -> None:
     self._motor.stopMotor()
+    self._resetTargetSpeed()
 
   def _updateTelemetry(self) -> None:
     SmartDashboard.putNumber(f'{self._baseKey}/Speed', self.getSpeed())
+    SmartDashboard.putNumber(f'{self._baseKey}/TargetSpeed', self._targetSpeed)
     SmartDashboard.putNumber(f'{self._baseKey}/Current', self._motor.getOutputCurrent())
     SmartDashboard.putNumber(f'{self._baseKey}/Velocity', self._relativeEncoder.getVelocity())

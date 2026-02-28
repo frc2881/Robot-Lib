@@ -240,7 +240,6 @@ class VelocityControlModuleConstants:
   motorFeedForwardGains: FeedForwardGains
   motorMotionMaxVelocity: units.revolutions_per_minute
   motorMotionMaxAcceleration: units.units_per_second
-  motorMotionAllowedProfileError: float
 
 @dataclass(frozen=True, slots=True)
 class VelocityControlModuleConfig:
