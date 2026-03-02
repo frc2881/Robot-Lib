@@ -145,20 +145,6 @@ class SwerveModuleConfig:
   translation: Translation2d
   constants: SwerveModuleConstants
 
-@dataclass(frozen=True, slots=True)
-class HeadingAlignmentConstants:
-  rotationPID: PID
-  rotationPositionTolerance: units.degrees
-
-@dataclass(frozen=True, slots=True)
-class PoseAlignmentConstants:
-  translationPID: PID
-  translationMaxVelocity: units.meters_per_second
-  translationPositionTolerance: units.meters
-  rotationPID: PID
-  rotationMaxVelocity: units.degrees_per_second
-  rotationPositionTolerance: units.degrees
-
 class DifferentialModuleLocation(IntEnum):
   Left = 0,
   Right = 1
@@ -240,6 +226,7 @@ class VelocityControlModuleConstants:
   motorFeedForwardGains: FeedForwardGains
   motorMotionMaxVelocity: units.revolutions_per_minute
   motorMotionMaxAcceleration: units.units_per_second
+  motorVelocityConversionFactor: float
 
 @dataclass(frozen=True, slots=True)
 class VelocityControlModuleConfig:
@@ -247,6 +234,20 @@ class VelocityControlModuleConfig:
   motorCANId: int
   isInverted: bool
   constants: VelocityControlModuleConstants
+
+@dataclass(frozen=True, slots=True)
+class SpeedModuleConstants:
+  motorControllerType: SparkLowLevel.SparkModel
+  motorType: SparkLowLevel.MotorType
+  motorCurrentLimit: int
+  motorVelocityConversionFactor: float
+
+@dataclass(frozen=True, slots=True)
+class SpeedModuleConfig:
+  baseKey: str
+  motorCANId: int
+  isInverted: bool
+  constants: SpeedModuleConstants
 
 @dataclass(frozen=True, slots=True)
 class FollowerModuleConstants:
@@ -268,13 +269,6 @@ class ButtonControllerConfig:
   channel: int
 
 @dataclass(frozen=True, slots=True)
-class PoseSensorConfig:
-  name: str
-  transform: Transform3d
-  stream: str
-  aprilTagFieldLayout: AprilTagFieldLayout
-
-@dataclass(frozen=True, slots=True)
 class BinarySensorConfig:
   name: str
   channel: int
@@ -288,6 +282,13 @@ class DistanceSensorConfig:
   maxTargetDistance: units.millimeters
 
 @dataclass(frozen=True, slots=True)
+class PoseSensorConfig:
+  name: str
+  transform: Transform3d
+  stream: str
+  aprilTagFieldLayout: AprilTagFieldLayout
+
+@dataclass(frozen=True, slots=True)
 class ObjectSensorConfig:
   name: str
   transform: Transform3d
@@ -298,3 +299,17 @@ class ObjectSensorConfig:
 class Objects:
   transform: Transform2d
   count: int
+
+@dataclass(frozen=True, slots=True)
+class HeadingAlignmentConstants:
+  rotationPID: PID
+  rotationPositionTolerance: units.degrees
+
+@dataclass(frozen=True, slots=True)
+class PoseAlignmentConstants:
+  translationPID: PID
+  translationMaxVelocity: units.meters_per_second
+  translationPositionTolerance: units.meters
+  rotationPID: PID
+  rotationMaxVelocity: units.degrees_per_second
+  rotationPositionTolerance: units.degrees

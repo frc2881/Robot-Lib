@@ -34,5 +34,5 @@ class FollowerModule:
     utils.setMotorIdleMode(self._motor, motorIdleMode)
 
   def _updateTelemetry(self) -> None:
-    SmartDashboard.putNumber(f'{self._baseKey}/Current', self._motor.getOutputCurrent())
     SmartDashboard.putNumber(f'{self._baseKey}/Velocity', self._relativeEncoder.getVelocity())
+    SmartDashboard.putNumber(f'{self._baseKey}/Current', self._motor.getOutputCurrent())
