@@ -1,4 +1,4 @@
-from typing import Any, Callable, Tuple, TypeVar
+from typing import Any, Callable, Tuple, TypeVar, Optional
 import math
 import numpy
 import json
@@ -15,7 +15,7 @@ from .classes import Alliance, RobotMode, RobotState, MotorIdleMode, Value, Rang
 
 T = TypeVar("T")
 
-__robot__: TimedCommandRobot = None
+__robot__: Optional[TimedCommandRobot] = None
 
 def setRobotInstance(instance: TimedCommandRobot) -> None:
   global __robot__
@@ -83,7 +83,9 @@ def getTargetDistance(sourcePose: Pose2d | Pose3d, targetPose: Pose2d | Pose3d) 
     (targetPose.X(), targetPose.Y(), targetPose.Z() if isinstance(targetPose, Pose3d) else 0)
   )
 
-def getTargetHeading(sourcePose: Pose2d, targetPose: Pose2d, isRobotRelative: bool = False) -> units.degrees:
+def getTargetHeading(sourcePose: Pose2d | Pose3d, targetPose: Pose2d | Pose3d, isRobotRelative: bool = False) -> units.degrees:
+  if isinstance(sourcePose, Pose3d): sourcePose = sourcePose.toPose2d()
+  if isinstance(targetPose, Pose3d): targetPose = targetPose.toPose2d()
   return units.radiansToDegrees(math.atan2(targetPose.Y() - sourcePose.Y(), targetPose.X() - sourcePose.X()) - (sourcePose.rotation().radians() if isRobotRelative else 0))
 
 def getTargetPitch(sourcePose: Pose3d, targetPose: Pose3d) -> units.degrees:

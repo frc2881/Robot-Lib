@@ -15,6 +15,7 @@ class RelativePositionControlModule:
 
     self._baseKey = f'Robot/{self._config.baseKey}'
 
+    self._isHoming: bool = False
     self._isHomed: bool = False
     self._targetPosition: float = Value.none
     self._isAtTargetPosition: bool = False
@@ -105,6 +106,7 @@ class RelativePositionControlModule:
   
   def _startHoming(self) -> None:
     self._isHomed = False
+    self._isHoming = True
     utils.setSoftLimitsEnabled(self._motor, False)
     if utils.getRobotState() == RobotState.Enabled:
       self._motor.set(-self._config.constants.motorHomingSpeed)
@@ -119,7 +121,11 @@ class RelativePositionControlModule:
     self._relativeEncoder.setPosition(self._config.constants.motorHomedPosition)
     utils.setSoftLimitsEnabled(self._motor, True)
     self._isHomed = True
+    self._isHoming = False
   
+  def isHoming(self) -> bool:
+    return self._isHoming
+
   def isHomed(self) -> bool:
     return self._isHomed
 
