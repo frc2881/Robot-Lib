@@ -4,7 +4,7 @@ import math
 from enum import Enum, IntEnum, auto
 from dataclasses import dataclass
 from wpimath import units
-from wpimath.geometry import Translation2d, Transform2d, Transform3d
+from wpimath.geometry import Translation2d, Transform2d, Transform3d, Pose3d
 from robotpy_apriltag import AprilTagFieldLayout
 from rev import SparkLowLevel, AbsoluteEncoderConfig
 
@@ -287,6 +287,14 @@ class PoseSensorConfig:
   transform: Transform3d
   stream: str
   aprilTagFieldLayout: AprilTagFieldLayout
+
+@dataclass(frozen=True, slots=True)
+class PoseSensorResult:
+  timestamp: units.seconds
+  estimatedPose: Pose3d
+  bestTargetReprojectionError: float
+  bestTargetAmbiguity: units.percent
+  bestTargetDistance: units.meters
 
 @dataclass(frozen=True, slots=True)
 class ObjectSensorConfig:
