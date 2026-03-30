@@ -288,10 +288,15 @@ class PoseSensorConfig:
   stream: str
   aprilTagFieldLayout: AprilTagFieldLayout
 
+class PoseSensorResultType(Enum):
+  SINGLE_TAG = auto()
+  MULTI_TAG = auto()
+
 @dataclass(frozen=True, slots=True)
 class PoseSensorResult:
   timestamp: units.seconds
   estimatedPose: Pose3d
+  resultType: PoseSensorResultType
   bestTargetReprojectionError: float
   bestTargetAmbiguity: units.percent
   bestTargetDistance: units.meters

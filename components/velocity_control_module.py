@@ -1,4 +1,3 @@
-import math
 from wpimath import units
 from wpilib import SmartDashboard
 from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, FeedbackSensor, ResetMode, PersistMode
@@ -57,8 +56,11 @@ class VelocityControlModule:
   def getSpeed(self) -> units.percent:
     return self._relativeEncoder.getVelocity() / self._config.constants.motorMotionMaxVelocity
 
+  def getTargetSpeed(self) -> float:
+    return self._targetSpeed
+
   def isAtTargetSpeed(self) -> bool:
-    return self._targetSpeed != 0 and math.isclose(self.getSpeed(), self._targetSpeed, abs_tol = 0.05)
+    return self._targetSpeed != 0 and utils.isValueWithinTolerance(self.getSpeed(), self._targetSpeed, 0.05)
   
   def _resetTargetSpeed(self) -> None:
     self._targetSpeed = 0
@@ -71,7 +73,6 @@ class VelocityControlModule:
     self._resetTargetSpeed()
 
   def _updateTelemetry(self) -> None:
-    SmartDashboard.putNumber(f'{self._baseKey}/TargetSpeed', self._targetSpeed)
     SmartDashboard.putNumber(f'{self._baseKey}/Speed', self.getSpeed())
     SmartDashboard.putNumber(f'{self._baseKey}/Velocity', self._relativeEncoder.getVelocity())
     SmartDashboard.putNumber(f'{self._baseKey}/Current', self._motor.getOutputCurrent())

@@ -1,4 +1,3 @@
-import math
 from wpimath import units
 from wpilib import SmartDashboard
 from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, FeedbackSensor, ResetMode, PersistMode
@@ -73,10 +72,13 @@ class AbsolutePositionControlModule:
       self._resetPosition()
       self._targetPosition = position
     self._closedLoopController.setSetpoint(self._targetPosition, SparkBase.ControlType.kMAXMotionPositionControl)
-    self._isAtTargetPosition = math.isclose(self.getPosition(), self._targetPosition, abs_tol = self._config.constants.motorMotionAllowedProfileError)
+    self._isAtTargetPosition = utils.isValueWithinTolerance(self.getPosition(), self._targetPosition, self._config.constants.motorMotionAllowedProfileError)
 
   def getPosition(self) -> float:
     return self._relativeEncoder.getPosition()
+
+  def getTargetPosition(self) -> float:
+    return self._targetPosition
 
   def isAtTargetPosition(self) -> bool:
     return self._isAtTargetPosition
@@ -86,10 +88,10 @@ class AbsolutePositionControlModule:
     self._isAtTargetPosition = False
 
   def isAtSoftLimit(self, direction: MotorDirection, tolerance: float) -> bool:
-    return math.isclose(
+    return utils.isValueWithinTolerance(
       self.getPosition(),
       self._config.constants.motorSoftLimitReverse if direction == MotorDirection.Reverse else self._config.constants.motorSoftLimitForward, 
-      abs_tol = tolerance
+      tolerance
     )
   
   def setSoftLimitsEnabled(self, isEnabled: bool) -> None:

@@ -53,8 +53,11 @@ def getValueForAlliance(blueValue: T, redValue: T) -> T:
 def getMatchTime() -> units.seconds:
   return DriverStation.getMatchTime()
 
-def isValueInRange(value: float, minValue: float, maxValue: float) -> bool:
+def isValueWithinRange(value: float, minValue: float, maxValue: float) -> bool:
   return value >= minValue and value <= maxValue
+
+def isValueWithinTolerance(value: float, targetValue: float, tolerance: float) -> bool:
+  return math.isclose(value, targetValue, abs_tol=tolerance)
 
 def clampValue(value: float, minValue: float, maxValue: float) -> float:
   return max(min(value, maxValue), minValue)
@@ -67,14 +70,14 @@ def getInterpolatedValue(x: float, xs: tuple[float, ...], ys: tuple[float, ...])
   except: return Value.none
 
 def isPoseInBounds(pose: Pose2d, bounds: Tuple[Translation2d, Translation2d]) -> bool:
-  return isValueInRange(pose.X(), bounds[0].X(), bounds[1].X()) and isValueInRange(pose.Y(), bounds[0].Y(), bounds[1].Y())
+  return isValueWithinRange(pose.X(), bounds[0].X(), bounds[1].X()) and isValueWithinRange(pose.Y(), bounds[0].Y(), bounds[1].Y())
 
 def isPoseAlignedToTarget(sourcePose: Pose2d, targetPose: Pose3d, translationTolerance: units.meters, rotationTolerance: units.degrees) -> bool:
   transform = sourcePose - targetPose.toPose2d()
   return (
-    isValueInRange(transform.translation().X(), -translationTolerance, translationTolerance) and 
-    isValueInRange(transform.translation().Y(), -translationTolerance, translationTolerance) and
-    isValueInRange(transform.rotation().degrees(), -rotationTolerance, rotationTolerance)
+    isValueWithinRange(transform.translation().X(), -translationTolerance, translationTolerance) and 
+    isValueWithinRange(transform.translation().Y(), -translationTolerance, translationTolerance) and
+    isValueWithinRange(transform.rotation().degrees(), -rotationTolerance, rotationTolerance)
   )
 
 def getTargetDistance(sourcePose: Pose2d | Pose3d, targetPose: Pose2d | Pose3d) -> units.meters:
@@ -99,7 +102,7 @@ def squareControllerInput(input: units.percent, deadband: units.percent) -> unit
   return math.copysign(deadbandInput * deadbandInput, input)
 
 def clampTranslationVelocity(chassisSpeeds: ChassisSpeeds, translationMaxVelocity: units.meters_per_second) -> ChassisSpeeds:
-  if not isValueInRange(chassisSpeeds.vx, -translationMaxVelocity, translationMaxVelocity) or not isValueInRange(chassisSpeeds.vy, -translationMaxVelocity, translationMaxVelocity):
+  if not isValueWithinRange(chassisSpeeds.vx, -translationMaxVelocity, translationMaxVelocity) or not isValueWithinRange(chassisSpeeds.vy, -translationMaxVelocity, translationMaxVelocity):
     dv = translationMaxVelocity / abs(max(chassisSpeeds.vx, chassisSpeeds.vy, key = abs))
     chassisSpeeds = ChassisSpeeds(chassisSpeeds.vx * dv, chassisSpeeds.vy * dv, chassisSpeeds.omega)
   return chassisSpeeds

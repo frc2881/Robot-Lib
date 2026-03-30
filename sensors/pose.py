@@ -3,7 +3,7 @@ from wpilib import SmartDashboard
 from photonlibpy.photonCamera import PhotonCamera
 from photonlibpy.photonPoseEstimator import PhotonPoseEstimator, EstimatedRobotPose
 from .. import logger, utils
-from ..classes import PoseSensorConfig, PoseSensorResult
+from ..classes import PoseSensorConfig, PoseSensorResult, PoseSensorResultType
 
 class PoseSensor:
   def __init__(
@@ -48,12 +48,15 @@ class PoseSensor:
         photonPipelineResult = photonPipelineResults[-1]
         if photonPipelineResult.hasTargets():
           estimatedRobotPose = self._photonPoseEstimator.estimateCoprocMultiTagPose(photonPipelineResult)
+          resultType = PoseSensorResultType.MULTI_TAG
           if estimatedRobotPose is None:
             estimatedRobotPose = self._photonPoseEstimator.estimateLowestAmbiguityPose(photonPipelineResult)
+            resultType = PoseSensorResultType.SINGLE_TAG
           if estimatedRobotPose is not None:
             poseSensorResult = PoseSensorResult(
               timestamp = estimatedRobotPose.timestampSeconds,
               estimatedPose = estimatedRobotPose.estimatedPose,
+              resultType = resultType,
               bestTargetReprojectionError = photonPipelineResult.multitagResult.estimatedPose.bestReprojErr if photonPipelineResult.multitagResult is not None else -1,
               bestTargetAmbiguity = -1 if photonPipelineResult.multitagResult is not None else photonPipelineResult.getBestTarget().poseAmbiguity,
               bestTargetDistance = photonPipelineResult.getBestTarget().bestCameraToTarget.translation().norm()
