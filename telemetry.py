@@ -24,3 +24,4 @@ def _updateGameMatchInfo() -> None:
   SmartDashboard.putNumber("Game/Team", RobotController.getTeamNumber())
   SmartDashboard.putString("Match/Alliance", utils.getAlliance().name)
   SmartDashboard.putNumber("Match/Station", DriverStation.getLocation() or 0)
+  SmartDashboard.putBoolean("Match/IsCompetitionMode", utils.isCompetitionMode())
