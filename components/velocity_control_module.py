@@ -38,7 +38,7 @@ class VelocityControlModule:
         .kG(self._config.constants.motorFeedForwardGains.gravity))
     (self._motorConfig.closedLoop.maxMotion
       .maxAcceleration(self._config.constants.motorMotionMaxAcceleration)
-      .allowedProfileError(1.0))
+      .allowedProfileError(0.1))
     utils.setSparkConfig(self._motor.configure(self._motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters))
     self._closedLoopController = self._motor.getClosedLoopController()
     self._relativeEncoder = self._motor.getEncoder()
@@ -60,7 +60,7 @@ class VelocityControlModule:
     return self._targetSpeed
 
   def isAtTargetSpeed(self) -> bool:
-    return self._targetSpeed != 0 and utils.isValueWithinTolerance(self.getSpeed(), self._targetSpeed, 0.05)
+    return self._targetSpeed != 0 and utils.isValueWithinTolerance(self.getSpeed(), self._targetSpeed, 0.1)
   
   def _resetTargetSpeed(self) -> None:
     self._targetSpeed = 0
