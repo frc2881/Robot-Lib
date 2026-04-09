@@ -40,7 +40,11 @@ class Gyro_NAVX2():
   def reset(self) -> Command:
     return cmd.runOnce(self._reset).withName("GyroSensor:Reset")
   
+  def isConnected(self) -> bool:
+    return self._gyro.isConnected()
+  
   def _updateTelemetry(self) -> None:
+    SmartDashboard.putBoolean(f'{self._baseKey}/IsConnected', self.isConnected())
     SmartDashboard.putNumber(f'{self._baseKey}/Heading', self.getHeading())
     SmartDashboard.putNumber(f'{self._baseKey}/Pitch', self.getPitch())
     SmartDashboard.putNumber(f'{self._baseKey}/Roll', self.getRoll())
