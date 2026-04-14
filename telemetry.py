@@ -6,9 +6,9 @@ def start() -> None:
   _updateTimingInfo()
   _updateRobotInfo()
   _updateGameMatchInfo()
-  utils.addRobotPeriodic(_updateTimingInfo, 0.2, 0.25)
-  utils.addRobotPeriodic(_updateRobotInfo, 1.0, 0.50)
-  utils.addRobotPeriodic(_updateGameMatchInfo, 3.0, 0.75)
+  utils.addRobotPeriodic(_updateTimingInfo, 0.1, 0.25)
+  utils.addRobotPeriodic(_updateRobotInfo, 0.2, 0.50)
+  utils.addRobotPeriodic(_updateGameMatchInfo, 1.0, 0.75)
 
 def _updateTimingInfo() -> None:
   SmartDashboard.putNumber("Robot/Status/Time", Timer.getFPGATimestamp())
@@ -18,7 +18,6 @@ def _updateRobotInfo() -> None:
   SmartDashboard.putString("Robot/Status/Mode", utils.getRobotMode().name)
   SmartDashboard.putString("Robot/Status/State", utils.getRobotState().name)
   SmartDashboard.putNumber("Robot/Power/Battery/Voltage", RobotController.getBatteryVoltage())
-  SmartDashboard.putNumber("Robot/Power/IsBrownedOut", RobotController.isBrownedOut())
 
 def _updateGameMatchInfo() -> None:
   SmartDashboard.putNumber("Game/Team", RobotController.getTeamNumber())
