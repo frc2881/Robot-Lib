@@ -1,4 +1,4 @@
-from typing import Any, Callable, Tuple, TypeVar, Optional
+from typing import Any, Callable, TypeVar, Optional
 import math
 import numpy
 import json
@@ -11,7 +11,7 @@ from wpilib import DriverStation
 from wpimath.kinematics import ChassisSpeeds
 from rev import SparkBase, SparkBaseConfig, REVLibError, ResetMode, PersistMode
 from . import logger
-from .classes import Alliance, RobotMode, RobotState, MotorIdleMode, Value, Range
+from .classes import Alliance, RobotMode, RobotState, MotorIdleMode, Value, Zone, Range
 
 T = TypeVar("T")
 
@@ -69,8 +69,8 @@ def getInterpolatedValue(x: float, xs: tuple[float, ...], ys: tuple[float, ...])
   try: return numpy.interp([x], xs, ys)[0]
   except: return Value.none
 
-def isPoseInBounds(pose: Pose2d, bounds: Tuple[Translation2d, Translation2d]) -> bool:
-  return isValueWithinRange(pose.X(), bounds[0].X(), bounds[1].X()) and isValueWithinRange(pose.Y(), bounds[0].Y(), bounds[1].Y())
+def isPoseWithinZone(pose: Pose2d, zone: Zone) -> bool:
+  return isValueWithinRange(pose.X(), zone.start.X(), zone.end.X()) and isValueWithinRange(pose.Y(), zone.start.Y(), zone.end.Y())
 
 def isPoseAlignedToTarget(sourcePose: Pose2d, targetPose: Pose3d, translationTolerance: units.meters, rotationTolerance: units.degrees) -> bool:
   transform = sourcePose - targetPose.toPose2d()

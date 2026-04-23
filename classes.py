@@ -91,6 +91,10 @@ class Range(NamedTuple):
   min: float
   max: float
 
+class Zone(NamedTuple):
+  start: Translation2d
+  end: Translation2d
+
 class PID(NamedTuple):
   P: float = 0
   I: float = 0
