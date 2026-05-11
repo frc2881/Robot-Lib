@@ -38,7 +38,7 @@ class DifferentialModule:
   def _periodic(self) -> None:
     self._updateTelemetry()
 
-  def getMotorController(self) -> SparkMax:
+  def getMotorController(self) -> SparkFlex | SparkMax:
     return self._drivingMotor
 
   def getPosition(self) -> float:

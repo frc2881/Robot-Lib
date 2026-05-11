@@ -1,7 +1,8 @@
 from typing import Optional
 from wpilib import SmartDashboard
 from photonlibpy.photonCamera import PhotonCamera
-from photonlibpy.photonPoseEstimator import PhotonPoseEstimator, EstimatedRobotPose
+from photonlibpy.photonPoseEstimator import PhotonPoseEstimator
+from photonlibpy.estimatedRobotPose import EstimatedRobotPose
 from .. import logger, utils
 from ..classes import PoseSensorConfig, PoseSensorResult, PoseSensorResultType
 
@@ -53,13 +54,14 @@ class PoseSensor:
             estimatedRobotPose = self._photonPoseEstimator.estimateLowestAmbiguityPose(photonPipelineResult)
             resultType = PoseSensorResultType.SINGLE_TAG
           if estimatedRobotPose is not None:
+            bestTarget = photonPipelineResult.getBestTarget()
             poseSensorResult = PoseSensorResult(
               timestamp = estimatedRobotPose.timestampSeconds,
               estimatedPose = estimatedRobotPose.estimatedPose,
               resultType = resultType,
               bestTargetReprojectionError = photonPipelineResult.multitagResult.estimatedPose.bestReprojErr if photonPipelineResult.multitagResult is not None else -1,
-              bestTargetAmbiguity = -1 if photonPipelineResult.multitagResult is not None else photonPipelineResult.getBestTarget().poseAmbiguity,
-              bestTargetDistance = photonPipelineResult.getBestTarget().bestCameraToTarget.translation().norm()
+              bestTargetAmbiguity = -1 if photonPipelineResult.multitagResult is not None else bestTarget.poseAmbiguity if bestTarget is not None else 1.0,
+              bestTargetDistance = bestTarget.bestCameraToTarget.translation().norm() if bestTarget is not None else 10
             )
     return poseSensorResult
 

@@ -51,7 +51,7 @@ class SwerveModule:
       .inverted(True)
       .positionConversionFactor(turningEncoderPositionConversionFactor)
       .velocityConversionFactor(turningEncoderPositionConversionFactor / 60.0)
-      .apply(self._config.constants.turningMotorAbsoluteEncoderConfig()))
+      .apply(self._config.constants.turningMotorAbsoluteEncoderConfig))
     (self._turningMotorConfig.closedLoop
       .setFeedbackSensor(FeedbackSensor.kAbsoluteEncoder)
       .pid(*self._config.constants.turningMotorPID)

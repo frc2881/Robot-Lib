@@ -5,6 +5,7 @@ from enum import Enum, IntEnum, auto
 from dataclasses import dataclass
 from wpimath import units
 from wpimath.geometry import Translation2d, Transform2d, Transform3d, Pose3d
+from wpimath.kinematics import SwerveModuleState
 from robotpy_apriltag import AprilTagFieldLayout
 from rev import SparkLowLevel, AbsoluteEncoderConfig
 
@@ -122,9 +123,9 @@ class SwerveModuleGearKit(Enum):
   ExtraHigh5 = auto()
 
 class SwerveModuleLocation(IntEnum):
-  FrontLeft = 0,
-  FrontRight = 1,
-  RearLeft = 2,
+  FrontLeft = 0
+  FrontRight = 1
+  RearLeft = 2
   RearRight = 3
 
 @dataclass(frozen=True, slots=True)
@@ -150,7 +151,7 @@ class SwerveModuleConfig:
   constants: SwerveModuleConstants
 
 class DifferentialModuleLocation(IntEnum):
-  Left = 0,
+  Left = 0
   Right = 1
 
 class DifferentialModulePositions(NamedTuple):
