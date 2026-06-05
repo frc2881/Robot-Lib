@@ -22,7 +22,8 @@ def setRobotInstance(instance: TimedCommandRobot) -> None:
   __robot__ = instance
 
 def addRobotPeriodic(callback: Callable[[], None], period: units.seconds = 0.02, offset: units.seconds = 0) -> None:
-  __robot__.addPeriodic(callback, period, offset)
+  if __robot__ is not None:
+    __robot__.addPeriodic(callback, period, offset)
 
 def getRobotState() -> RobotState:
   if wpilib.RobotState.isEnabled(): return RobotState.Enabled
