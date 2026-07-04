@@ -89,3 +89,4 @@ class SwerveModule:
   def _updateTelemetry(self) -> None:
     SmartDashboard.putNumber(f'{self._baseKey}/Driving/Velocity', self._drivingEncoder.getVelocity())
     SmartDashboard.putNumber(f'{self._baseKey}/Turning/Velocity', self._turningEncoder.getVelocity())
+    SmartDashboard.putNumber(f'{self._baseKey}/Driving/Current', self._drivingMotor.getOutputCurrent())
