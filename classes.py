@@ -231,7 +231,6 @@ class VelocityControlModuleConstants:
   motorFeedForwardGains: FeedForwardGains
   motorMotionMaxVelocity: units.revolutions_per_minute
   motorMotionMaxAcceleration: units.units_per_second
-  motorVelocityConversionFactor: float
 
 @dataclass(frozen=True, slots=True)
 class VelocityControlModuleConfig:
@@ -245,7 +244,6 @@ class SpeedModuleConstants:
   motorControllerType: SparkLowLevel.SparkModel
   motorType: SparkLowLevel.MotorType
   motorCurrentLimit: int
-  motorVelocityConversionFactor: float
 
 @dataclass(frozen=True, slots=True)
 class SpeedModuleConfig:

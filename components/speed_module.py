@@ -24,7 +24,7 @@ class SpeedModule:
       .inverted(self._config.isInverted))
     (self._motorConfig.encoder
       .positionConversionFactor(1.0)
-      .velocityConversionFactor(self._config.constants.motorVelocityConversionFactor))
+      .velocityConversionFactor(1.0))
     utils.setSparkConfig(self._motor.configure(self._motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters))
     self._relativeEncoder = self._motor.getEncoder()
     self._relativeEncoder.setPosition(0)

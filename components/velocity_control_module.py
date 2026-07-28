@@ -26,7 +26,7 @@ class VelocityControlModule:
       .inverted(self._config.isInverted))
     (self._motorConfig.encoder
       .positionConversionFactor(1.0)
-      .velocityConversionFactor(self._config.constants.motorVelocityConversionFactor))
+      .velocityConversionFactor(1.0))
     (self._motorConfig.closedLoop
       .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
       .pid(*self._config.constants.motorPID)
