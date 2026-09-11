@@ -55,6 +55,8 @@ class Position(Enum):
   Out = auto()
   Unlocked = auto()
   Locked = auto()
+  Forward = auto()
+  Backward = auto()
 
 class MotorDirection(Enum):
   Forward = auto()
@@ -226,8 +228,7 @@ class LimitPositionControlModuleConstants:
   motorControllerType: SparkLowLevel.SparkModel
   motorType: SparkLowLevel.MotorType
   motorCurrentLimit: int
-  motorMaxSpeed: units.percent
-  motorAllowedPositionError: float
+  motorOutputRange: Range
 
 @dataclass(frozen=True, slots=True)
 class LimitPositionControlModuleConfig:
