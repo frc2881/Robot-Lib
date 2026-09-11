@@ -222,6 +222,21 @@ class AbsolutePositionControlModuleConfig:
   constants: AbsolutePositionControlModuleConstants
 
 @dataclass(frozen=True, slots=True)
+class LimitPositionControlModuleConstants:
+  motorControllerType: SparkLowLevel.SparkModel
+  motorType: SparkLowLevel.MotorType
+  motorCurrentLimit: int
+  motorMaxSpeed: units.percent
+  motorAllowedPositionError: float
+
+@dataclass(frozen=True, slots=True)
+class LimitPositionControlModuleConfig:
+  baseKey: str
+  motorCANId: int
+  isInverted: bool
+  constants: LimitPositionControlModuleConstants
+
+@dataclass(frozen=True, slots=True)
 class VelocityControlModuleConstants:
   motorControllerType: SparkLowLevel.SparkModel
   motorType: SparkLowLevel.MotorType
