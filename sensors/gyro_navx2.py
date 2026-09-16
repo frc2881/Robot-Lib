@@ -8,11 +8,11 @@ from .. import logger, utils
 class Gyro_NAVX2():
   def __init__(
       self,
-      comType: AHRS.NavXComType
+      port: AHRS.NavXComType
     ) -> None:
     self._baseKey = f'Robot/Sensors/Gyro'
     
-    self._gyro = AHRS(comType)
+    self._gyro = AHRS(port)
 
     self._angleAdjustment: units.degrees = 0
 
