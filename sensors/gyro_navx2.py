@@ -5,7 +5,7 @@ from wpimath.geometry import Pose2d
 from navx import AHRS
 from .. import logger, utils
 
-class Gyro_NAVX2():
+class Gyro():
   def __init__(
       self,
       port: AHRS.NavXComType

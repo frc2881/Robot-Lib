@@ -5,7 +5,7 @@ from wpimath.geometry import Pose2d
 from navx import Navx
 from .. import logger, utils
 
-class Gyro_NAVX3():
+class Gyro():
   def __init__(
       self,
       port: Navx.Port
