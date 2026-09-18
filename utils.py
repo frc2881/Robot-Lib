@@ -6,12 +6,12 @@ from commands2 import TimedCommandRobot
 import wpilib
 import wpimath
 from wpimath import units
-from wpimath.geometry import Pose2d, Pose3d, Translation2d
+from wpimath.geometry import Pose2d, Pose3d, Rectangle2d
 from wpilib import DriverStation
 from wpimath.kinematics import ChassisSpeeds
 from rev import SparkBase, SparkBaseConfig, REVLibError, ResetMode, PersistMode
 from . import logger
-from .classes import Alliance, RobotMode, RobotState, MotorIdleMode, Value, Zone, Range
+from .classes import Alliance, RobotMode, RobotState, MotorIdleMode, Value, Range
 
 T = TypeVar("T")
 
@@ -70,15 +70,15 @@ def getInterpolatedValue(x: float, xs: tuple[float, ...], ys: tuple[float, ...])
   try: return numpy.interp([x], xs, ys)[0]
   except: return Value.none
 
-def isPoseWithinZone(pose: Pose2d, zone: Zone) -> bool:
-  return isValueWithinRange(pose.X(), zone.start.X(), zone.end.X()) and isValueWithinRange(pose.Y(), zone.start.Y(), zone.end.Y())
+def isPoseWithinBounds(pose: Pose2d, bounds: Rectangle2d) -> bool:
+  return bounds.contains(pose.translation())
 
 def isPoseAlignedToTarget(sourcePose: Pose2d, targetPose: Pose3d, translationTolerance: units.meters, rotationTolerance: units.degrees) -> bool:
   transform = sourcePose - targetPose.toPose2d()
   return (
-    isValueWithinRange(transform.translation().X(), -translationTolerance, translationTolerance) and 
-    isValueWithinRange(transform.translation().Y(), -translationTolerance, translationTolerance) and
-    isValueWithinRange(transform.rotation().degrees(), -rotationTolerance, rotationTolerance)
+    isValueWithinTolerance(transform.translation().X(), 0, translationTolerance) and
+    isValueWithinTolerance(transform.translation().Y(), 0, translationTolerance) and
+    isValueWithinTolerance(transform.rotation().degrees(), 0, rotationTolerance)
   )
 
 def getTargetDistance(sourcePose: Pose2d | Pose3d, targetPose: Pose2d | Pose3d) -> units.meters:
