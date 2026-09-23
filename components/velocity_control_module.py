@@ -37,6 +37,7 @@ class VelocityControlModule:
         .kA(self._config.constants.motorFeedForwardGains.acceleration)
         .kG(self._config.constants.motorFeedForwardGains.gravity))
     (self._motorConfig.closedLoop.maxMotion
+      .cruiseVelocity(self._config.constants.motorMotionCruiseVelocity)
       .maxAcceleration(self._config.constants.motorMotionMaxAcceleration)
       .allowedProfileError(0.1))
     utils.setSparkConfig(self._motor.configure(self._motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters))
@@ -51,16 +52,16 @@ class VelocityControlModule:
     
   def setSpeed(self, speed: units.percent) -> None:
     self._targetSpeed = speed
-    self._closedLoopController.setSetpoint(self._config.constants.motorMotionMaxVelocity * speed, SparkBase.ControlType.kMAXMotionVelocityControl)
+    self._closedLoopController.setSetpoint(self._config.constants.motorMotionCruiseVelocity * speed, SparkBase.ControlType.kMAXMotionVelocityControl)
 
   def getSpeed(self) -> units.percent:
-    return self._relativeEncoder.getVelocity() / self._config.constants.motorMotionMaxVelocity
+    return self._relativeEncoder.getVelocity() / self._config.constants.motorMotionCruiseVelocity
 
-  def getTargetSpeed(self) -> float:
+  def getTargetSpeed(self) -> units.percent:
     return self._targetSpeed
 
   def isAtTargetSpeed(self) -> bool:
-    return self._targetSpeed != 0 and utils.isValueWithinTolerance(self.getSpeed(), self._targetSpeed, 0.1)
+    return self._targetSpeed != 0 and utils.isValueWithinTolerance(self.getSpeed(), self._targetSpeed, 0.05)
   
   def _resetTargetSpeed(self) -> None:
     self._targetSpeed = 0
