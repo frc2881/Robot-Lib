@@ -1,3 +1,4 @@
+from typing import Any
 import math
 from wpilib import Timer, DriverStation, RobotController, SmartDashboard
 from . import logger, utils
@@ -11,16 +12,35 @@ def start() -> None:
   utils.addRobotPeriodic(_updateGameMatchInfo, 1.0, 0.75)
 
 def _updateTimingInfo() -> None:
-  SmartDashboard.putNumber("Robot/Status/Time", Timer.getFPGATimestamp())
-  SmartDashboard.putNumber("Match/Time",  math.floor(DriverStation.getMatchTime()))
+  log("Robot/Status/Time", Timer.getFPGATimestamp())
+  log("Match/Time",  math.floor(DriverStation.getMatchTime()))
 
 def _updateRobotInfo() -> None:
-  SmartDashboard.putString("Robot/Status/Mode", utils.getRobotMode().name)
-  SmartDashboard.putString("Robot/Status/State", utils.getRobotState().name)
-  SmartDashboard.putNumber("Robot/Power/Battery/Voltage", RobotController.getBatteryVoltage())
+  log("Robot/Status/Mode", utils.getRobotMode().name)
+  log("Robot/Status/State", utils.getRobotState().name)
+  log("Robot/Power/Battery/Voltage", RobotController.getBatteryVoltage())
 
 def _updateGameMatchInfo() -> None:
-  SmartDashboard.putNumber("Game/Team", RobotController.getTeamNumber())
-  SmartDashboard.putString("Match/Alliance", utils.getAlliance().name)
-  SmartDashboard.putNumber("Match/Station", DriverStation.getLocation() or 0)
-  SmartDashboard.putBoolean("Match/IsCompetitionMode", utils.isCompetitionMode())
+  log("Game/Team", RobotController.getTeamNumber())
+  log("Match/Alliance", utils.getAlliance().name)
+  log("Match/Station", DriverStation.getLocation() or 0)
+  log("Match/IsCompetitionMode", utils.isCompetitionMode())
+
+def log(name: str, value: Any) -> None:
+  match value:
+    case str():
+      SmartDashboard.putString(name, value)
+    case bool():
+      SmartDashboard.putBoolean(name, value)
+    case int() | float():
+      SmartDashboard.putNumber(name, value)
+    case list():
+      match value[0]:
+        case str():
+          SmartDashboard.putStringArray(name, value)
+        case bool():
+          SmartDashboard.putBooleanArray(name, value)
+        case int() | float():
+          SmartDashboard.putNumberArray(name, value)
+    case _:
+      pass

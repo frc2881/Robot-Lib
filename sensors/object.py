@@ -1,10 +1,10 @@
 from typing import Optional
 import math
-from wpilib import SmartDashboard, Timer
+from wpilib import Timer
 from wpimath import units
 from wpimath.geometry import Translation2d, Rotation2d, Transform2d
 from photonlibpy.photonCamera import PhotonCamera
-from .. import logger, utils
+from .. import logger, telemetry, utils
 from ..classes import ObjectSensorConfig, Objects
 
 class ObjectSensor:
@@ -27,7 +27,7 @@ class ObjectSensor:
     self._hasTarget = False
     self._pipelineResultBufferTimer = Timer()
 
-    SmartDashboard.putString(f'{self._baseKey}/Stream', config.stream)
+    telemetry.log(f'{self._baseKey}/Stream', config.stream)
 
     utils.addRobotPeriodic(self._periodic)
 
@@ -60,5 +60,5 @@ class ObjectSensor:
     return self._hasTarget
 
   def _updateTelemetry(self) -> None:
-    SmartDashboard.putBoolean(f'{self._baseKey}/IsConnected', self._photonCamera.isConnected())
-    SmartDashboard.putBoolean(f'{self._baseKey}/HasTarget', self.hasTarget())
+    telemetry.log(f'{self._baseKey}/IsConnected', self._photonCamera.isConnected())
+    telemetry.log(f'{self._baseKey}/HasTarget', self.hasTarget())

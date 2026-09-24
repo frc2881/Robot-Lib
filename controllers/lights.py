@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from wpilib import SmartDashboard
+from .. import logger, telemetry, utils
 
 class LightsMode(Enum):
   Default = auto()
@@ -9,4 +9,4 @@ class LightsController:
     self.setMode(LightsMode.Default)
 
   def setMode(self, mode: Enum) -> None:
-    SmartDashboard.putString("Robot/Controllers/Lights/Mode", mode.name)
+    telemetry.log("Robot/Controllers/Lights/Mode", mode.name)

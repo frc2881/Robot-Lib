@@ -1,8 +1,7 @@
-from wpilib import SmartDashboard
 from wpimath import units
 from rev import SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, ResetMode, PersistMode
 from ..classes import SpeedModuleConfig, MotorIdleMode
-from .. import logger, utils
+from .. import logger, telemetry, utils
 
 class SpeedModule:
   def __init__(
@@ -47,6 +46,6 @@ class SpeedModule:
     self._motor.stopMotor()
 
   def _updateTelemetry(self) -> None:
-    SmartDashboard.putNumber(f'{self._baseKey}/Speed', self.getSpeed())
-    SmartDashboard.putNumber(f'{self._baseKey}/Velocity', self._relativeEncoder.getVelocity())
-    SmartDashboard.putNumber(f'{self._baseKey}/Current', self._motor.getOutputCurrent())
+    telemetry.log(f'{self._baseKey}/Speed', self.getSpeed())
+    telemetry.log(f'{self._baseKey}/Velocity', self._relativeEncoder.getVelocity())
+    telemetry.log(f'{self._baseKey}/Current', self._motor.getOutputCurrent())

@@ -1,7 +1,6 @@
-from wpilib import SmartDashboard
 from rev import SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, ResetMode, PersistMode, LimitSwitchConfig
 from ..classes import LimitPositionControlModuleConfig, MotorIdleMode, Position
-from .. import logger, utils
+from .. import logger, telemetry, utils
 
 class LimitPositionControlModule:
   def __init__(
@@ -70,7 +69,7 @@ class LimitPositionControlModule:
     self._motor.stopMotor()
 
   def _updateTelemetry(self) -> None:
-    SmartDashboard.putString(f'{self._baseKey}/Position', self.getPosition().name)
-    SmartDashboard.putBoolean(f'{self._baseKey}/LimitSwitchForward', self._forwardLimitSwitch.get())
-    SmartDashboard.putBoolean(f'{self._baseKey}/LimitSwitchReverse', self._reverseLimitSwitch.get())
-    SmartDashboard.putNumber(f'{self._baseKey}/Current', self._motor.getOutputCurrent())
+    telemetry.log(f'{self._baseKey}/Position', self.getPosition().name)
+    telemetry.log(f'{self._baseKey}/LimitSwitchForward', self._forwardLimitSwitch.get())
+    telemetry.log(f'{self._baseKey}/LimitSwitchReverse', self._reverseLimitSwitch.get())
+    telemetry.log(f'{self._baseKey}/Current', self._motor.getOutputCurrent())

@@ -1,7 +1,6 @@
-from wpilib import SmartDashboard
 from rev import SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, ResetMode, PersistMode
 from ..classes import FollowerModuleConfig, MotorIdleMode
-from .. import logger, utils
+from .. import logger, telemetry, utils
 
 class FollowerModule:
   def __init__(
@@ -34,5 +33,5 @@ class FollowerModule:
     utils.setMotorIdleMode(self._motor, motorIdleMode)
 
   def _updateTelemetry(self) -> None:
-    SmartDashboard.putNumber(f'{self._baseKey}/Velocity', self._relativeEncoder.getVelocity())
-    SmartDashboard.putNumber(f'{self._baseKey}/Current', self._motor.getOutputCurrent())
+    telemetry.log(f'{self._baseKey}/Velocity', self._relativeEncoder.getVelocity())
+    telemetry.log(f'{self._baseKey}/Current', self._motor.getOutputCurrent())

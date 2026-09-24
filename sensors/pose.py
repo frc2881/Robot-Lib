@@ -1,9 +1,8 @@
 from typing import Optional
-from wpilib import SmartDashboard
 from photonlibpy.photonCamera import PhotonCamera
 from photonlibpy.photonPoseEstimator import PhotonPoseEstimator
 from photonlibpy.estimatedRobotPose import EstimatedRobotPose
-from .. import logger, utils
+from .. import logger, telemetry, utils
 from ..classes import PoseSensorConfig, PoseSensorResult, PoseSensorResultType
 
 class PoseSensor:
@@ -21,7 +20,7 @@ class PoseSensor:
       config.transform
     )
 
-    SmartDashboard.putString(f'{self._baseKey}/Stream', config.stream)
+    telemetry.log(f'{self._baseKey}/Stream', config.stream)
 
     self._photonCamera.getAllUnreadResults()
 
@@ -75,5 +74,5 @@ class PoseSensor:
     return self._photonCamera._cameraTable.getBoolean("hasTarget", False)
   
   def _updateTelemetry(self) -> None:
-    SmartDashboard.putBoolean(f'{self._baseKey}/IsConnected', self.isConnected())
-    SmartDashboard.putBoolean(f'{self._baseKey}/HasTarget', self.hasTarget())
+    telemetry.log(f'{self._baseKey}/IsConnected', self.isConnected())
+    telemetry.log(f'{self._baseKey}/HasTarget', self.hasTarget())

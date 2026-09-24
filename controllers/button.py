@@ -1,7 +1,7 @@
 from commands2.button import Trigger
-from wpilib import DigitalInput, SmartDashboard
+from wpilib import DigitalInput
 from ..classes import ButtonControllerConfig, RobotState
-from .. import logger, utils
+from .. import logger, telemetry, utils
 
 class ButtonController():
   def __init__(
@@ -25,4 +25,4 @@ class ButtonController():
     return Trigger(lambda: self._isPressed())
   
   def _updateTelemetry(self) -> None:
-    SmartDashboard.putBoolean(f'{self._baseKey}/IsPressed', self._isPressed())
+    telemetry.log(f'{self._baseKey}/IsPressed', self._isPressed())

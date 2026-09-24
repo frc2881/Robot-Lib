@@ -3,7 +3,7 @@ from commands2 import Command, cmd
 from commands2.button import CommandXboxController, Trigger
 from wpimath import units
 from wpilib import XboxController as _XboxController
-from .. import logger, utils
+from .. import logger, telemetry, utils
 from ..classes import ControllerRumblePattern
 
 class XboxController(CommandXboxController):

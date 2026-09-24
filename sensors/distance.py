@@ -1,8 +1,8 @@
 import math
-from wpilib import DigitalInput, DutyCycle, SmartDashboard
+from wpilib import DigitalInput, DutyCycle
 from wpimath import units
 from ..classes import DistanceSensorConfig
-from .. import logger, utils
+from .. import logger, telemetry, utils
 
 class DistanceSensor:
   def __init__(
@@ -42,6 +42,6 @@ class DistanceSensor:
     self._isTriggered = False
 
   def _updateTelemetry(self) -> None:
-    SmartDashboard.putNumber(f'{self._baseKey}/Value', self.getDistance())
-    SmartDashboard.putBoolean(f'{self._baseKey}/HasTarget', self.hasTarget())
-    SmartDashboard.putBoolean(f'{self._baseKey}/IsTriggered', self.isTriggered())
+    telemetry.log(f'{self._baseKey}/Value', self.getDistance())
+    telemetry.log(f'{self._baseKey}/HasTarget', self.hasTarget())
+    telemetry.log(f'{self._baseKey}/IsTriggered', self.isTriggered())

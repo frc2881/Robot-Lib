@@ -2,10 +2,9 @@ import math
 from wpimath import units
 from wpimath.geometry import Rotation2d
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
-from wpilib import SmartDashboard
 from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, FeedbackSensor, ResetMode, PersistMode
 from ..classes import SwerveModuleConfig, MotorIdleMode
-from .. import logger, utils
+from .. import logger, telemetry, utils
 
 class SwerveModule:
   def __init__(
@@ -87,6 +86,6 @@ class SwerveModule:
     utils.setMotorIdleMode(self._turningMotor, motorIdleMode)
     
   def _updateTelemetry(self) -> None:
-    SmartDashboard.putNumber(f'{self._baseKey}/Driving/Velocity', self._drivingEncoder.getVelocity())
-    SmartDashboard.putNumber(f'{self._baseKey}/Turning/Velocity', self._turningEncoder.getVelocity())
-    SmartDashboard.putNumber(f'{self._baseKey}/Driving/Current', self._drivingMotor.getOutputCurrent())
+    telemetry.log(f'{self._baseKey}/Driving/Velocity', self._drivingEncoder.getVelocity())
+    telemetry.log(f'{self._baseKey}/Turning/Velocity', self._turningEncoder.getVelocity())
+    telemetry.log(f'{self._baseKey}/Driving/Current', self._drivingMotor.getOutputCurrent())

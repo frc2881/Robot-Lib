@@ -1,6 +1,6 @@
-from wpilib import DigitalInput, SmartDashboard
+from wpilib import DigitalInput
 from ..classes import BinarySensorConfig
-from .. import logger, utils
+from .. import logger, telemetry, utils
 
 class BinarySensor:
   def __init__(
@@ -32,5 +32,5 @@ class BinarySensor:
     self._isTriggered = False
 
   def _updateTelemetry(self) -> None:
-    SmartDashboard.putBoolean(f'{self._baseKey}/HasTarget', self.hasTarget())
-    SmartDashboard.putBoolean(f'{self._baseKey}/IsTriggered', self.isTriggered())
+    telemetry.log(f'{self._baseKey}/HasTarget', self.hasTarget())
+    telemetry.log(f'{self._baseKey}/IsTriggered', self.isTriggered())

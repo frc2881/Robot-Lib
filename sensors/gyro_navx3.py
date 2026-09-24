@@ -1,9 +1,8 @@
 from commands2 import Command, cmd
-from wpilib import SmartDashboard
 from wpimath import units
 from wpimath.geometry import Pose2d
 from navx import Navx
-from .. import logger, utils
+from .. import logger, telemetry, utils
 
 class Gyro():
   def __init__(
@@ -44,7 +43,7 @@ class Gyro():
     return self._gyro.getTemperature() > 0
   
   def _updateTelemetry(self) -> None:
-    SmartDashboard.putBoolean(f'{self._baseKey}/IsConnected', self.isConnected())
-    SmartDashboard.putNumber(f'{self._baseKey}/Heading', self.getHeading())
-    SmartDashboard.putNumber(f'{self._baseKey}/Pitch', self.getPitch())
-    SmartDashboard.putNumber(f'{self._baseKey}/Roll', self.getRoll())
+    telemetry.log(f'{self._baseKey}/IsConnected', self.isConnected())
+    telemetry.log(f'{self._baseKey}/Heading', self.getHeading())
+    telemetry.log(f'{self._baseKey}/Pitch', self.getPitch())
+    telemetry.log(f'{self._baseKey}/Roll', self.getRoll())

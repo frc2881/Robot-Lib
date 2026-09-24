@@ -1,9 +1,8 @@
 from commands2 import Command, cmd, Subsystem
 from wpimath import units
-from wpilib import SmartDashboard
 from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, FeedbackSensor, ResetMode, PersistMode
 from ..classes import RelativePositionControlModuleConfig, MotorDirection, MotorIdleMode, RobotState, Value
-from .. import logger, utils
+from .. import logger, telemetry, utils
 
 class RelativePositionControlModule:
   def __init__(
@@ -136,6 +135,6 @@ class RelativePositionControlModule:
     self._resetTargetPosition()
 
   def _updateTelemetry(self) -> None:
-    SmartDashboard.putNumber(f'{self._baseKey}/RelativePosition', self._relativeEncoder.getPosition())
-    SmartDashboard.putNumber(f'{self._baseKey}/Velocity', self._relativeEncoder.getVelocity())
-    SmartDashboard.putNumber(f'{self._baseKey}/Current', self._motor.getOutputCurrent())
+    telemetry.log(f'{self._baseKey}/RelativePosition', self._relativeEncoder.getPosition())
+    telemetry.log(f'{self._baseKey}/Velocity', self._relativeEncoder.getVelocity())
+    telemetry.log(f'{self._baseKey}/Current', self._motor.getOutputCurrent())

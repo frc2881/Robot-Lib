@@ -1,8 +1,7 @@
 from wpimath import units
-from wpilib import SmartDashboard
 from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, FeedbackSensor, ResetMode, PersistMode
 from ..classes import AbsolutePositionControlModuleConfig, MotorDirection, MotorIdleMode, Value
-from .. import logger, utils
+from .. import logger, telemetry, utils
 
 class AbsolutePositionControlModule:
   def __init__(
@@ -106,7 +105,7 @@ class AbsolutePositionControlModule:
     self._relativeEncoder.setPosition(self._absoluteEncoder.getPosition())
 
   def _updateTelemetry(self) -> None:
-    SmartDashboard.putNumber(f'{self._baseKey}/AbsolutePosition', self._absoluteEncoder.getPosition())
-    SmartDashboard.putNumber(f'{self._baseKey}/RelativePosition', self._relativeEncoder.getPosition())
-    SmartDashboard.putNumber(f'{self._baseKey}/Velocity', self._relativeEncoder.getVelocity())
-    SmartDashboard.putNumber(f'{self._baseKey}/Current', self._motor.getOutputCurrent())
+    telemetry.log(f'{self._baseKey}/AbsolutePosition', self._absoluteEncoder.getPosition())
+    telemetry.log(f'{self._baseKey}/RelativePosition', self._relativeEncoder.getPosition())
+    telemetry.log(f'{self._baseKey}/Velocity', self._relativeEncoder.getVelocity())
+    telemetry.log(f'{self._baseKey}/Current', self._motor.getOutputCurrent())

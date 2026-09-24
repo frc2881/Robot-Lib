@@ -1,8 +1,7 @@
 import math
-from wpilib import SmartDashboard
 from rev import SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, ResetMode, PersistMode
 from ..classes import DifferentialModuleConfig, MotorIdleMode
-from .. import utils, logger
+from .. import logger, telemetry, utils
 
 class DifferentialModule:
   def __init__(
@@ -54,5 +53,5 @@ class DifferentialModule:
     self._drivingEncoder.setPosition(0)
 
   def _updateTelemetry(self) -> None:
-    SmartDashboard.putNumber(f'{self._baseKey}/Driving/Velocity', self._drivingEncoder.getVelocity())
-    SmartDashboard.putNumber(f'{self._baseKey}/Driving/Current', self._drivingMotor.getOutputCurrent())
+    telemetry.log(f'{self._baseKey}/Driving/Velocity', self._drivingEncoder.getVelocity())
+    telemetry.log(f'{self._baseKey}/Driving/Current', self._drivingMotor.getOutputCurrent())
