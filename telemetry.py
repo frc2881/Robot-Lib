@@ -35,12 +35,13 @@ def log(name: str, value: Any) -> None:
     case int() | float():
       SmartDashboard.putNumber(name, value)
     case list():
-      match value[0]:
-        case str():
-          SmartDashboard.putStringArray(name, value)
-        case bool():
-          SmartDashboard.putBooleanArray(name, value)
-        case int() | float():
-          SmartDashboard.putNumberArray(name, value)
+      if value:
+        match value[0]:
+          case str():
+            SmartDashboard.putStringArray(name, value)
+          case bool():
+            SmartDashboard.putBooleanArray(name, value)
+          case int() | float():
+            SmartDashboard.putNumberArray(name, value)
     case _:
       pass
