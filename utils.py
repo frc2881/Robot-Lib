@@ -1,29 +1,27 @@
-from typing import Any, Callable, TypeVar, Optional
-import math
-import numpy
-import json
-from commands2 import TimedCommandRobot
-import wpilib
-import wpimath
+from typing import Any, Callable, TypeVar
+import math, numpy, json
+import wpilib, wpimath
 from wpimath import units
 from wpimath.geometry import Pose2d, Pose3d, Rectangle2d
-from wpilib import DriverStation
 from wpimath.kinematics import ChassisSpeeds
-from rev import SparkBase, SparkBaseConfig, REVLibError, ResetMode, PersistMode
+from commands2 import TimedCommandRobot
+from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkFlex, SparkMax, REVLibError, ResetMode, PersistMode
 from . import logger
-from .classes import Alliance, RobotMode, RobotState, MotorIdleMode, Value, Range
+from .classes import Alliance, RobotMode, RobotState, IdleMode, Value, Range
 
 T = TypeVar("T")
 
-__robot__: Optional[TimedCommandRobot] = None
+_robot: TimedCommandRobot
 
-def setRobotInstance(instance: TimedCommandRobot) -> None:
-  global __robot__
-  __robot__ = instance
+def initRobot(robot: TimedCommandRobot) -> None:
+  global _robot
+  _robot = robot
 
 def addRobotPeriodic(callback: Callable[[], None], period: units.seconds = 0.02, offset: units.seconds = 0) -> None:
-  if __robot__ is not None:
-    __robot__.addPeriodic(callback, period, offset)
+  _robot.addPeriodic(callback, period, offset)
+
+def getRobotTime() -> units.seconds:
+  return wpilib.Timer.getTimestamp()
 
 def getRobotState() -> RobotState:
   if wpilib.RobotState.isEnabled(): return RobotState.Enabled
@@ -43,22 +41,22 @@ def isAutonomousMode() -> bool:
   return getRobotMode() == RobotMode.Auto
 
 def isCompetitionMode() -> bool:
-  return DriverStation.isFMSAttached()
+  return wpilib.DriverStation.isFMSAttached()
 
 def getAlliance() -> Alliance:
-  return Alliance(DriverStation.getAlliance() or Alliance.Blue)
+  return Alliance(wpilib.DriverStation.getAlliance() or Alliance.Blue)
 
 def getValueForAlliance(blueValue: T, redValue: T) -> T:
   return blueValue if getAlliance() == Alliance.Blue else redValue
 
 def getMatchTime() -> units.seconds:
-  return DriverStation.getMatchTime()
+  return wpilib.DriverStation.getMatchTime()
 
 def isValueWithinRange(value: float, minValue: float, maxValue: float) -> bool:
   return value >= minValue and value <= maxValue
 
 def isValueWithinTolerance(value: float, targetValue: float, tolerance: float) -> bool:
-  return math.isclose(value, targetValue, abs_tol=tolerance)
+  return math.isclose(value, targetValue, abs_tol = tolerance)
 
 def clampValue(value: float, minValue: float, maxValue: float) -> float:
   return max(min(value, maxValue), minValue)
@@ -108,18 +106,27 @@ def clampTranslationVelocity(chassisSpeeds: ChassisSpeeds, translationMaxVelocit
     chassisSpeeds = ChassisSpeeds(chassisSpeeds.vx * dv, chassisSpeeds.vy * dv, chassisSpeeds.omega)
   return chassisSpeeds
 
-def setSoftLimitsEnabled(motor: SparkBase, enabled: bool) -> None:
-  config = SparkBaseConfig()
-  config.softLimit.reverseSoftLimitEnabled(enabled).forwardSoftLimitEnabled(enabled)
-  setSparkConfig(motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters))
+def getSparkController(id: int, controllerType: SparkLowLevel.SparkModel, motorType: SparkLowLevel.MotorType) -> SparkBase:
+  return SparkFlex(id, motorType) if controllerType == SparkLowLevel.SparkModel.kSparkFlex else SparkMax(id, motorType)
 
-def setMotorIdleMode(motor: SparkBase, motorIdleMode: MotorIdleMode) -> None:
-  setSparkConfig(motor.configure(SparkBaseConfig().setIdleMode(
-    SparkBaseConfig.IdleMode.kCoast if motorIdleMode == MotorIdleMode.Coast else SparkBaseConfig.IdleMode.kBrake
-  ), ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters))
+def configureSparkController(controller: SparkBase, sparkConfig: SparkBaseConfig, isPersisted: bool = True) -> None:
+  error = controller.configure(
+    sparkConfig, 
+    ResetMode.kResetSafeParameters if isPersisted else ResetMode.kNoResetSafeParameters,
+    PersistMode.kPersistParameters if isPersisted else PersistMode.kNoPersistParameters
+  )
+  if error != REVLibError.kOk: 
+    logger.error(f'REVLibError: {error}')
 
-def setSparkConfig(error: REVLibError) -> None:
-  if error != REVLibError.kOk: logger.error(f'REVLibError: {error}')
+def setSoftLimitsEnabled(controller: SparkBase, enabled: bool) -> None:
+  sparkConfig = SparkBaseConfig()
+  sparkConfig.softLimit.reverseSoftLimitEnabled(enabled).forwardSoftLimitEnabled(enabled)
+  configureSparkController(controller, sparkConfig, isPersisted = False)
+
+def setIdleMode(controller: SparkBase, idleMode: IdleMode) -> None:
+  sparkConfig = SparkBaseConfig()
+  sparkConfig.setIdleMode(SparkBaseConfig.IdleMode.kCoast if idleMode == IdleMode.Coast else SparkBaseConfig.IdleMode.kBrake)
+  configureSparkController(controller, sparkConfig, isPersisted = False)
 
 def toJson(value: Any) -> str:
   try: return json.dumps(value, default=lambda o: o.__dict__)

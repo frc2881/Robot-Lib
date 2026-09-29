@@ -1,6 +1,6 @@
 from wpilib import DigitalInput
-from ..classes import BinarySensorConfig
 from .. import logger, telemetry, utils
+from ..classes import BinarySensorConfig
 
 class BinarySensor:
   def __init__(
@@ -8,9 +8,8 @@ class BinarySensor:
       config: BinarySensorConfig
     ) -> None:
     self._config = config
-    self._baseKey = f'Robot/Sensors/Binary/{self._config.name}'
 
-    self._digitalInput = DigitalInput(self._config.channel)
+    self._digitalInput = DigitalInput(config.channel)
 
     self._isTriggered: bool = False
     
@@ -32,5 +31,5 @@ class BinarySensor:
     self._isTriggered = False
 
   def _updateTelemetry(self) -> None:
-    telemetry.log(f'{self._baseKey}/HasTarget', self.hasTarget())
-    telemetry.log(f'{self._baseKey}/IsTriggered', self.isTriggered())
+    telemetry.log(f'{self._config.telemetryName}/HasTarget', self.hasTarget())
+    telemetry.log(f'{self._config.telemetryName}/IsTriggered', self.isTriggered())

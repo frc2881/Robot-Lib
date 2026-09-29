@@ -13,9 +13,8 @@ class ObjectSensor:
       config: ObjectSensorConfig
     ) -> None:
     self._config = config
-    self._baseKey = f'Robot/Sensors/Object/{config.name}'
     
-    self._photonCamera = PhotonCamera(config.name)
+    self._photonCamera = PhotonCamera(config.cameraName)
     self._photonCamera.setDriverMode(False)
 
     self._cameraTranslation = self._config.transform.translation().toTranslation2d()
@@ -27,7 +26,7 @@ class ObjectSensor:
     self._hasTarget = False
     self._pipelineResultBufferTimer = Timer()
 
-    telemetry.log(f'{self._baseKey}/Stream', config.stream)
+    telemetry.log(f'{self._config.telemetryName}/{self._config.cameraName}/Stream', config.stream)
 
     utils.addRobotPeriodic(self._periodic)
 
@@ -54,11 +53,14 @@ class ObjectSensor:
     return objects
 
   def getCameraName(self) -> str:
-    return self._config.name
+      return self._photonCamera.getName()
+
+  def isConnected(self) -> bool:
+    return self._photonCamera.isConnected()
   
   def hasTarget(self) -> bool:
     return self._hasTarget
 
   def _updateTelemetry(self) -> None:
-    telemetry.log(f'{self._baseKey}/IsConnected', self._photonCamera.isConnected())
-    telemetry.log(f'{self._baseKey}/HasTarget', self.hasTarget())
+    telemetry.log(f'{self._config.telemetryName}/{self._config.cameraName}/IsConnected', self.isConnected())
+    telemetry.log(f'{self._config.telemetryName}/{self._config.cameraName}/HasTarget', self.hasTarget())

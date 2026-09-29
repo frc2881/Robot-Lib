@@ -1,6 +1,6 @@
-from commands2 import Command, cmd
 from wpimath import units
 from wpimath.geometry import Pose2d
+from commands2 import Command, cmd
 from navx import AHRS
 from .. import logger, telemetry, utils
 
@@ -9,8 +9,8 @@ class Gyro():
       self,
       port: AHRS.NavXComType
     ) -> None:
-    self._baseKey = f'Robot/Sensors/Gyro'
-    
+    self._telemetryName = "Robot/Sensors/Gyro"
+
     self._gyro = AHRS(port)
 
     self._angleAdjustment: units.degrees = 0
@@ -37,13 +37,13 @@ class Gyro():
     self._reset(utils.wrapAngle(robotPose.rotation().degrees() + utils.getValueForAlliance(0.0, 180.0)))
 
   def reset(self) -> Command:
-    return cmd.runOnce(self._reset).withName("GyroSensor:Reset")
+    return cmd.runOnce(self._reset).withName("Gyro:Reset")
   
   def isConnected(self) -> bool:
     return self._gyro.isConnected()
   
   def _updateTelemetry(self) -> None:
-    telemetry.log(f'{self._baseKey}/IsConnected', self.isConnected())
-    telemetry.log(f'{self._baseKey}/Heading', self.getHeading())
-    telemetry.log(f'{self._baseKey}/Pitch', self.getPitch())
-    telemetry.log(f'{self._baseKey}/Roll', self.getRoll())
+    telemetry.log(f'{self._telemetryName}/IsConnected', self.isConnected())
+    telemetry.log(f'{self._telemetryName}/Heading', self.getHeading())
+    telemetry.log(f'{self._telemetryName}/Pitch', self.getPitch())
+    telemetry.log(f'{self._telemetryName}/Roll', self.getRoll())

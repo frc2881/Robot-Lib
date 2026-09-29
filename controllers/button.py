@@ -1,7 +1,7 @@
-from commands2.button import Trigger
 from wpilib import DigitalInput
-from ..classes import ButtonControllerConfig, RobotState
+from commands2.button import Trigger
 from .. import logger, telemetry, utils
+from ..classes import ButtonControllerConfig, RobotState
 
 class ButtonController():
   def __init__(
@@ -9,9 +9,8 @@ class ButtonController():
       config: ButtonControllerConfig
     ) -> None:
     self._config = config
-    self._baseKey = f'Robot/Controllers/Button/{self._config.name}'
 
-    self._digitalInput = DigitalInput(self._config.channel)
+    self._digitalInput = DigitalInput(config.channel)
     
     utils.addRobotPeriodic(self._periodic)
 
@@ -25,4 +24,4 @@ class ButtonController():
     return Trigger(lambda: self._isPressed())
   
   def _updateTelemetry(self) -> None:
-    telemetry.log(f'{self._baseKey}/IsPressed', self._isPressed())
+    telemetry.log(f'{self._config.telemetryName}/IsPressed', self._isPressed())

@@ -1,8 +1,8 @@
 import math
 from wpilib import DigitalInput, DutyCycle
 from wpimath import units
-from ..classes import DistanceSensorConfig
 from .. import logger, telemetry, utils
+from ..classes import DistanceSensorConfig
 
 class DistanceSensor:
   def __init__(
@@ -10,9 +10,8 @@ class DistanceSensor:
       config: DistanceSensorConfig
     ) -> None:
     self._config = config
-    self._baseKey = f'Robot/Sensors/Distance/{self._config.name}'
 
-    self._dutycycle = DutyCycle(DigitalInput(self._config.channel))
+    self._dutycycle = DutyCycle(DigitalInput(config.channel))
 
     self._isTriggered: bool = False
 
@@ -42,6 +41,6 @@ class DistanceSensor:
     self._isTriggered = False
 
   def _updateTelemetry(self) -> None:
-    telemetry.log(f'{self._baseKey}/Value', self.getDistance())
-    telemetry.log(f'{self._baseKey}/HasTarget', self.hasTarget())
-    telemetry.log(f'{self._baseKey}/IsTriggered', self.isTriggered())
+    telemetry.log(f'{self._config.telemetryName}/Value', self.getDistance())
+    telemetry.log(f'{self._config.telemetryName}/HasTarget', self.hasTarget())
+    telemetry.log(f'{self._config.telemetryName}/IsTriggered', self.isTriggered())

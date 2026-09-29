@@ -1,7 +1,10 @@
 from typing import Any
 import math
-from wpilib import Timer, DriverStation, RobotController, SmartDashboard
+from wpilib import Timer, DriverStation, RobotController
+from ntcore import NetworkTableInstance, StructPublisher, StructArrayPublisher
 from . import logger, utils
+
+_publishers: dict[str, StructPublisher | StructArrayPublisher] = {}
 
 def start() -> None:
   _updateTimingInfo()
@@ -27,21 +30,23 @@ def _updateGameMatchInfo() -> None:
   log("Match/IsCompetitionMode", utils.isCompetitionMode())
 
 def log(name: str, value: Any, element_type: type[Any] | None = None) -> None:
-  match value:
-    case str():
-      SmartDashboard.putString(name, value)
-    case bool():
-      SmartDashboard.putBoolean(name, value)
-    case int() | float():
-      SmartDashboard.putNumber(name, value)
-    case list():
-      if element_type is str:
-        SmartDashboard.putStringArray(name, value)
-      elif element_type is bool:
-        SmartDashboard.putBooleanArray(name, value)
-      elif element_type is int or element_type is float:
-        SmartDashboard.putNumberArray(name, value)
-      else:
-        pass
-    case _:
-      pass
+  name = f'/Telemetry/{ name }'
+  if hasattr(value, "WPIStruct") or hasattr(element_type, "WPIStruct"):
+    topic = (
+      NetworkTableInstance.getDefault().getStructArrayTopic(name, element_type)
+      if element_type is not None else
+      NetworkTableInstance.getDefault().getStructTopic(name, type(value))
+    )
+    if not topic.exists(): 
+      _publishers[name] = topic.publish()
+    _publishers[name].set(value)
+  else:
+    entry = NetworkTableInstance.getDefault().getEntry(name)
+    if isinstance(value, list):
+      if element_type is str: entry.setStringArray(value)
+      elif element_type is bool: entry.setBooleanArray(value)
+      elif element_type is int: entry.setIntegerArray(value)
+      elif element_type is float: entry.setFloatArray(value)
+      else: pass
+    else:
+      entry.setValue(value)

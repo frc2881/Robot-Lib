@@ -1,7 +1,7 @@
 from wpimath import units
-from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, FeedbackSensor, ResetMode, PersistMode
-from ..classes import VelocityControlModuleConfig, MotorIdleMode
+from rev import SparkBase, SparkBaseConfig, FeedbackSensor
 from .. import logger, telemetry, utils
+from ..classes import VelocityControlModuleConfig, IdleMode
 
 class VelocityControlModule:
   def __init__(
@@ -10,39 +10,38 @@ class VelocityControlModule:
   ) -> None:
     self._config = config
 
-    self._baseKey = f'Robot/{self._config.baseKey}'
-
     self._targetSpeed: float = 0
 
-    if self._config.constants.motorControllerType == SparkLowLevel.SparkModel.kSparkFlex:
-      self._motor = SparkFlex(self._config.motorCANId, self._config.constants.motorType)
-    else: 
-      self._motor = SparkMax(self._config.motorCANId, self._config.constants.motorType)
-    self._motorConfig = SparkBaseConfig()
-    (self._motorConfig
-      .smartCurrentLimit(self._config.constants.motorCurrentLimit)
+    self._controller = utils.getSparkController(config.id, config.controllerType, config.motorType)
+    sparkConfig = SparkBaseConfig()
+    (sparkConfig
+      .smartCurrentLimit(self._config.currentLimit)
       .setIdleMode(SparkBaseConfig.IdleMode.kBrake)
-      .inverted(self._config.isInverted))
-    (self._motorConfig.encoder
+      .inverted(self._config.isInverted)
+    )
+    (sparkConfig.encoder
       .positionConversionFactor(1.0)
-      .velocityConversionFactor(1.0))
-    (self._motorConfig.closedLoop
+      .velocityConversionFactor(1.0)
+    )
+    (sparkConfig.closedLoop
       .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
-      .pid(*self._config.constants.motorPID)
-      .outputRange(*self._config.constants.motorOutputRange)
+      .pid(*self._config.controlPID)
+      .outputRange(*self._config.outputRange)
       .feedForward
-        .kS(self._config.constants.motorFeedForwardGains.static)
-        .kV(self._config.constants.motorFeedForwardGains.velocity)
-        .kA(self._config.constants.motorFeedForwardGains.acceleration)
-        .kG(self._config.constants.motorFeedForwardGains.gravity))
-    (self._motorConfig.closedLoop.maxMotion
-      .cruiseVelocity(self._config.constants.motorMotionCruiseVelocity)
-      .maxAcceleration(self._config.constants.motorMotionMaxAcceleration)
-      .allowedProfileError(0.1))
-    utils.setSparkConfig(self._motor.configure(self._motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters))
-    self._closedLoopController = self._motor.getClosedLoopController()
-    self._relativeEncoder = self._motor.getEncoder()
-    self._relativeEncoder.setPosition(0)
+        .kS(self._config.feedForwardGains.static)
+        .kV(self._config.feedForwardGains.velocity)
+        .kA(self._config.feedForwardGains.acceleration)
+        .kG(self._config.feedForwardGains.gravity)
+    )
+    (sparkConfig.closedLoop.maxMotion
+      .cruiseVelocity(self._config.cruiseVelocity)
+      .maxAcceleration(self._config.maxAcceleration)
+      .allowedProfileError(self._config.allowedProfileError)
+    )
+    utils.configureSparkController(self._controller, sparkConfig)
+    self._closedLoopController = self._controller.getClosedLoopController()
+    self._encoder = self._controller.getEncoder()
+    self._encoder.setPosition(0)
 
     utils.addRobotPeriodic(self._periodic)
 
@@ -51,10 +50,10 @@ class VelocityControlModule:
     
   def setSpeed(self, speed: units.percent) -> None:
     self._targetSpeed = speed
-    self._closedLoopController.setSetpoint(self._config.constants.motorMotionCruiseVelocity * speed, SparkBase.ControlType.kMAXMotionVelocityControl)
+    self._closedLoopController.setSetpoint(self._config.cruiseVelocity * speed, SparkBase.ControlType.kMAXMotionVelocityControl)
 
   def getSpeed(self) -> units.percent:
-    return self._relativeEncoder.getVelocity() / self._config.constants.motorMotionCruiseVelocity
+    return self._encoder.getVelocity() / self._config.cruiseVelocity
 
   def getTargetSpeed(self) -> units.percent:
     return self._targetSpeed
@@ -65,15 +64,15 @@ class VelocityControlModule:
   def _resetTargetSpeed(self) -> None:
     self._targetSpeed = 0
 
-  def setIdleMode(self, motorIdleMode: MotorIdleMode) -> None:
-    utils.setMotorIdleMode(self._motor, motorIdleMode)
+  def setIdleMode(self, idleMode: IdleMode) -> None:
+    utils.setIdleMode(self._controller, idleMode)
 
   def reset(self) -> None:
-    self._motor.stopMotor()
+    self._controller.stopMotor()
     self._resetTargetSpeed()
 
   def _updateTelemetry(self) -> None:
-    telemetry.log(f'{self._baseKey}/Speed', self.getSpeed())
-    telemetry.log(f'{self._baseKey}/Velocity', self._relativeEncoder.getVelocity())
-    telemetry.log(f'{self._baseKey}/Current', self._motor.getOutputCurrent())
+    telemetry.log(f'{self._config.telemetryName}/Speed', self.getSpeed())
+    telemetry.log(f'{self._config.telemetryName}/Velocity', self._encoder.getVelocity())
+    telemetry.log(f'{self._config.telemetryName}/Current', self._controller.getOutputCurrent())
 

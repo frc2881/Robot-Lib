@@ -1,7 +1,7 @@
 import traceback
+from wpilib import DataLogManager, DriverStation
 from commands2 import CommandScheduler, Command, cmd
-from wpilib import DataLogManager, DriverStation, Timer
-from . import telemetry
+from . import telemetry, utils
 from .classes import RobotMode
 
 def start() -> None:
@@ -18,13 +18,13 @@ def start() -> None:
     lambda command: log(f'---< Command End: {command.getName()}')
   )
 
+  log("+++++ Robot Started +++++")
+
   telemetry.log("Robot/Status/HasError", False)
   telemetry.log("Robot/Status/LastError", "")
 
-  log("***** Robot Started *****")
-
 def log(message: str) -> None:
-  DataLogManager.log(f'[{"%.6f" % Timer.getFPGATimestamp()}] {message}')
+  DataLogManager.log(f'[{"%.6f" % utils.getRobotTime()}] {message}')
 
 def log_(message: str) -> Command:
   return cmd.runOnce(lambda: log(message))

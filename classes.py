@@ -1,11 +1,9 @@
 from typing import NamedTuple, Optional
-import sys
-import math
+import sys, math
 from enum import Enum, IntEnum, auto
 from dataclasses import dataclass
 from wpimath import units
 from wpimath.geometry import Translation2d, Transform2d, Transform3d, Pose3d
-from wpimath.kinematics import SwerveModuleState
 from robotpy_apriltag import AprilTagFieldLayout
 from rev import SparkLowLevel, AbsoluteEncoderConfig
 
@@ -63,7 +61,7 @@ class MotorDirection(Enum):
   Reverse = auto()
   Stop = auto()
 
-class MotorIdleMode(Enum):
+class IdleMode(Enum):
   Brake = auto()
   Coast = auto()
 
@@ -110,7 +108,7 @@ class MotorModel(Enum):
   NEOVortex = auto()
   NEO550 = auto()
 
-class SwerveModuleGearKit(Enum):
+class SwerveDriveModuleGearKit(Enum):
   Low = auto()
   Medium = auto()
   High = auto()
@@ -120,188 +118,174 @@ class SwerveModuleGearKit(Enum):
   ExtraHigh4 = auto()
   ExtraHigh5 = auto()
 
-class SwerveModuleLocation(IntEnum):
+class SwerveDriveModuleLocation(IntEnum):
   FrontLeft = 0
   FrontRight = 1
   RearLeft = 2
   RearRight = 3
 
 @dataclass(frozen=True, slots=True)
-class SwerveModuleConstants:
-  wheelDiameter: units.meters
-  drivingMotorControllerType: SparkLowLevel.SparkModel
-  drivingMotorType: SparkLowLevel.MotorType
-  drivingMotorFreeSpeed: units.revolutions_per_minute
-  drivingMotorReduction: float
-  drivingMotorCurrentLimit: int
-  drivingMotorPID: PID
-  turningMotorCurrentLimit: int
-  turningMotorPID: PID
-  turningMotorAbsoluteEncoderConfig: AbsoluteEncoderConfig
+class SwerveDriveModuleConfig:
+  location: SwerveDriveModuleLocation
+  drivingId: int
+  turningId: int
+  turningOffset: units.degrees
+  chassisTranslation: Translation2d
+  constants: SwerveDriveModuleConfigConstants
 
 @dataclass(frozen=True, slots=True)
-class SwerveModuleConfig:
-  location: SwerveModuleLocation
-  drivingMotorCANId: int
-  turningMotorCANId: int
-  turningOffset: units.degrees
-  translation: Translation2d
-  constants: SwerveModuleConstants
+class SwerveDriveModuleConfigConstants:
+  drivingControllerType: SparkLowLevel.SparkModel
+  drivingMotorType: SparkLowLevel.MotorType
+  drivingFreeSpeed: units.revolutions_per_minute
+  drivingGearReduction: float
+  drivingCurrentLimit: int
+  drivingControlPID: PID
+  turningCurrentLimit: int
+  turningControlPID: PID
+  turningEncoderConfig: AbsoluteEncoderConfig
+  wheelDiameter: units.meters
+  telemetryName: str
 
-class DifferentialModuleLocation(IntEnum):
+class DifferentialDriveModuleLocation(IntEnum):
   Left = 0
   Right = 1
 
-class DifferentialModulePositions(NamedTuple):
+class DifferentialDriveModulePositions(NamedTuple):
   left: units.meters
   right: units.meters
 
 @dataclass(frozen=True, slots=True)
-class DifferentialModuleConstants:
-  wheelDiameter: units.meters
-  drivingMotorControllerType: SparkLowLevel.SparkModel
-  drivingMotorType: SparkLowLevel.MotorType
-  drivingMotorReduction: float
-  drivingMotorCurrentLimit: int
-
-@dataclass(frozen=True, slots=True)
-class DifferentialModuleConfig:
-  location: DifferentialModuleLocation
-  drivingMotorCANId: int
-  leaderMotorCANId: Optional[int]
+class DifferentialDriveModuleConfig:
+  location: DifferentialDriveModuleLocation
+  id: int
+  leaderId: Optional[int]
   isInverted: bool
-  constants: DifferentialModuleConstants
+  constants: DifferentialDriveModuleConfigConstants
 
 @dataclass(frozen=True, slots=True)
-class RelativePositionControlModuleConstants:
-  motorControllerType: SparkLowLevel.SparkModel
+class DifferentialDriveModuleConfigConstants:
+  controllerType: SparkLowLevel.SparkModel
   motorType: SparkLowLevel.MotorType
-  motorCurrentLimit: int
-  motorPID: PID
-  motorOutputRange: Range
-  motorFeedForwardGains: FeedForwardGains
-  motorMotionCruiseVelocity: units.revolutions_per_minute
-  motorMotionMaxAcceleration: units.units_per_second
-  motorMotionAllowedProfileError: float
-  motorRelativeEncoderPositionConversionFactor: float
-  motorSoftLimitReverse: float
-  motorSoftLimitForward: float
-  motorHomedPosition: float
-  motorHomingSpeed: units.percent
+  gearReduction: float
+  currentLimit: int
+  wheelDiameter: units.meters
+  telemetryName: str
 
 @dataclass(frozen=True, slots=True)
 class RelativePositionControlModuleConfig:
-  baseKey: str
-  motorCANId: int
-  isInverted: bool
-  constants: RelativePositionControlModuleConstants
-
-@dataclass(frozen=True, slots=True)
-class AbsolutePositionControlModuleConstants:
-  motorControllerType: SparkLowLevel.SparkModel
+  id: int
+  controllerType: SparkLowLevel.SparkModel
   motorType: SparkLowLevel.MotorType
-  motorCurrentLimit: int
-  motorPID: PID
-  motorOutputRange: Range
-  motorFeedForwardGains: FeedForwardGains
-  motorMotionCruiseVelocity: units.revolutions_per_minute
-  motorMotionMaxAcceleration: units.units_per_second
-  motorMotionAllowedProfileError: float
-  motorRelativeEncoderPositionConversionFactor: float
-  motorAbsoluteEncoderPositionConversionFactor: float
-  motorSoftLimitReverse: float
-  motorSoftLimitForward: float
+  currentLimit: int
+  isInverted: bool
+  softLimitReverse: float
+  softLimitForward: float
+  controlPID: PID
+  outputRange: Range
+  feedForwardGains: FeedForwardGains
+  cruiseVelocity: units.revolutions_per_minute
+  maxAcceleration: units.units_per_second
+  allowedProfileError: float
+  homingPosition: float
+  homingSpeed: units.percent
+  positionConversionFactor: float
+  telemetryName: str
 
 @dataclass(frozen=True, slots=True)
 class AbsolutePositionControlModuleConfig:
-  baseKey: str
-  motorCANId: int
-  isInverted: bool
-  constants: AbsolutePositionControlModuleConstants
-
-@dataclass(frozen=True, slots=True)
-class LimitPositionControlModuleConstants:
-  motorControllerType: SparkLowLevel.SparkModel
+  id: int
+  controllerType: SparkLowLevel.SparkModel
   motorType: SparkLowLevel.MotorType
-  motorCurrentLimit: int
-  motorOutputRange: Range
+  currentLimit: int
+  isInverted: bool
+  softLimitReverse: float
+  softLimitForward: float
+  controlPID: PID
+  outputRange: Range
+  feedForwardGains: FeedForwardGains
+  cruiseVelocity: units.revolutions_per_minute
+  maxAcceleration: units.units_per_second
+  allowedProfileError: float
+  relativePositionConversionFactor: float
+  absolutePositionConversionFactor: float
+  telemetryName: str
 
 @dataclass(frozen=True, slots=True)
 class LimitPositionControlModuleConfig:
-  baseKey: str
-  motorCANId: int
-  isInverted: bool
-  constants: LimitPositionControlModuleConstants
-
-@dataclass(frozen=True, slots=True)
-class VelocityControlModuleConstants:
-  motorControllerType: SparkLowLevel.SparkModel
+  id: int
+  controllerType: SparkLowLevel.SparkModel
   motorType: SparkLowLevel.MotorType
-  motorCurrentLimit: int
-  motorPID: PID
-  motorOutputRange: Range
-  motorFeedForwardGains: FeedForwardGains
-  motorMotionCruiseVelocity: units.revolutions_per_minute
-  motorMotionMaxAcceleration: units.units_per_second
+  currentLimit: int
+  isInverted: bool
+  outputRange: Range
+  telemetryName: str
 
 @dataclass(frozen=True, slots=True)
 class VelocityControlModuleConfig:
-  baseKey: str
-  motorCANId: int
-  isInverted: bool
-  constants: VelocityControlModuleConstants
-
-@dataclass(frozen=True, slots=True)
-class SpeedModuleConstants:
-  motorControllerType: SparkLowLevel.SparkModel
+  id: int
+  controllerType: SparkLowLevel.SparkModel
   motorType: SparkLowLevel.MotorType
-  motorCurrentLimit: int
-
-@dataclass(frozen=True, slots=True)
-class SpeedModuleConfig:
-  baseKey: str
-  motorCANId: int
+  currentLimit: int
   isInverted: bool
-  constants: SpeedModuleConstants
+  controlPID: PID
+  outputRange: Range
+  feedForwardGains: FeedForwardGains
+  cruiseVelocity: units.revolutions_per_minute
+  maxAcceleration: units.units_per_second
+  allowedProfileError: float
+  telemetryName: str
 
 @dataclass(frozen=True, slots=True)
-class FollowerModuleConstants:
-  motorControllerType: SparkLowLevel.SparkModel
+class SpeedControlModuleConfig:
+  id: int
+  controllerType: SparkLowLevel.SparkModel
   motorType: SparkLowLevel.MotorType
-  motorCurrentLimit: int
+  currentLimit: int
+  isInverted: bool
+  telemetryName: str
 
 @dataclass(frozen=True, slots=True)
-class FollowerModuleConfig:
-  baseKey: str
-  motorCANId: int
-  leaderMotorCANId: int
+class FollowerControlModuleConfig:
+  id: int
+  leaderId: int
+  controllerType: SparkLowLevel.SparkModel
+  motorType: SparkLowLevel.MotorType
+  currentLimit: int
   isInverted: bool
-  constants: FollowerModuleConstants
+  telemetryName: str
+
+@dataclass(frozen=True, slots=True)
+class XboxControllerConfig:
+  port: int
+  inputDeadband: units.percent
+  telemetryName: str
 
 @dataclass(frozen=True, slots=True)
 class ButtonControllerConfig:
-  name: str
   channel: int
+  telemetryName: str
 
 @dataclass(frozen=True, slots=True)
 class BinarySensorConfig:
-  name: str
   channel: int
+  telemetryName: str
 
 @dataclass(frozen=True, slots=True)
 class DistanceSensorConfig:
-  name: str
   channel: int
   pulseWidthConversionFactor: float
   minTargetDistance: units.millimeters
   maxTargetDistance: units.millimeters
+  telemetryName: str
 
 @dataclass(frozen=True, slots=True)
 class PoseSensorConfig:
-  name: str
+  cameraName: str
   transform: Transform3d
   stream: str
   aprilTagFieldLayout: AprilTagFieldLayout
+  telemetryName: str
 
 class PoseSensorResultType(Enum):
   SINGLE_TAG = auto()
@@ -318,10 +302,11 @@ class PoseSensorResult:
 
 @dataclass(frozen=True, slots=True)
 class ObjectSensorConfig:
-  name: str
+  cameraName: str
   transform: Transform3d
   stream: str
   objectHeight: units.meters
+  telemetryName: str
 
 @dataclass(frozen=True, slots=True)
 class Objects:
@@ -330,14 +315,14 @@ class Objects:
 
 @dataclass(frozen=True, slots=True)
 class HeadingAlignmentConstants:
-  rotationPID: PID
+  rotationControlPID: PID
   rotationPositionTolerance: units.degrees
 
 @dataclass(frozen=True, slots=True)
 class PoseAlignmentConstants:
-  translationPID: PID
+  translationControlPID: PID
   translationMaxVelocity: units.meters_per_second
   translationPositionTolerance: units.meters
-  rotationPID: PID
+  rotationControlPID: PID
   rotationMaxVelocity: units.degrees_per_second
   rotationPositionTolerance: units.degrees

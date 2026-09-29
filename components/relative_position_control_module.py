@@ -1,8 +1,8 @@
-from commands2 import Command, cmd, Subsystem
 from wpimath import units
-from rev import SparkBase, SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, FeedbackSensor, ResetMode, PersistMode
-from ..classes import RelativePositionControlModuleConfig, MotorDirection, MotorIdleMode, RobotState, Value
+from commands2 import Command, cmd, Subsystem
+from rev import SparkBase, SparkBaseConfig, FeedbackSensor
 from .. import logger, telemetry, utils
+from ..classes import RelativePositionControlModuleConfig, MotorDirection, IdleMode, RobotState, Value
 
 class RelativePositionControlModule:
   def __init__(
@@ -11,47 +11,47 @@ class RelativePositionControlModule:
   ) -> None:
     self._config = config
 
-    self._baseKey = f'Robot/{self._config.baseKey}'
-
     self._isHoming: bool = False
     self._isHomed: bool = False
     self._targetPosition: float = Value.none
     self._isAtTargetPosition: bool = False
 
-    if self._config.constants.motorControllerType == SparkLowLevel.SparkModel.kSparkFlex:
-      self._motor = SparkFlex(self._config.motorCANId, self._config.constants.motorType)
-    else: 
-      self._motor = SparkMax(self._config.motorCANId, self._config.constants.motorType)
-    self._motorConfig = SparkBaseConfig()
-    (self._motorConfig
-      .smartCurrentLimit(self._config.constants.motorCurrentLimit)
+    self._controller = utils.getSparkController(config.id, config.controllerType, config.motorType)
+    sparkConfig = SparkBaseConfig()
+    (sparkConfig
+      .smartCurrentLimit(config.currentLimit)
       .setIdleMode(SparkBaseConfig.IdleMode.kBrake)
-      .inverted(self._config.isInverted))
-    (self._motorConfig.encoder
-      .positionConversionFactor(self._config.constants.motorRelativeEncoderPositionConversionFactor)
-      .velocityConversionFactor(self._config.constants.motorRelativeEncoderPositionConversionFactor / 60.0))
-    (self._motorConfig.softLimit
+      .inverted(config.isInverted)
+    )
+    (sparkConfig.encoder
+      .positionConversionFactor(config.positionConversionFactor)
+      .velocityConversionFactor(config.positionConversionFactor / 60.0)
+    )
+    (sparkConfig.softLimit
       .reverseSoftLimitEnabled(True)
-      .reverseSoftLimit(self._config.constants.motorSoftLimitReverse)
+      .reverseSoftLimit(config.softLimitReverse)
       .forwardSoftLimitEnabled(True)
-      .forwardSoftLimit(self._config.constants.motorSoftLimitForward))
-    (self._motorConfig.closedLoop
+      .forwardSoftLimit(config.softLimitForward)
+    )
+    (sparkConfig.closedLoop
       .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
-      .pid(*self._config.constants.motorPID)
-      .outputRange(*self._config.constants.motorOutputRange)
+      .pid(*config.controlPID)
+      .outputRange(*config.outputRange)
       .feedForward
-        .kS(self._config.constants.motorFeedForwardGains.static)
-        .kV(self._config.constants.motorFeedForwardGains.velocity)
-        .kA(self._config.constants.motorFeedForwardGains.acceleration)
-        .kG(self._config.constants.motorFeedForwardGains.gravity))
-    (self._motorConfig.closedLoop.maxMotion
-      .cruiseVelocity(self._config.constants.motorMotionCruiseVelocity)
-      .maxAcceleration(self._config.constants.motorMotionMaxAcceleration)
-      .allowedProfileError(self._config.constants.motorMotionAllowedProfileError))
-    utils.setSparkConfig(self._motor.configure(self._motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters))
-    self._closedLoopController = self._motor.getClosedLoopController()
-    self._relativeEncoder = self._motor.getEncoder()
-    self._relativeEncoder.setPosition(0)
+        .kS(config.feedForwardGains.static)
+        .kV(config.feedForwardGains.velocity)
+        .kA(config.feedForwardGains.acceleration)
+        .kG(config.feedForwardGains.gravity)
+    )
+    (sparkConfig.closedLoop.maxMotion
+      .cruiseVelocity(config.cruiseVelocity)
+      .maxAcceleration(config.maxAcceleration)
+      .allowedProfileError(config.allowedProfileError)
+    )
+    utils.configureSparkController(self._controller, sparkConfig)
+    self._closedLoopController = self._controller.getClosedLoopController()
+    self._encoder = self._controller.getEncoder()
+    self._encoder.setPosition(0)
 
     utils.addRobotPeriodic(self._periodic)
 
@@ -59,21 +59,21 @@ class RelativePositionControlModule:
     self._updateTelemetry()
     
   def setSpeed(self, speed: units.percent) -> None:
-    self._motor.set(-speed if self._config.isInverted else speed)
+    self._controller.set(-speed if self._config.isInverted else speed)
     if speed != 0:
       self._resetTargetPosition()
     
   def setPosition(self, position: float) -> None:
-    if position == Value.min: position = self._config.constants.motorSoftLimitReverse
-    if position == Value.max: position = self._config.constants.motorSoftLimitForward
+    if position == Value.min: position = self._config.softLimitReverse
+    if position == Value.max: position = self._config.softLimitForward
     if position != self._targetPosition:
       self._resetTargetPosition()
       self._targetPosition = position
     self._closedLoopController.setSetpoint(self._targetPosition, SparkBase.ControlType.kMAXMotionPositionControl)
-    self._isAtTargetPosition = utils.isValueWithinTolerance(self.getPosition(), self._targetPosition, self._config.constants.motorMotionAllowedProfileError)
+    self._isAtTargetPosition = utils.isValueWithinTolerance(self.getPosition(), self._targetPosition, self._config.allowedProfileError)
 
   def getPosition(self) -> float:
-    return self._relativeEncoder.getPosition()
+    return self._encoder.getPosition()
 
   def getTargetPosition(self) -> float:
     return self._targetPosition
@@ -88,15 +88,15 @@ class RelativePositionControlModule:
   def isAtSoftLimit(self, direction: MotorDirection, tolerance: float) -> bool:
     return utils.isValueWithinTolerance(
       self.getPosition(),
-      self._config.constants.motorSoftLimitReverse if direction == MotorDirection.Reverse else self._config.constants.motorSoftLimitForward, 
+      self._config.softLimitReverse if direction == MotorDirection.Reverse else self._config.softLimitForward, 
       tolerance
     )
 
   def setSoftLimitsEnabled(self, isEnabled: bool) -> None:
-    utils.setSoftLimitsEnabled(self._motor, isEnabled)
+    utils.setSoftLimitsEnabled(self._controller, isEnabled)
 
-  def setIdleMode(self, motorIdleMode: MotorIdleMode) -> None:
-    utils.setMotorIdleMode(self._motor, motorIdleMode)
+  def setIdleMode(self, idleMode: IdleMode) -> None:
+    utils.setIdleMode(self._controller, idleMode)
 
   def resetToHome(self, subsystem: Subsystem) -> Command:
     return cmd.startEnd(
@@ -108,19 +108,19 @@ class RelativePositionControlModule:
   def _startHoming(self) -> None:
     self._isHomed = False
     self._isHoming = True
-    utils.setSoftLimitsEnabled(self._motor, False)
+    utils.setSoftLimitsEnabled(self._controller, False)
     if utils.getRobotState() == RobotState.Enabled:
-      self._motor.set(-self._config.constants.motorHomingSpeed)
+      self._controller.set(-self._config.homingSpeed)
     else:
-      self.setIdleMode(MotorIdleMode.Coast)
+      self.setIdleMode(IdleMode.Coast)
 
   def _endHoming(self) -> None:
     if utils.getRobotState() == RobotState.Enabled:
-      self._motor.stopMotor()
+      self._controller.stopMotor()
     else:
-      self.setIdleMode(MotorIdleMode.Brake)
-    self._relativeEncoder.setPosition(self._config.constants.motorHomedPosition)
-    utils.setSoftLimitsEnabled(self._motor, True)
+      self.setIdleMode(IdleMode.Brake)
+    self._encoder.setPosition(self._config.homingPosition)
+    utils.setSoftLimitsEnabled(self._controller, True)
     self._isHomed = True
     self._isHoming = False
   
@@ -131,10 +131,10 @@ class RelativePositionControlModule:
     return self._isHomed
 
   def reset(self) -> None:
-    self._motor.stopMotor()
+    self._controller.stopMotor()
     self._resetTargetPosition()
 
   def _updateTelemetry(self) -> None:
-    telemetry.log(f'{self._baseKey}/RelativePosition', self._relativeEncoder.getPosition())
-    telemetry.log(f'{self._baseKey}/Velocity', self._relativeEncoder.getVelocity())
-    telemetry.log(f'{self._baseKey}/Current', self._motor.getOutputCurrent())
+    telemetry.log(f'{self._config.telemetryName}/Position', self._encoder.getPosition())
+    telemetry.log(f'{self._config.telemetryName}/Velocity', self._encoder.getVelocity())
+    telemetry.log(f'{self._config.telemetryName}/Current', self._controller.getOutputCurrent())

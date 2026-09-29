@@ -1,6 +1,6 @@
-from rev import SparkBaseConfig, SparkLowLevel, SparkMax, SparkFlex, ResetMode, PersistMode, LimitSwitchConfig
-from ..classes import LimitPositionControlModuleConfig, MotorIdleMode, Position
+from rev import SparkBaseConfig, LimitSwitchConfig
 from .. import logger, telemetry, utils
+from ..classes import LimitPositionControlModuleConfig, IdleMode, Position
 
 class LimitPositionControlModule:
   def __init__(
@@ -9,31 +9,28 @@ class LimitPositionControlModule:
   ) -> None:
     self._config = config
 
-    self._baseKey = f'Robot/{self._config.baseKey}'
-
     self._targetPosition: Position = Position.Unknown
 
-    if self._config.constants.motorControllerType == SparkLowLevel.SparkModel.kSparkFlex:
-      self._motor = SparkFlex(self._config.motorCANId, self._config.constants.motorType)
-    else: 
-      self._motor = SparkMax(self._config.motorCANId, self._config.constants.motorType)
-    self._motorConfig = SparkBaseConfig()
-    (self._motorConfig
-      .smartCurrentLimit(self._config.constants.motorCurrentLimit)
+    self._controller = utils.getSparkController(config.id, config.controllerType, config.motorType)
+    sparkConfig = SparkBaseConfig()
+    (sparkConfig
+      .smartCurrentLimit(self._config.currentLimit)
       .setIdleMode(SparkBaseConfig.IdleMode.kBrake)
-      .inverted(self._config.isInverted))
-    (self._motorConfig.softLimit
+      .inverted(self._config.isInverted)
+    )
+    (sparkConfig.softLimit
       .reverseSoftLimitEnabled(False)
-      .forwardSoftLimitEnabled(False))
-    (self._motorConfig.limitSwitch
+      .forwardSoftLimitEnabled(False)
+    )
+    (sparkConfig.limitSwitch
       .forwardLimitSwitchEnabled(True)
       .forwardLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
       .reverseLimitSwitchEnabled(True)
       .reverseLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
-     )
-    utils.setSparkConfig(self._motor.configure(self._motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters))
-    self._forwardLimitSwitch = self._motor.getForwardLimitSwitch()
-    self._reverseLimitSwitch = self._motor.getReverseLimitSwitch()
+    )
+    utils.configureSparkController(self._controller, sparkConfig)
+    self._forwardLimitSwitch = self._controller.getForwardLimitSwitch()
+    self._reverseLimitSwitch = self._controller.getReverseLimitSwitch()
 
     utils.addRobotPeriodic(self._periodic)
 
@@ -44,11 +41,11 @@ class LimitPositionControlModule:
     self._targetPosition = position
     match self._targetPosition:
       case Position.Forward:
-        self._motor.set(self._config.constants.motorOutputRange.max)
+        self._controller.set(self._config.outputRange.max)
       case Position.Backward:
-        self._motor.set(self._config.constants.motorOutputRange.min)
+        self._controller.set(self._config.outputRange.min)
       case _:
-        self._motor.stopMotor()
+        self._controller.stopMotor()
     
   def getPosition(self) -> Position:
     if self._forwardLimitSwitch.get(): return Position.Forward
@@ -62,14 +59,14 @@ class LimitPositionControlModule:
     position = self.getPosition()
     return position != Position.Unknown and position == self._targetPosition
 
-  def setIdleMode(self, motorIdleMode: MotorIdleMode) -> None:
-    utils.setMotorIdleMode(self._motor, motorIdleMode)
+  def setIdleMode(self, idleMode: IdleMode) -> None:
+    utils.setIdleMode(self._controller, idleMode)
 
   def reset(self) -> None:
-    self._motor.stopMotor()
+    self._controller.stopMotor()
 
   def _updateTelemetry(self) -> None:
-    telemetry.log(f'{self._baseKey}/Position', self.getPosition().name)
-    telemetry.log(f'{self._baseKey}/LimitSwitchForward', self._forwardLimitSwitch.get())
-    telemetry.log(f'{self._baseKey}/LimitSwitchReverse', self._reverseLimitSwitch.get())
-    telemetry.log(f'{self._baseKey}/Current', self._motor.getOutputCurrent())
+    telemetry.log(f'{self._config.telemetryName}/Position', self.getPosition().name)
+    telemetry.log(f'{self._config.telemetryName}/LimitSwitchForward', self._forwardLimitSwitch.get())
+    telemetry.log(f'{self._config.telemetryName}/LimitSwitchReverse', self._reverseLimitSwitch.get())
+    telemetry.log(f'{self._config.telemetryName}/Current', self._controller.getOutputCurrent())

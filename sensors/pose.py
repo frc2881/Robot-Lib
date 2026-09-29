@@ -11,18 +11,16 @@ class PoseSensor:
       config: PoseSensorConfig
     ) -> None:
     self._config = config
-    self._baseKey = f'Robot/Sensors/Pose/{config.name}'
 
-    self._photonCamera = PhotonCamera(config.name)
+    self._photonCamera = PhotonCamera(config.cameraName)
     self._photonCamera.setDriverMode(False)
     self._photonPoseEstimator = PhotonPoseEstimator(
       config.aprilTagFieldLayout, 
       config.transform
     )
-
-    telemetry.log(f'{self._baseKey}/Stream', config.stream)
-
     self._photonCamera.getAllUnreadResults()
+
+    telemetry.log(f'{self._config.telemetryName}/{self._config.cameraName}/Stream', config.stream)
 
     utils.addRobotPeriodic(self._periodic)
 
@@ -74,5 +72,5 @@ class PoseSensor:
     return self._photonCamera._cameraTable.getBoolean("hasTarget", False)
   
   def _updateTelemetry(self) -> None:
-    telemetry.log(f'{self._baseKey}/IsConnected', self.isConnected())
-    telemetry.log(f'{self._baseKey}/HasTarget', self.hasTarget())
+    telemetry.log(f'{self._config.telemetryName}/{self._config.cameraName}/IsConnected', self.isConnected())
+    telemetry.log(f'{self._config.telemetryName}/{self._config.cameraName}/HasTarget', self.hasTarget())
