@@ -1,24 +1,18 @@
 from typing import Any
-import math
-from wpilib import Timer, DriverStation, RobotController
+from wpilib import DriverStation, RobotController
 from ntcore import NetworkTableInstance, StructPublisher, StructArrayPublisher
 from . import logger, utils
 
 _publishers: dict[str, StructPublisher | StructArrayPublisher] = {}
 
 def start() -> None:
-  _updateTimingInfo()
   _updateRobotInfo()
   _updateGameMatchInfo()
-  utils.addRobotPeriodic(_updateTimingInfo, 0.1, 0.25)
-  utils.addRobotPeriodic(_updateRobotInfo, 0.2, 0.50)
-  utils.addRobotPeriodic(_updateGameMatchInfo, 1.0, 0.75)
-
-def _updateTimingInfo() -> None:
-  log("Robot/Status/Time", Timer.getFPGATimestamp())
-  log("Match/Time",  math.floor(DriverStation.getMatchTime()))
+  utils.addRobotPeriodic(_updateRobotInfo, 0.1, 0.25)
+  utils.addRobotPeriodic(_updateGameMatchInfo, 3.0, 0.50)
 
 def _updateRobotInfo() -> None:
+  log("Robot/Status/Time", utils.getRobotTime())
   log("Robot/Status/Mode", utils.getRobotMode().name)
   log("Robot/Status/State", utils.getRobotState().name)
   log("Robot/Power/Battery/Voltage", RobotController.getBatteryVoltage())

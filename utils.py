@@ -50,7 +50,7 @@ def getValueForAlliance(blueValue: T, redValue: T) -> T:
   return blueValue if getAlliance() == Alliance.Blue else redValue
 
 def getMatchTime() -> units.seconds:
-  return wpilib.DriverStation.getMatchTime()
+  return math.floor(wpilib.DriverStation.getMatchTime())
 
 def isValueWithinRange(value: float, minValue: float, maxValue: float) -> bool:
   return value >= minValue and value <= maxValue
