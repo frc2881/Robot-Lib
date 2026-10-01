@@ -8,79 +8,79 @@ from robotpy_apriltag import AprilTagFieldLayout
 from rev import SparkLowLevel, AbsoluteEncoderConfig
 
 class Alliance(IntEnum):
-  Red = 0
-  Blue = 1
+  RED = 0
+  BLUE = 1
 
 class RobotMode(Enum):
-  Disabled = auto()
-  Auto = auto()
-  Teleop = auto()
-  Test = auto()
+  DISABLED = auto()
+  AUTO = auto()
+  TELEOP = auto()
+  TEST = auto()
 
 class RobotState(Enum):
-  Disabled = auto()
-  Enabled = auto()
-  EStopped = auto()
+  DISABLED = auto()
+  ENABLED = auto()
+  ESTOPPED = auto()
 
 class RobotType(Enum):
-  Other = auto()
-  Competition = auto()
-  Practice = auto()
-  Demo = auto()
+  OTHER = auto()
+  COMPETITION = auto()
+  PRACTICE = auto()
+  DEMO = auto()
 
 class State(Enum):
-  Disabled = auto()
-  Enabled = auto()
-  Stopped = auto()
-  Running = auto()
-  Completed = auto()
+  DISABLED = auto()
+  ENABLED = auto()
+  STOPPED = auto()
+  RUNNING = auto()
+  COMPLETED = auto()
 
 class Position(Enum):
-  Unknown = auto()
-  Default = auto()
-  Up = auto()
-  Down = auto()
-  Left = auto()
-  Right = auto()
-  Front = auto()
-  Rear = auto()
-  Top = auto()
-  Bottom = auto()
-  Center = auto()
-  Open = auto()
-  Closed = auto()
-  In = auto()
-  Out = auto()
-  Unlocked = auto()
-  Locked = auto()
-  Forward = auto()
-  Backward = auto()
+  UNKNOWN = auto()
+  DEFAULT = auto()
+  UP = auto()
+  DOWN = auto()
+  LEFT = auto()
+  RIGHT = auto()
+  FRONT = auto()
+  REAR = auto()
+  TOP = auto()
+  BOTTOM = auto()
+  CENTER = auto()
+  OPEN = auto()
+  CLOSED = auto()
+  IN = auto()
+  OUT = auto()
+  UNLOCKED = auto()
+  LOCKED = auto()
+  FORWARD = auto()
+  BACKWARD = auto()
 
 class MotorDirection(Enum):
-  Forward = auto()
-  Reverse = auto()
-  Stop = auto()
+  FORWARD = auto()
+  REVERSE = auto()
+  STOP = auto()
 
 class IdleMode(Enum):
-  Brake = auto()
-  Coast = auto()
+  BRAKE = auto()
+  COAST = auto()
 
 class DriveOrientation(Enum):
-  Field = auto()
-  Robot = auto()
+  FIELD = auto()
+  ROBOT = auto()
 
 class SpeedMode(Enum):
-  Competition = auto()
-  Demo = auto()
+  COMPETITION = auto()
+  DEMO = auto()
 
 class ControllerRumbleMode(Enum):
-  Both = auto()
-  Driver = auto()
-  Operator = auto()
+  BOTH = auto()
+  DRIVER = auto()
+  OPERATOR = auto()
 
 class ControllerRumblePattern(Enum):
-  Short = auto()
-  Long = auto()
+  SHORT = auto()
+  LONG = auto()
 
 @dataclass(frozen=True, slots=True)
 class Value(float):
@@ -105,24 +105,24 @@ class FeedForwardGains(NamedTuple):
 
 class MotorModel(Enum):
   NEO = auto()
-  NEOVortex = auto()
-  NEO550 = auto()
+  NEO_VORTEX = auto()
+  NEO_550 = auto()
 
 class SwerveDriveModuleGearKit(Enum):
-  Low = auto()
-  Medium = auto()
-  High = auto()
-  ExtraHigh1 = auto()
-  ExtraHigh2 = auto()
-  ExtraHigh3 = auto()
-  ExtraHigh4 = auto()
-  ExtraHigh5 = auto()
+  LOW = auto()
+  MEDIUM = auto()
+  HIGH = auto()
+  EXTRA_HIGH_1 = auto()
+  EXTRA_HIGH_2 = auto()
+  EXTRA_HIGH_3 = auto()
+  EXTRA_HIGH_4 = auto()
+  EXTRA_HIGH_5 = auto()
 
 class SwerveDriveModuleLocation(IntEnum):
-  FrontLeft = 0
-  FrontRight = 1
-  RearLeft = 2
-  RearRight = 3
+  FRONT_LEFT = 0
+  FRONT_RIGHT = 1
+  REAR_LEFT = 2
+  REAR_RIGHT = 3
 
 @dataclass(frozen=True, slots=True)
 class SwerveDriveModuleConfig:
@@ -148,8 +148,8 @@ class SwerveDriveModuleConfigConstants:
   telemetryName: str
 
 class DifferentialDriveModuleLocation(IntEnum):
-  Left = 0
-  Right = 1
+  LEFT = 0
+  RIGHT = 1
 
 class DifferentialDriveModulePositions(NamedTuple):
   left: units.meters

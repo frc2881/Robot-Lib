@@ -24,30 +24,30 @@ def getRobotTime() -> units.seconds:
   return wpilib.Timer.getTimestamp()
 
 def getRobotState() -> RobotState:
-  if wpilib.RobotState.isEnabled(): return RobotState.Enabled
-  elif wpilib.RobotState.isEStopped(): return RobotState.EStopped
-  else: return RobotState.Disabled
+  if wpilib.RobotState.isEnabled(): return RobotState.ENABLED
+  elif wpilib.RobotState.isEStopped(): return RobotState.ESTOPPED
+  else: return RobotState.DISABLED
 
 def getRobotMode() -> RobotMode:
-  if wpilib.RobotState.isTeleop(): return RobotMode.Teleop
-  elif wpilib.RobotState.isAutonomous(): return RobotMode.Auto
-  elif wpilib.RobotState.isTest(): return RobotMode.Test
-  else: return RobotMode.Disabled
+  if wpilib.RobotState.isTeleop(): return RobotMode.TELEOP
+  elif wpilib.RobotState.isAutonomous(): return RobotMode.AUTO
+  elif wpilib.RobotState.isTest(): return RobotMode.TEST
+  else: return RobotMode.DISABLED
 
 def getValueForRobotMode(autoValue: T, teleopValue: T) -> T:
-  return autoValue if getRobotMode() == RobotMode.Auto else teleopValue 
+  return autoValue if getRobotMode() == RobotMode.AUTO else teleopValue 
 
 def isAutonomousMode() -> bool:
-  return getRobotMode() == RobotMode.Auto
+  return getRobotMode() == RobotMode.AUTO
 
 def isCompetitionMode() -> bool:
   return wpilib.DriverStation.isFMSAttached()
 
 def getAlliance() -> Alliance:
-  return Alliance(wpilib.DriverStation.getAlliance() or Alliance.Blue)
+  return Alliance.RED if wpilib.DriverStation.getAlliance() == 1 else Alliance.BLUE
 
 def getValueForAlliance(blueValue: T, redValue: T) -> T:
-  return blueValue if getAlliance() == Alliance.Blue else redValue
+  return blueValue if getAlliance() == Alliance.BLUE else redValue
 
 def getMatchTime() -> units.seconds:
   return math.floor(wpilib.DriverStation.getMatchTime())
@@ -125,7 +125,7 @@ def setSoftLimitsEnabled(controller: SparkBase, enabled: bool) -> None:
 
 def setIdleMode(controller: SparkBase, idleMode: IdleMode) -> None:
   sparkConfig = SparkBaseConfig()
-  sparkConfig.setIdleMode(SparkBaseConfig.IdleMode.kCoast if idleMode == IdleMode.Coast else SparkBaseConfig.IdleMode.kBrake)
+  sparkConfig.setIdleMode(SparkBaseConfig.IdleMode.kCoast if idleMode == IdleMode.COAST else SparkBaseConfig.IdleMode.kBrake)
   configureSparkController(controller, sparkConfig, isPersisted = False)
 
 def toJson(value: Any) -> str:

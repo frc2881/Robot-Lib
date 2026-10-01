@@ -46,11 +46,11 @@ class XboxController(CommandXboxController):
   def rumble(self, pattern: ControllerRumblePattern) -> Command:
     return cmd.select(
       {
-        ControllerRumblePattern.Short: cmd.startEnd(
+        ControllerRumblePattern.SHORT: cmd.startEnd(
           lambda: self.getHID().setRumble(GenericHID.RumbleType.kRightRumble, 1),
           lambda: self.getHID().setRumble(GenericHID.RumbleType.kRightRumble, 0)
         ).withTimeout(0.5),
-        ControllerRumblePattern.Long: cmd.startEnd(
+        ControllerRumblePattern.LONG: cmd.startEnd(
           lambda: self.getHID().setRumble(GenericHID.RumbleType.kRightRumble, 1),
           lambda: self.getHID().setRumble(GenericHID.RumbleType.kRightRumble, 0)
         ).withTimeout(1.0)

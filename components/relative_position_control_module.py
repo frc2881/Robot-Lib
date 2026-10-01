@@ -88,7 +88,7 @@ class RelativePositionControlModule:
   def isAtSoftLimit(self, direction: MotorDirection, tolerance: float) -> bool:
     return utils.isValueWithinTolerance(
       self.getPosition(),
-      self._config.softLimitReverse if direction == MotorDirection.Reverse else self._config.softLimitForward, 
+      self._config.softLimitReverse if direction == MotorDirection.REVERSE else self._config.softLimitForward, 
       tolerance
     )
 
@@ -109,16 +109,16 @@ class RelativePositionControlModule:
     self._isHomed = False
     self._isHoming = True
     utils.setSoftLimitsEnabled(self._controller, False)
-    if utils.getRobotState() == RobotState.Enabled:
+    if utils.getRobotState() == RobotState.ENABLED:
       self._controller.set(-self._config.homingSpeed)
     else:
-      self.setIdleMode(IdleMode.Coast)
+      self.setIdleMode(IdleMode.COAST)
 
   def _endHoming(self) -> None:
-    if utils.getRobotState() == RobotState.Enabled:
+    if utils.getRobotState() == RobotState.ENABLED:
       self._controller.stopMotor()
     else:
-      self.setIdleMode(IdleMode.Brake)
+      self.setIdleMode(IdleMode.BRAKE)
     self._encoder.setPosition(self._config.homingPosition)
     utils.setSoftLimitsEnabled(self._controller, True)
     self._isHomed = True

@@ -9,7 +9,7 @@ class LimitPositionControlModule:
   ) -> None:
     self._config = config
 
-    self._targetPosition: Position = Position.Unknown
+    self._targetPosition: Position = Position.UNKNOWN
 
     self._controller = utils.getSparkController(config.id, config.controllerType, config.motorType)
     sparkConfig = SparkBaseConfig()
@@ -40,24 +40,24 @@ class LimitPositionControlModule:
   def setPosition(self, position: Position) -> None:
     self._targetPosition = position
     match self._targetPosition:
-      case Position.Forward:
+      case Position.FORWARD:
         self._controller.set(self._config.outputRange.max)
-      case Position.Backward:
+      case Position.BACKWARD:
         self._controller.set(self._config.outputRange.min)
       case _:
         self._controller.stopMotor()
     
   def getPosition(self) -> Position:
-    if self._forwardLimitSwitch.get(): return Position.Forward
-    if self._reverseLimitSwitch.get(): return Position.Backward
-    return Position.Unknown
+    if self._forwardLimitSwitch.get(): return Position.FORWARD
+    if self._reverseLimitSwitch.get(): return Position.BACKWARD
+    return Position.UNKNOWN
 
   def getTargetPosition(self) -> Position:
     return self._targetPosition
 
   def isAtTargetPosition(self) -> bool:
     position = self.getPosition()
-    return position != Position.Unknown and position == self._targetPosition
+    return position != Position.UNKNOWN and position == self._targetPosition
 
   def setIdleMode(self, idleMode: IdleMode) -> None:
     utils.setIdleMode(self._controller, idleMode)

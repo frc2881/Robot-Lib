@@ -37,7 +37,7 @@ class Gyro():
     self._reset(utils.wrapAngle(robotPose.rotation().degrees() + utils.getValueForAlliance(0.0, 180.0)))
 
   def reset(self) -> Command:
-    return cmd.runOnce(self._reset).withName("GyroSensor:Reset")
+    return cmd.runOnce(self._reset).withName("Gyro:Reset")
   
   def isConnected(self) -> bool:
     uuid = self._gyro.getSensorUUID()
