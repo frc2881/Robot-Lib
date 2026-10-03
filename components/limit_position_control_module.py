@@ -23,10 +23,10 @@ class LimitPositionControlModule:
       .forwardSoftLimitEnabled(False)
     )
     (sparkConfig.limitSwitch
-      .forwardLimitSwitchEnabled(True)
       .forwardLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
-      .reverseLimitSwitchEnabled(True)
+      .forwardLimitSwitchEnabled(True)
       .reverseLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
+      .reverseLimitSwitchEnabled(True)
     )
     utils.configureSparkController(self._controller, sparkConfig)
     self._forwardLimitSwitch = self._controller.getForwardLimitSwitch()

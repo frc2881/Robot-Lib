@@ -28,10 +28,10 @@ class RelativePositionControlModule:
       .velocityConversionFactor(config.positionConversionFactor / 60.0)
     )
     (sparkConfig.softLimit
-      .reverseSoftLimitEnabled(True)
-      .reverseSoftLimit(config.softLimitReverse)
-      .forwardSoftLimitEnabled(True)
       .forwardSoftLimit(config.softLimitForward)
+      .forwardSoftLimitEnabled(True)
+      .reverseSoftLimit(config.softLimitReverse)
+      .reverseSoftLimitEnabled(True)
     )
     (sparkConfig.closedLoop
       .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
