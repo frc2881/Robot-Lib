@@ -9,7 +9,7 @@ def start() -> None:
   _updateRobotInfo()
   _updateGameMatchInfo()
   utils.addRobotPeriodic(_updateRobotInfo, 0.1, 0.25)
-  utils.addRobotPeriodic(_updateGameMatchInfo, 3.0, 0.50)
+  utils.addRobotPeriodic(_updateGameMatchInfo, 2.0, 0.50)
 
 def _updateRobotInfo() -> None:
   log("Robot/Status/Time", utils.getRobotTime())

@@ -44,7 +44,7 @@ def isCompetitionMode() -> bool:
   return wpilib.DriverStation.isFMSAttached()
 
 def getAlliance() -> Alliance:
-  return Alliance.RED if wpilib.DriverStation.getAlliance() == 1 else Alliance.BLUE
+  return Alliance.RED if wpilib.DriverStation.getAlliance() == 0 else Alliance.BLUE
 
 def getValueForAlliance(blueValue: T, redValue: T) -> T:
   return blueValue if getAlliance() == Alliance.BLUE else redValue
