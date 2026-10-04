@@ -215,7 +215,6 @@ class LimitPositionControlModuleConfig(ControlModuleConfigBase):
 @dataclass(frozen=True, slots=True)
 class VelocityControlModuleConfig(ControlModuleConfigBase):
   controlPID: PID
-  outputRange: Range
   feedForwardGains: FeedForwardGains
   cruiseVelocity: units.revolutions_per_minute
   maxAcceleration: units.units_per_second

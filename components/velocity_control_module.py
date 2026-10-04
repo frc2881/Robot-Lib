@@ -26,7 +26,7 @@ class VelocityControlModule:
     (sparkConfig.closedLoop
       .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
       .pid(*self._config.controlPID)
-      .outputRange(*self._config.outputRange)
+      .outputRange(-1.0, 1.0)
       .feedForward
         .kS(self._config.feedForwardGains.static)
         .kV(self._config.feedForwardGains.velocity)
