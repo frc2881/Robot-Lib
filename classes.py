@@ -173,12 +173,16 @@ class DifferentialDriveModuleConfigConstants:
   telemetryName: str
 
 @dataclass(frozen=True, slots=True)
-class RelativePositionControlModuleConfig:
+class ControlModuleConfigBase:
   id: int
   controllerType: SparkLowLevel.SparkModel
   motorType: SparkLowLevel.MotorType
   currentLimit: int
   isInverted: bool
+  telemetryName: str
+
+@dataclass(frozen=True, slots=True)
+class RelativePositionControlModuleConfig(ControlModuleConfigBase):
   softLimitReverse: float
   softLimitForward: float
   controlPID: PID
@@ -190,15 +194,9 @@ class RelativePositionControlModuleConfig:
   homingPosition: float
   homingSpeed: units.percent
   positionConversionFactor: float
-  telemetryName: str
 
 @dataclass(frozen=True, slots=True)
-class AbsolutePositionControlModuleConfig:
-  id: int
-  controllerType: SparkLowLevel.SparkModel
-  motorType: SparkLowLevel.MotorType
-  currentLimit: int
-  isInverted: bool
+class AbsolutePositionControlModuleConfig(ControlModuleConfigBase):
   softLimitReverse: float
   softLimitForward: float
   controlPID: PID
@@ -209,51 +207,27 @@ class AbsolutePositionControlModuleConfig:
   allowedProfileError: float
   relativePositionConversionFactor: float
   absolutePositionConversionFactor: float
-  telemetryName: str
 
 @dataclass(frozen=True, slots=True)
-class LimitPositionControlModuleConfig:
-  id: int
-  controllerType: SparkLowLevel.SparkModel
-  motorType: SparkLowLevel.MotorType
-  currentLimit: int
-  isInverted: bool
+class LimitPositionControlModuleConfig(ControlModuleConfigBase):
   outputRange: Range
-  telemetryName: str
 
 @dataclass(frozen=True, slots=True)
-class VelocityControlModuleConfig:
-  id: int
-  controllerType: SparkLowLevel.SparkModel
-  motorType: SparkLowLevel.MotorType
-  currentLimit: int
-  isInverted: bool
+class VelocityControlModuleConfig(ControlModuleConfigBase):
   controlPID: PID
   outputRange: Range
   feedForwardGains: FeedForwardGains
   cruiseVelocity: units.revolutions_per_minute
   maxAcceleration: units.units_per_second
   allowedProfileError: float
-  telemetryName: str
 
 @dataclass(frozen=True, slots=True)
-class SpeedControlModuleConfig:
-  id: int
-  controllerType: SparkLowLevel.SparkModel
-  motorType: SparkLowLevel.MotorType
-  currentLimit: int
-  isInverted: bool
-  telemetryName: str
+class SpeedControlModuleConfig(ControlModuleConfigBase):
+  pass
 
 @dataclass(frozen=True, slots=True)
-class FollowerControlModuleConfig:
-  id: int
+class FollowerControlModuleConfig(ControlModuleConfigBase):
   leaderId: int
-  controllerType: SparkLowLevel.SparkModel
-  motorType: SparkLowLevel.MotorType
-  currentLimit: int
-  isInverted: bool
-  telemetryName: str
 
 @dataclass(frozen=True, slots=True)
 class XboxControllerConfig:
