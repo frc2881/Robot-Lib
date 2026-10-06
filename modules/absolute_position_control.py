@@ -87,11 +87,11 @@ class AbsolutePositionControlModule:
     self._targetPosition = Value.none
     self._isAtTargetPosition = False
 
-  def isAtSoftLimit(self, direction: MotorDirection, tolerance: float) -> bool:
-    return utils.isValueWithinTolerance(
-      self.getPosition(),
-      self._config.softLimitReverse if direction == MotorDirection.REVERSE else self._config.softLimitForward, 
-      tolerance
+  def isAtSoftLimit(self, direction: MotorDirection) -> bool:
+    return (
+      self._controller.getReverseSoftLimit().isReached()
+      if direction == MotorDirection.REVERSE else
+      self._controller.getForwardSoftLimit().isReached()
     )
   
   def setSoftLimitsEnabled(self, isEnabled: bool) -> None:

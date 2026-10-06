@@ -23,6 +23,10 @@ class DifferentialDriveModule:
       .positionConversionFactor(drivingPositionConversionFactor)
       .velocityConversionFactor(drivingPositionConversionFactor / 60.0)
     )
+    (sparkConfig.softLimit
+      .reverseSoftLimitEnabled(False)
+      .forwardSoftLimitEnabled(False)
+    )
     if config.leaderId is not None:
       sparkConfig.follow(config.leaderId)
     utils.configureSparkController(self._controller, sparkConfig)

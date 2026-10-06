@@ -28,6 +28,10 @@ class SwerveDriveModule:
       .positionConversionFactor(drivingPositionConversionFactor)
       .velocityConversionFactor(drivingPositionConversionFactor / 60.0)
     )
+    (drivingSparkConfig.softLimit
+      .reverseSoftLimitEnabled(False)
+      .forwardSoftLimitEnabled(False)
+    )
     (drivingSparkConfig.closedLoop
       .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
       .pid(*config.constants.drivingControlPID)
@@ -50,6 +54,10 @@ class SwerveDriveModule:
       .positionConversionFactor(turningPositionConversionFactor)
       .velocityConversionFactor(turningPositionConversionFactor / 60.0)
       .apply(config.constants.turningEncoderConfig)
+    )
+    (turningSparkConfig.softLimit
+      .reverseSoftLimitEnabled(False)
+      .forwardSoftLimitEnabled(False)
     )
     (turningSparkConfig.closedLoop
       .setFeedbackSensor(FeedbackSensor.kAbsoluteEncoder)

@@ -28,10 +28,10 @@ class RelativePositionControlModule:
       .velocityConversionFactor(config.positionConversionFactor / 60.0)
     )
     (sparkConfig.softLimit
-      .forwardSoftLimit(config.softLimitForward)
-      .forwardSoftLimitEnabled(True)
       .reverseSoftLimit(config.softLimitReverse)
       .reverseSoftLimitEnabled(True)
+      .forwardSoftLimit(config.softLimitForward)
+      .forwardSoftLimitEnabled(True)
     )
     (sparkConfig.closedLoop
       .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
@@ -85,13 +85,13 @@ class RelativePositionControlModule:
     self._targetPosition = Value.none
     self._isAtTargetPosition = False
 
-  def isAtSoftLimit(self, direction: MotorDirection, tolerance: float) -> bool:
-    return utils.isValueWithinTolerance(
-      self.getPosition(),
-      self._config.softLimitReverse if direction == MotorDirection.REVERSE else self._config.softLimitForward, 
-      tolerance
+  def isAtSoftLimit(self, direction: MotorDirection) -> bool:
+    return (
+      self._controller.getReverseSoftLimit().isReached()
+      if direction == MotorDirection.REVERSE else
+      self._controller.getForwardSoftLimit().isReached()
     )
-
+  
   def setSoftLimitsEnabled(self, isEnabled: bool) -> None:
     utils.setSoftLimitsEnabled(self._controller, isEnabled)
 

@@ -18,15 +18,19 @@ class LimitPositionControlModule:
       .setIdleMode(SparkBaseConfig.IdleMode.kBrake)
       .inverted(self._config.isInverted)
     )
+    (sparkConfig.encoder
+      .positionConversionFactor(1.0)
+      .velocityConversionFactor(1.0)
+    )
     (sparkConfig.softLimit
       .reverseSoftLimitEnabled(False)
       .forwardSoftLimitEnabled(False)
     )
     (sparkConfig.limitSwitch
-      .forwardLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
-      .forwardLimitSwitchEnabled(True)
       .reverseLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
       .reverseLimitSwitchEnabled(True)
+      .forwardLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
+      .forwardLimitSwitchEnabled(True)
     )
     utils.configureSparkController(self._controller, sparkConfig)
     self._forwardLimitSwitch = self._controller.getForwardLimitSwitch()

@@ -229,6 +229,18 @@ class FollowerControlModuleConfig(ControlModuleConfigBase):
   leaderId: int
 
 @dataclass(frozen=True, slots=True)
+class CatapultModuleConfig(ControlModuleConfigBase):
+  controlPID: PID
+  feedForwardGains: FeedForwardGains
+  cruiseVelocity: units.revolutions_per_minute
+  maxAcceleration: units.units_per_second
+  allowedProfileError: float
+  homingSpeed: units.percent
+  resetSpeed: units.percent
+  holdSpeed: units.percent
+  launchPosition: float
+
+@dataclass(frozen=True, slots=True)
 class XboxControllerConfig:
   port: int
   inputDeadband: units.percent

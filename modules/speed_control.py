@@ -21,6 +21,10 @@ class SpeedControlModule:
       .positionConversionFactor(1.0)
       .velocityConversionFactor(1.0)
     )
+    (sparkConfig.softLimit
+      .reverseSoftLimitEnabled(False)
+      .forwardSoftLimitEnabled(False)
+    )
     utils.configureSparkController(self._controller, sparkConfig)
     self._encoder = self._controller.getEncoder()
     self._encoder.setPosition(0)
