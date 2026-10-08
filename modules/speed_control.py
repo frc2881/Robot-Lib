@@ -40,6 +40,9 @@ class SpeedControlModule:
   def getSpeed(self) -> units.percent:
     return self._controller.get()
 
+  def getOutputCurrent(self) -> units.amperes:
+    return self._controller.getOutputCurrent()
+
   def setIdleMode(self, idleMode: IdleMode) -> None:
     utils.setIdleMode(self._controller, idleMode)
 

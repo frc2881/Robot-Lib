@@ -68,6 +68,9 @@ class VelocityControlModule:
   def _resetTargetSpeed(self) -> None:
     self._targetSpeed = 0
 
+  def getOutputCurrent(self) -> units.amperes:
+    return self._controller.getOutputCurrent()
+
   def setIdleMode(self, idleMode: IdleMode) -> None:
     utils.setIdleMode(self._controller, idleMode)
 
