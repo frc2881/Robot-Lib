@@ -265,6 +265,12 @@ class DistanceSensorConfig:
   telemetryName: str
 
 @dataclass(frozen=True, slots=True)
+class CurrentSensorConfig:
+  targetCurrent: units.amperes
+  changeTime: units.seconds
+  telemetryName: str
+
+@dataclass(frozen=True, slots=True)
 class PoseSensorConfig:
   cameraName: str
   transform: Transform3d
