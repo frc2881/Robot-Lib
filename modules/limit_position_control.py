@@ -28,8 +28,10 @@ class LimitPositionControlModule:
     )
     (sparkConfig.limitSwitch
       .reverseLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
+      .reverseLimitSwitchTriggerBehavior(LimitSwitchConfig.Behavior.kStopMovingMotor)
       .reverseLimitSwitchEnabled(True)
       .forwardLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed)
+      .forwardLimitSwitchTriggerBehavior(LimitSwitchConfig.Behavior.kStopMovingMotor)
       .forwardLimitSwitchEnabled(True)
     )
     utils.configureSparkController(self._controller, sparkConfig)
@@ -71,6 +73,6 @@ class LimitPositionControlModule:
 
   def _updateTelemetry(self) -> None:
     telemetry.log(f'{self._config.telemetryName}/Position', self.getPosition().name)
-    telemetry.log(f'{self._config.telemetryName}/LimitSwitchForward', self._forwardLimitSwitch.get())
-    telemetry.log(f'{self._config.telemetryName}/LimitSwitchReverse', self._reverseLimitSwitch.get())
+    telemetry.log(f'{self._config.telemetryName}/LimitSwitch/Forward', self._forwardLimitSwitch.get())
+    telemetry.log(f'{self._config.telemetryName}/LimitSwitch/Reverse', self._reverseLimitSwitch.get())
     telemetry.log(f'{self._config.telemetryName}/Current', self._controller.getOutputCurrent())

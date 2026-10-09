@@ -29,10 +29,10 @@ class AbsolutePositionControlModule:
       .inverted(config.isInverted)
     )
     (sparkConfig.softLimit
-      .forwardSoftLimit(config.softLimitForward)
-      .forwardSoftLimitEnabled(True)
       .reverseSoftLimit(config.softLimitReverse)
       .reverseSoftLimitEnabled(True)
+      .forwardSoftLimit(config.softLimitForward)
+      .forwardSoftLimitEnabled(True)
     )
     (sparkConfig.closedLoop
       .setFeedbackSensor(FeedbackSensor.kPrimaryEncoder)
