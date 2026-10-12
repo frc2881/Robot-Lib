@@ -11,7 +11,8 @@ class Gyro():
     ) -> None:
     self._telemetryName = "Robot/Sensors/Gyro"
     
-    self._gyro = Navx(port)
+    self._gyro = Navx(port = port)
+    self._gyro.enableOptionalMessages(True, True, True, False, False, True, False, False, False, False)
 
     self._angleAdjustment: units.degrees = 0
 

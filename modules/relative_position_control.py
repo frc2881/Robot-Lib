@@ -98,10 +98,10 @@ class RelativePositionControlModule:
   def setIdleMode(self, idleMode: IdleMode) -> None:
     utils.setIdleMode(self._controller, idleMode)
 
-  def resetToHome(self, subsystem: Subsystem) -> Command:
+  def resetToHome(self, subsystem: Subsystem, defaultIdleMode: IdleMode = IdleMode.BRAKE) -> Command:
     return cmd.startEnd(
       lambda: self._startHoming(),
-      lambda: self._endHoming(),
+      lambda: self._endHoming(defaultIdleMode),
       subsystem
     )
   
@@ -114,11 +114,11 @@ class RelativePositionControlModule:
     else:
       self.setIdleMode(IdleMode.COAST)
 
-  def _endHoming(self) -> None:
+  def _endHoming(self, defaultIdleMode: IdleMode) -> None:
     if utils.getRobotState() == RobotState.ENABLED:
       self._controller.stopMotor()
     else:
-      self.setIdleMode(IdleMode.BRAKE)
+      self.setIdleMode(defaultIdleMode)
     self._encoder.setPosition(self._config.homingPosition)
     utils.setSoftLimitsEnabled(self._controller, True)
     self._isHomed = True

@@ -1,3 +1,4 @@
+from typing import Callable
 from wpimath import units
 from commands2 import Command, cmd, Subsystem
 from rev import SparkBase, SparkBaseConfig, FeedbackSensor
@@ -56,15 +57,15 @@ class CatapultModule:
   def _periodic(self) -> None:
     self._updateTelemetry()
 
-  def launch(self, speed: units.percent, subsystem: Subsystem) -> Command:
+  def launch(self, getSpeed: Callable[[], units.percent], subsystem: Subsystem) -> Command:
     return (
-      cmd.run(lambda: self._setSpeed(speed), subsystem)
+      cmd.run(lambda: self._setSpeed(getSpeed()), subsystem)
       .until(lambda: self._controller.getForwardSoftLimit().isReached())
-      .andThen(
-        cmd.run(lambda: self._setSpeed(-self._config.resetSpeed), subsystem)
-        .until(lambda: self.isReset())
-      )
-      .finallyDo(lambda end: self._setSpeed(-self._config.holdSpeed))
+    )
+
+  def retract(self, subsystem: Subsystem) -> Command:
+    return (
+      cmd.run(lambda: self._controller.set(-self._config.retractSpeed if not self.isRetracted() else 0), subsystem)
     )
 
   def _setSpeed(self, speed: units.percent) -> None:
@@ -73,8 +74,8 @@ class CatapultModule:
   def _getSpeed(self) -> units.percent:
     return self._encoder.getVelocity() / self._config.cruiseVelocity
 
-  def isReset(self) -> bool:
-    return self._controller.getReverseSoftLimit().isReached()
+  def isRetracted(self) -> bool:
+    return utils.isValueWithinTolerance(self._encoder.getPosition(), 0, self._config.allowedProfileError)
 
   def setIdleMode(self, idleMode: IdleMode) -> None:
     utils.setIdleMode(self._controller, idleMode)

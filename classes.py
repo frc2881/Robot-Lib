@@ -236,8 +236,7 @@ class CatapultModuleConfig(ControlModuleConfigBase):
   maxAcceleration: units.units_per_second
   allowedProfileError: float
   homingSpeed: units.percent
-  resetSpeed: units.percent
-  holdSpeed: units.percent
+  retractSpeed: units.percent
   launchPosition: float
 
 @dataclass(frozen=True, slots=True)
