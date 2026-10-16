@@ -27,9 +27,9 @@ class CatapultModule:
       .velocityConversionFactor(1.0)
     )
     (sparkConfig.softLimit
-      .reverseSoftLimit(0)
+      .reverseSoftLimit(config.softLimitReverse)
       .reverseSoftLimitEnabled(True)
-      .forwardSoftLimit(self._config.launchPosition)
+      .forwardSoftLimit(config.softLimitForward)
       .forwardSoftLimitEnabled(True)
     )
     (sparkConfig.closedLoop
@@ -60,7 +60,7 @@ class CatapultModule:
   def launch(self, getSpeed: Callable[[], units.percent], subsystem: Subsystem) -> Command:
     return (
       cmd.run(lambda: self._setSpeed(getSpeed()), subsystem)
-      .until(lambda: self._controller.getForwardSoftLimit().isReached())
+      .until(lambda: self.isAtLaunchPosition())
     )
 
   def retract(self, subsystem: Subsystem) -> Command:
@@ -73,6 +73,9 @@ class CatapultModule:
 
   def _getSpeed(self) -> units.percent:
     return self._encoder.getVelocity() / self._config.cruiseVelocity
+
+  def isAtLaunchPosition(self) -> bool:
+    return utils.isValueWithinTolerance(self._encoder.getPosition(), self._config.launchPosition, 0.05)
 
   def isRetracted(self) -> bool:
     return utils.isValueWithinTolerance(self._encoder.getPosition(), 0, self._config.allowedProfileError)

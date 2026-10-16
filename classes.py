@@ -230,6 +230,8 @@ class FollowerControlModuleConfig(ControlModuleConfigBase):
 
 @dataclass(frozen=True, slots=True)
 class CatapultModuleConfig(ControlModuleConfigBase):
+  softLimitReverse: float
+  softLimitForward: float
   controlPID: PID
   feedForwardGains: FeedForwardGains
   cruiseVelocity: units.revolutions_per_minute
