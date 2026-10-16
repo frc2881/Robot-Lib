@@ -1,5 +1,4 @@
-from wpimath import units
-from wpimath.geometry import Pose2d
+from wpimath import units, Pose2d
 from commands2 import Command, cmd
 from navx import AHRS
 from .. import logger, telemetry, utils
@@ -37,7 +36,7 @@ class Gyro():
     self._reset(utils.wrapAngle(robotPose.rotation().degrees() + utils.getValueForAlliance(0.0, 180.0)))
 
   def reset(self) -> Command:
-    return cmd.runOnce(self._reset).withName("Gyro:Reset")
+    return cmd.run_once(self._reset).with_name("Gyro:Reset")
   
   def isConnected(self) -> bool:
     return self._gyro.isConnected()

@@ -1,5 +1,5 @@
 import math
-from wpilib import DigitalInput, DutyCycle
+from wpilib import DutyCycle
 from wpimath import units
 from .. import logger, telemetry, utils
 from ..classes import DistanceSensorConfig
@@ -11,7 +11,7 @@ class DistanceSensor:
     ) -> None:
     self._config = config
 
-    self._dutycycle = DutyCycle(DigitalInput(config.channel))
+    self._dutycycle = DutyCycle(config.channel)
 
     self._isTriggered: bool = False
 
@@ -21,7 +21,7 @@ class DistanceSensor:
     self._updateTelemetry()
 
   def getDistance(self) -> units.millimeters:
-    time = self._dutycycle.getHighTime() * 1000000
+    time = self._dutycycle.get_high_time() * 1000000
     distance = -1
     if time > 0 and time < 1850:
       distance = (time - 1000) * self._config.pulseWidthConversionFactor

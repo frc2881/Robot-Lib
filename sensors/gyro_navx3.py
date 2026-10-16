@@ -1,5 +1,4 @@
-from wpimath import units
-from wpimath.geometry import Pose2d
+from wpimath import units, Pose2d
 from commands2 import Command, cmd
 from navx import Navx
 from .. import logger, telemetry, utils
@@ -11,7 +10,8 @@ class Gyro():
     ) -> None:
     self._telemetryName = "Robot/Sensors/Gyro"
     
-    self._gyro = Navx(port)
+    self._gyro = Navx(port = port)
+    self._gyro.enableOptionalMessages(True, True, True, False, False, True, False, False, False, False)
 
     self._angleAdjustment: units.degrees = 0
 
@@ -37,7 +37,7 @@ class Gyro():
     self._reset(utils.wrapAngle(robotPose.rotation().degrees() + utils.getValueForAlliance(0.0, 180.0)))
 
   def reset(self) -> Command:
-    return cmd.runOnce(self._reset).withName("GyroSensor:Reset")
+    return cmd.run_once(self._reset).with_name("Gyro:Reset")
   
   def isConnected(self) -> bool:
     uuid = self._gyro.getSensorUUID()

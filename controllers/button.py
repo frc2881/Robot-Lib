@@ -18,7 +18,7 @@ class ButtonController():
     self._updateTelemetry()
 
   def _isPressed(self) -> bool:
-    return False if utils.getRobotState() != RobotState.Disabled else not self._digitalInput.get()
+    return False if utils.getRobotState() != RobotState.DISABLED else not self._digitalInput.get()
   
   def pressed(self) -> Trigger:
     return Trigger(lambda: self._isPressed())

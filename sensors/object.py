@@ -1,8 +1,7 @@
 from typing import Optional
 import math
 from wpilib import Timer
-from wpimath import units
-from wpimath.geometry import Translation2d, Rotation2d, Transform2d
+from wpimath import units, Translation2d, Rotation2d, Transform2d
 from photonlibpy.photonCamera import PhotonCamera
 from .. import logger, telemetry, utils
 from ..classes import ObjectSensorConfig, Objects
@@ -17,10 +16,10 @@ class ObjectSensor:
     self._photonCamera = PhotonCamera(config.cameraName)
     self._photonCamera.setDriverMode(False)
 
-    self._cameraTranslation = self._config.transform.translation().toTranslation2d()
-    self._cameraRotation = self._config.transform.rotation().toRotation2d()
-    self._cameraPitch = self._config.transform.rotation().Y()
-    self._cameraHeight = self._config.transform.translation().Z()
+    self._cameraTranslation = self._config.transform.translation().to_translation2d()
+    self._cameraRotation = self._config.transform.rotation().to_rotation2d()
+    self._cameraPitch = self._config.transform.rotation().y
+    self._cameraHeight = self._config.transform.translation().z
     self._targetHeightDelta = self._cameraHeight - (self._config.objectHeight / 2)
     
     self._hasTarget = False
@@ -42,13 +41,13 @@ class ObjectSensor:
         if photonPipelineResult.hasTargets():
           self._hasTarget = True
           targets = photonPipelineResult.getTargets()
-          distance = self._targetHeightDelta / math.tan(self._cameraPitch - units.degreesToRadians(targets[0].getPitch()))
-          rotation = Rotation2d().fromDegrees(targets[0].getYaw())
+          distance = self._targetHeightDelta / math.tan(self._cameraPitch - units.degrees_to_radians(targets[0].getPitch()))
+          rotation = Rotation2d().from_degrees(targets[0].getYaw())
           translation = Translation2d(rotation.cos() * distance, rotation.sin() * distance)
           objects = Objects(Transform2d(translation - self._cameraTranslation, rotation - self._cameraRotation), len(targets))
           self._pipelineResultBufferTimer.restart()
         else:
-          if self._hasTarget and self._pipelineResultBufferTimer.hasElapsed(0.1):
+          if self._hasTarget and self._pipelineResultBufferTimer.has_elapsed(0.1):
             self._hasTarget = False
     return objects
 

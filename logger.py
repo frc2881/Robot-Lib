@@ -6,16 +6,16 @@ from .classes import RobotMode
 
 def start() -> None:
   DataLogManager.start()
-  DriverStation.startDataLog(DataLogManager.getLog())
+  DriverStation.start_data_log(DataLogManager.get_log())
 
-  CommandScheduler.getInstance().onCommandInitialize(
-    lambda command: log(f'---> Command Start: {command.getName()}')
+  CommandScheduler.get_instance().on_command_initialize(
+    lambda command: log(f'---> Command Start: {command.get_name()}')
   )
-  CommandScheduler.getInstance().onCommandInterrupt(
-    lambda command: log(f'---X Command Interrupt: {command.getName()}')
+  CommandScheduler.get_instance().on_command_interrupt(
+    lambda command: log(f'---X Command Interrupt: {command.get_name()}')
   )
-  CommandScheduler.getInstance().onCommandFinish(
-    lambda command: log(f'---< Command End: {command.getName()}')
+  CommandScheduler.get_instance().on_command_finish(
+    lambda command: log(f'---< Command End: {command.get_name()}')
   )
 
   log("+++++ Robot Started +++++")
@@ -27,7 +27,7 @@ def log(message: str) -> None:
   DataLogManager.log(f'[{"%.6f" % utils.getRobotTime()}] {message}')
 
 def log_(message: str) -> Command:
-  return cmd.runOnce(lambda: log(message))
+  return cmd.run_once(lambda: log(message))
 
 def mode(mode: RobotMode) -> None:
   log(f'>>>>> Robot Mode Changed: {mode.name} <<<<<')
@@ -36,7 +36,7 @@ def debug(message: str) -> None:
   log(f'@@@@@ DEBUG: {message} @@@@@')
 
 def debug_(message: str) -> Command:
-  return cmd.runOnce(lambda: debug(message))
+  return cmd.run_once(lambda: debug(message))
 
 def error(message: str) -> None:
   log(f'!!!!! ERROR: {message} !!!!!')

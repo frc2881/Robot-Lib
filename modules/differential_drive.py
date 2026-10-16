@@ -12,22 +12,22 @@ class DifferentialDriveModule:
 
     drivingPositionConversionFactor: float = (config.constants.wheelDiameter * math.pi) / config.constants.gearReduction
 
-    self._controller = utils.getSparkController(config.id, config.constants.controllerType, config.constants.motorType)
+    self._controller = utils.getSparkController(config.port, config.id, config.constants.controllerType, config.constants.motorType)
     sparkConfig = SparkBaseConfig()
     (sparkConfig
-      .smartCurrentLimit(config.constants.currentLimit)
-      .setIdleMode(SparkBaseConfig.IdleMode.kBrake)
+      .smart_current_limit(config.constants.currentLimit)
+      .set_idle_mode(SparkBaseConfig.IdleMode.BRAKE)
       .inverted(config.isInverted)
     )
-    (sparkConfig.encoder
-      .positionConversionFactor(drivingPositionConversionFactor)
-      .velocityConversionFactor(drivingPositionConversionFactor / 60.0)
+    (sparkConfig.soft_limit
+      .reverse_soft_limit_enabled(False)
+      .forward_soft_limit_enabled(False)
     )
     if config.leaderId is not None:
       sparkConfig.follow(config.leaderId)
     utils.configureSparkController(self._controller, sparkConfig)
-    self._encoder = self._controller.getEncoder()
-    self._encoder.setPosition(0)
+    self._encoder = self._controller.get_encoder()
+    self._encoder.set_position(0)
 
     utils.addRobotPeriodic(self._periodic)
 
@@ -38,14 +38,14 @@ class DifferentialDriveModule:
     return self._controller
 
   def getPosition(self) -> float:
-    return self._encoder.getPosition()
+    return self._encoder.get_position().get()
   
   def getVelocity(self) -> float:
-    return self._encoder.getVelocity()
+    return self._encoder.get_velocity().get()
   
   def setIdleMode(self, idleMode: IdleMode) -> None:
     utils.setIdleMode(self._controller, idleMode)
 
   def _updateTelemetry(self) -> None:
-    telemetry.log(f'{self._config.constants.telemetryName}/{self._config.location.name}/Driving/Velocity', self._encoder.getVelocity())
-    telemetry.log(f'{self._config.constants.telemetryName}/{self._config.location.name}/Driving/Current', self._controller.getOutputCurrent())
+    telemetry.log(f'{self._config.constants.telemetryName}/{self._config.location.name}/Driving/Velocity', self._encoder.get_velocity().get())
+    telemetry.log(f'{self._config.constants.telemetryName}/{self._config.location.name}/Driving/Current', self._controller.get_output_current().get())

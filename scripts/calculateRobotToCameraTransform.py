@@ -1,5 +1,4 @@
-from wpimath import units
-from wpimath.geometry import Pose3d, Transform3d, Translation3d, Rotation3d, Quaternion
+from wpimath import units, Pose3d, Transform3d, Translation3d, Rotation3d, Quaternion
 
 # Use this script for empirical calculation of robot to camera transform 
 # for each pose sensor configuration using fixed target measured 
@@ -50,13 +49,13 @@ from wpimath.geometry import Pose3d, Transform3d, Translation3d, Rotation3d, Qua
 # Note: the constant values below are for example only - see the steps above for setting real/correct values.
 
 # distance from center of AprilTag to center of robot
-TARGET_TO_ROBOT_TRANSLATION_X: units.meters = units.inchesToMeters(6.375 + 51.750)
+TARGET_TO_ROBOT_TRANSLATION_X: units.meters = units.inches_to_meters(6.375 + 51.750)
 
 # distance from center of AprilTag to center of robot
-TARGET_TO_ROBOT_TRANSLATION_Y: units.meters = units.inchesToMeters(6.375 + 0)
+TARGET_TO_ROBOT_TRANSLATION_Y: units.meters = units.inches_to_meters(6.375 + 0)
 
 # distance from center of AprilTag to the floor (will be negative value as the robot is below the AprilTag)
-TARGET_TO_ROBOT_TRANSLATION_Z: units.meters = units.inchesToMeters(-34.125)
+TARGET_TO_ROBOT_TRANSLATION_Z: units.meters = units.inches_to_meters(-34.125)
 
 # rotation of the AprilTag to the robot (e.g. front of robot turned to face toward AprilTag is 180 degrees, rear of robot facing tag will be 0 degrees, sides will be -90/90 accordingly)
 TARGET_TO_ROBOT_ROTATION_YAW: units.degrees = 180.0 
@@ -74,7 +73,7 @@ TARGET_TO_CAMERA_QUATERNION_Z = -0.959
 
 targetToRobot = Transform3d(
   Translation3d(TARGET_TO_ROBOT_TRANSLATION_X, TARGET_TO_ROBOT_TRANSLATION_Y, TARGET_TO_ROBOT_TRANSLATION_Z), 
-  Rotation3d().fromDegrees(0, 0, TARGET_TO_ROBOT_ROTATION_YAW)
+  Rotation3d().from_degrees(0, 0, TARGET_TO_ROBOT_ROTATION_YAW)
 )
 
 targetToCamera = Transform3d(
@@ -82,9 +81,9 @@ targetToCamera = Transform3d(
   Rotation3d(Quaternion(TARGET_TO_CAMERA_QUATERNION_W, TARGET_TO_CAMERA_QUATERNION_X, TARGET_TO_CAMERA_QUATERNION_Y, TARGET_TO_CAMERA_QUATERNION_Z))
 )
 
-robotToCamera = Pose3d().transformBy(targetToCamera.inverse()) - Pose3d().transformBy(targetToRobot)
+robotToCamera = Pose3d().transform_by(targetToCamera.inverse()) - Pose3d().transform_by(targetToRobot)
 
 print(f'''Transform3d(
-  Translation3d(x = units.inchesToMeters({"%.2f" % round(units.metersToInches(robotToCamera.translation().X()), 2)}), y = units.inchesToMeters({"%.2f" % round(units.metersToInches(robotToCamera.translation().Y()), 2)}), z = units.inchesToMeters({"%.2f" % round(units.metersToInches(robotToCamera.translation().Z()), 2)})), 
-  Rotation3d(roll = units.degreesToRadians({"%.2f" % round(units.radiansToDegrees(robotToCamera.rotation().X()), 2)}), pitch = units.degreesToRadians({"%.2f" % round(units.radiansToDegrees(robotToCamera.rotation().Y()), 2)}), yaw = units.degreesToRadians({"%.2f" % round(units.radiansToDegrees(robotToCamera.rotation().Z()), 2)}))
+  Translation3d(x = units.inchesToMeters({"%.2f" % round(units.meters_to_inches(robotToCamera.translation().x), 2)}), y = units.inchesToMeters({"%.2f" % round(units.meters_to_inches(robotToCamera.translation().y), 2)}), z = units.inchesToMeters({"%.2f" % round(units.meters_to_inches(robotToCamera.translation().z), 2)})), 
+  Rotation3d(roll = units.degreesToRadians({"%.2f" % round(units.radians_to_degrees(robotToCamera.rotation().x), 2)}), pitch = units.degreesToRadians({"%.2f" % round(units.radians_to_degrees(robotToCamera.rotation().y), 2)}), yaw = units.degreesToRadians({"%.2f" % round(units.radians_to_degrees(robotToCamera.rotation().z), 2)}))
 )''')

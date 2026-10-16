@@ -10,20 +10,20 @@ class SpeedControlModule:
   ) -> None:
     self._config = config
 
-    self._controller = utils.getSparkController(config.id, config.controllerType, config.motorType)
+    self._controller = utils.getSparkController(config.port, config.id, config.controllerType, config.motorType)
     sparkConfig = SparkBaseConfig()
     (sparkConfig
-      .smartCurrentLimit(self._config.currentLimit)
-      .setIdleMode(SparkBaseConfig.IdleMode.kBrake)
+      .smart_current_limit(self._config.currentLimit)
+      .set_idle_mode(SparkBaseConfig.IdleMode.BRAKE)
       .inverted(self._config.isInverted)
     )
-    (sparkConfig.encoder
-      .positionConversionFactor(1.0)
-      .velocityConversionFactor(1.0)
+    (sparkConfig.soft_limit
+      .reverse_soft_limit_enabled(False)
+      .forward_soft_limit_enabled(False)
     )
     utils.configureSparkController(self._controller, sparkConfig)
-    self._encoder = self._controller.getEncoder()
-    self._encoder.setPosition(0)
+    self._encoder = self._controller.get_encoder()
+    self._encoder.set_position(0)
 
     utils.addRobotPeriodic(self._periodic)
 
@@ -31,18 +31,21 @@ class SpeedControlModule:
     self._updateTelemetry()
 
   def setSpeed(self, speed: units.percent) -> None:
-    self._controller.set(speed)
+    self._controller.set_throttle(speed)
 
   def getSpeed(self) -> units.percent:
-    return self._controller.get()
+    return self._controller.get_throttle()
+
+  def getOutputCurrent(self) -> units.amperes:
+    return self._controller.get_output_current().get()
 
   def setIdleMode(self, idleMode: IdleMode) -> None:
     utils.setIdleMode(self._controller, idleMode)
 
   def reset(self) -> None:
-    self._controller.stopMotor()
+    self._controller.stop_motor()
 
   def _updateTelemetry(self) -> None:
     telemetry.log(f'{self._config.telemetryName}/Speed', self.getSpeed())
-    telemetry.log(f'{self._config.telemetryName}/Velocity', self._encoder.getVelocity())
-    telemetry.log(f'{self._config.telemetryName}/Current', self._controller.getOutputCurrent())
+    telemetry.log(f'{self._config.telemetryName}/Velocity', self._encoder.get_velocity().get())
+    telemetry.log(f'{self._config.telemetryName}/Current', self._controller.get_output_current().get())
