@@ -240,6 +240,7 @@ class CatapultModuleConfig(ControlModuleConfigBase):
   homingSpeed: units.percent
   retractSpeed: units.percent
   launchPosition: float
+  positionTolerance: float
 
 @dataclass(frozen=True, slots=True)
 class XboxControllerConfig:

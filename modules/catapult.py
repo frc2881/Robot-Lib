@@ -65,7 +65,7 @@ class CatapultModule:
 
   def retract(self, subsystem: Subsystem) -> Command:
     return (
-      cmd.run(lambda: self._controller.set(-self._config.retractSpeed if not self.isRetracted() else 0), subsystem)
+      cmd.run(lambda: self._controller.set(-self._config.retractSpeed if not self._controller.getReverseSoftLimit().isReached() else 0), subsystem)
     )
 
   def _setSpeed(self, speed: units.percent) -> None:
@@ -75,10 +75,10 @@ class CatapultModule:
     return self._encoder.getVelocity() / self._config.cruiseVelocity
 
   def isAtLaunchPosition(self) -> bool:
-    return utils.isValueWithinTolerance(self._encoder.getPosition(), self._config.launchPosition, 0.05)
+    return utils.isValueWithinTolerance(self._encoder.getPosition(), self._config.launchPosition, self._config.positionTolerance)
 
   def isRetracted(self) -> bool:
-    return utils.isValueWithinTolerance(self._encoder.getPosition(), 0, self._config.allowedProfileError)
+    return utils.isValueWithinTolerance(self._encoder.getPosition(), self._config.softLimitReverse, self._config.positionTolerance)
 
   def setIdleMode(self, idleMode: IdleMode) -> None:
     utils.setIdleMode(self._controller, idleMode)
