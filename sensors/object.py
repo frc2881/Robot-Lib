@@ -2,7 +2,7 @@ from typing import Optional
 import math
 from wpilib import Timer
 from wpimath import units, Translation2d, Rotation2d, Transform2d
-from photonlibpy.photonCamera import PhotonCamera
+from photonlibpy.photon_camera import PhotonCamera
 from .. import logger, telemetry, utils
 from ..classes import ObjectSensorConfig, Objects
 

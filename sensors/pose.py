@@ -1,7 +1,7 @@
 from typing import Optional
-from photonlibpy.photonCamera import PhotonCamera
-from photonlibpy.photonPoseEstimator import PhotonPoseEstimator
-from photonlibpy.estimatedRobotPose import EstimatedRobotPose
+from photonlibpy.photon_camera import PhotonCamera
+from photonlibpy.photon_pose_estimator import PhotonPoseEstimator
+from photonlibpy.estimated_robot_pose import EstimatedRobotPose
 from .. import logger, telemetry, utils
 from ..classes import PoseSensorConfig, PoseSensorResult, PoseSensorResultType
 
@@ -14,10 +14,7 @@ class PoseSensor:
 
     self._photonCamera = PhotonCamera(config.cameraName)
     self._photonCamera.setDriverMode(False)
-    self._photonPoseEstimator = PhotonPoseEstimator(
-      config.aprilTagFieldLayout, 
-      config.transform
-    )
+    self._photonPoseEstimator = PhotonPoseEstimator(config.field, config.transform)
     self._photonCamera.getAllUnreadResults()
 
     telemetry.log(f'{self._config.telemetryName}/{self._config.cameraName}/Stream', config.stream)
@@ -69,7 +66,7 @@ class PoseSensor:
     return self._photonCamera.isConnected()
 
   def hasTarget(self) -> bool:
-    return self._photonCamera._cameraTable.getBoolean("hasTarget", False)
+    return self._photonCamera._cameraTable.get_boolean("hasTarget", False)
   
   def _updateTelemetry(self) -> None:
     telemetry.log(f'{self._config.telemetryName}/{self._config.cameraName}/IsConnected', self.isConnected())

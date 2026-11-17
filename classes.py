@@ -4,6 +4,7 @@ from enum import Enum, IntEnum, auto
 from dataclasses import dataclass
 from wpilib import CANPort
 from wpimath import units, Translation2d, Transform2d, Transform3d, Pose3d
+from robotpy_fields import Field
 from rev import SparkLowLevel, AbsoluteEncoderConfig
 
 class Alliance(IntEnum):
@@ -54,6 +55,11 @@ class Position(Enum):
   LOCKED = auto()
   FORWARD = auto()
   BACKWARD = auto()
+
+class Alignment(Enum):
+  POSE = auto()
+  ROTATION = auto()
+  HEADING = auto()
 
 class MotorDirection(Enum):
   FORWARD = auto()
@@ -279,7 +285,7 @@ class PoseSensorConfig:
   cameraName: str
   transform: Transform3d
   stream: str
-  aprilTagFieldLayout: Any
+  field: Field
   telemetryName: str
 
 class PoseSensorResultType(Enum):
@@ -309,15 +315,20 @@ class Objects:
   count: int
 
 @dataclass(frozen=True, slots=True)
-class HeadingAlignmentConstants:
-  rotationControlPID: PID
-  rotationPositionTolerance: units.degrees
-
-@dataclass(frozen=True, slots=True)
 class PoseAlignmentConstants:
   translationControlPID: PID
   translationMaxVelocity: units.meters_per_second
   translationPositionTolerance: units.meters
   rotationControlPID: PID
   rotationMaxVelocity: units.degrees_per_second
+  rotationPositionTolerance: units.degrees
+
+@dataclass(frozen=True, slots=True)
+class HeadingLockConstants:
+  rotationControlPID: PID
+  rotationPositionTolerance: units.degrees
+
+@dataclass(frozen=True, slots=True)
+class DriftCorrectionConstants:
+  rotationControlPID: PID
   rotationPositionTolerance: units.degrees

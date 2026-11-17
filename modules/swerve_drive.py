@@ -13,8 +13,10 @@ class SwerveDriveModule:
 
     drivingWheelFreeSpeedRps: float = ((config.constants.drivingFreeSpeed / 60) * (config.constants.wheelDiameter * math.pi)) / config.constants.drivingGearReduction
     drivingFeedForwardVelocityGain: float = 12.0 / drivingWheelFreeSpeedRps
-    drivingPositionConversionFactor: float = (config.constants.wheelDiameter * math.pi) / config.constants.drivingGearReduction
-    turningPositionConversionFactor: float = 2 * math.pi
+    
+    self._drivingPositionConversionFactor: float = (config.constants.wheelDiameter * math.pi) / config.constants.drivingGearReduction
+    self._drivingVelocityConversionFactor: float = self._drivingPositionConversionFactor / 60.0
+    self._turningPositionConversionFactor: float = 2 * math.pi
 
     self._drivingController = utils.getSparkController(config.port, config.drivingId, config.constants.drivingControllerType, config.constants.drivingMotorType)
     drivingSparkConfig = SparkBaseConfig()
@@ -68,18 +70,24 @@ class SwerveDriveModule:
     self._updateTelemetry()
 
   def setTargetVelocity(self, targetVelocity: SwerveModuleVelocity) -> None:
-    currentAngle = Rotation2d(self._turningEncoder.get_position().get())
+    currentAngle = Rotation2d(self._turningEncoder.get_position().get() * self._turningPositionConversionFactor)
     targetVelocity.angle += Rotation2d(self._turningOffset)
     targetVelocity.optimize(currentAngle)
     targetVelocity.cosine_scale(currentAngle)
-    self._drivingClosedLoopController.set_setpoint(targetVelocity.velocity, SparkBase.ControlType.VELOCITY)
-    self._turningClosedLoopController.set_setpoint(targetVelocity.angle.radians(), SparkBase.ControlType.POSITION)
+    self._drivingClosedLoopController.set_setpoint(targetVelocity.velocity / self._drivingVelocityConversionFactor, SparkBase.ControlType.VELOCITY)
+    self._turningClosedLoopController.set_setpoint(targetVelocity.angle.radians() / self._turningPositionConversionFactor, SparkBase.ControlType.POSITION)
 
   def getVelocity(self) -> SwerveModuleVelocity:
-    return SwerveModuleVelocity(self._drivingEncoder.get_velocity().get(), Rotation2d(self._turningEncoder.get_position().get() - self._turningOffset))
+    return SwerveModuleVelocity(
+      self._drivingEncoder.get_velocity().get() * self._drivingVelocityConversionFactor, 
+      Rotation2d(self._turningEncoder.get_position().get() * self._turningPositionConversionFactor - self._turningOffset)
+    )
 
   def getPosition(self) -> SwerveModulePosition:
-    return SwerveModulePosition(self._drivingEncoder.get_position().get(), Rotation2d(self._turningEncoder.get_position().get() - self._turningOffset))
+    return SwerveModulePosition(
+      self._drivingEncoder.get_position().get() * self._drivingPositionConversionFactor, 
+      Rotation2d(self._turningEncoder.get_position().get() * self._turningPositionConversionFactor - self._turningOffset)
+    )
 
   def setIdleMode(self, idleMode: IdleMode) -> None:
     utils.setIdleMode(self._drivingController, idleMode)
