@@ -318,9 +318,11 @@ class Objects:
 class PoseAlignmentConstants:
   translationControlPID: PID
   translationMaxVelocity: units.meters_per_second
+  translationMaxAcceleration: units.meters_per_second_squared
   translationPositionTolerance: units.meters
   rotationControlPID: PID
   rotationMaxVelocity: units.degrees_per_second
+  rotationMaxAcceleration: units.degrees_per_second_squared
   rotationPositionTolerance: units.degrees
 
 @dataclass(frozen=True, slots=True)
